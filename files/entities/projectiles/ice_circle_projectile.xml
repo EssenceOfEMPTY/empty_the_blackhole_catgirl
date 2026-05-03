@@ -125,8 +125,8 @@
 
 	<AudioComponent
 		file="data/audio/Desktop/projectiles.bank"
-		event_root="projectiles/icethrower">
-	</AudioComponent>
+		event_root="projectiles/icethrower"
+	></AudioComponent>
 
 	<VariableStorageComponent
 		name="projectile_file"

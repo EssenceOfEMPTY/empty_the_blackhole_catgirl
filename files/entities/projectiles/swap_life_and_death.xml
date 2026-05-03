@@ -8,8 +8,7 @@
 		collide_with_world="0"
 		on_collision_die="0"
 		lifetime="3"
-	>
-	</ProjectileComponent>
+	></ProjectileComponent>
 
 	<LuaComponent
 		_enabled="1"

@@ -1,4 +1,4 @@
-<Entity name="$projectile_default" tags="player_projectile" >
+<Entity name="$projectile_default" tags="projectile" >
 
 	<LifetimeComponent
 		lifetime="300"

@@ -9,7 +9,7 @@ if ( entity ~= NULL_ENTITY ) then
 
 	if ( comp ) then
 		for a, b in ipairs( resists ) do
-			local multipliers = tonumber( ComponentObjectGetValue2( comp, 'damage_multipliers', b ) ) or 2
+			local multipliers = ComponentObjectGetValue2( comp, 'damage_multipliers', b )
 
 			if ( multipliers < 0 ) then
 				multipliers = 2

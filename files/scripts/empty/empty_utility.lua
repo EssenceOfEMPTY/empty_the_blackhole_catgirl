@@ -1,3 +1,4 @@
+--dofile_once( 'data/scripts/lib/utilities.lua' )
 
 empty_path = 'mods/empty_the_blackhole_catgirl/files/'
 p2 = 2 * math.pi
@@ -50,8 +51,19 @@ function loc_print( loc, key )
 	print( '}' )
 end
 
+---显示重要信息
+---@param title string|nil
+---@param desc string|nil
+function imp_print( title, desc )
+	if ( type( title ) == 'string' and type( desc ) == 'string' ) then
+		GamePrintImportant( title, desc )
+	elseif ( type( title ) == 'string' and type( desc ) ~= 'string' ) then
+		GamePrintImportant( title, '' )
+	end
+end
+
 ---发送提示信息
----@param name any
+---@param name string
 ---@param ... any
 function command_print( name, ... )
 	GamePrint( name .. ' : ' .. GameTextGet( ... ) )
@@ -63,7 +75,7 @@ if ( not ModSettingGet( 'empty_the_blackhole_catgirl.COMMAND_FEEDBACK' ) ) then
 	end
 end
 
----返回关于时间的3个数, 主要作为随机种子使用
+---返回关于时间的 3 个数, 主要作为随机种子使用
 ---@return number year_day_min
 ---@return number mon_hour_sec
 ---@return number frame_num
@@ -82,207 +94,24 @@ function time_for_vec3( )
 	return ( year + day + min ), ( mon + hour + sec ), GameGetFrameNum( )
 end
 
----在不更改速度方向的状态下将速度大小变为 speed
----@param vel_x number
----@param vel_y number
----@param speed number
----@return number vel_x
----@return number vel_y
-function change_vel( vel_x, vel_y, speed )
-	if ( vel_x == 0 and vel_y == 0 ) then
-		return 0, 0
+---设置随机数种子, 返回 entity 的位置
+---@param entity number|nil
+---@return number|nil x
+---@return number|nil y
+function r_seed_set( entity )
+	local a, b, c = time_for_vec3( )
+
+	if ( entity and entity ~= NULL_ENTITY ) then
+		local x, y = EntityGetTransform( entity )
+
+		SetRandomSeed( x - a + c, y - b + c )
+
+		return x, y
 	else
-		vel_x, vel_y = vec_normalize( vel_x, vel_y )
+		SetRandomSeed( a - c, b - c )
 
-		return vel_x * speed, vel_y * speed
+		return nil, nil
 	end
-end
-
----将角度 deg 转换为弧度 rad
----@param deg number
----@return number rad
-function deg_to_rad( deg )
-	local rad = math.fmod( deg * math.pi / 180.0, p2 )
-
-	if ( rad > math.pi ) then
-		rad = rad - p2
-	elseif ( rad < -math.pi ) then
-		rad = rad + p2
-	end
-
-	return rad
-end
-
----在不更改速度大小的状态下将速度方向在原基础上逆时针旋转 angle°
----@param vel_x number
----@param vel_y number
----@param angle number
----@return number vel_x
----@return number vel_y
-function rot_vel( vel_x, vel_y, angle )
-	if ( vel_x == 0 and vel_y == 0 ) then
-		return 0, 0
-	else
-		local rad = deg_to_rad( -angle )
-		local sin, cos = math.sin( rad ), math.cos( rad )
-
-		return cos * vel_x - sin * vel_y, sin * vel_x + cos * vel_y
-	end
-end
-
----在不更改速度大小的状态下将速度方向在正右方基础上逆时针旋转 angle°
----@param vel_x number
----@param vel_y number
----@param angle number
----@return number vel_x
----@return number vel_y
-function abs_rot_vel( vel_x, vel_y, angle )
-	if ( vel_x == 0 and vel_y == 0 ) then
-		return 0, 0
-	else
-		local rad, speed = deg_to_rad( -angle ), math.sqrt( vel_x * vel_x + vel_y * vel_y )
-		local sin, cos = math.sin( rad ), math.cos( rad )
-
-		return cos * speed, sin * speed
-	end
-end
-
----获取 NG+ 数
----@return number NG_count
-function get_ng_num( )
-	return tonumber( SessionNumbersGetValue( 'NEW_GAME_PLUS_COUNT' ) ) or 0
-end
-
----获取缩放比例
----@return number
-function get_scale( )
-	return tonumber( MagicNumbersGetValue( 'GUI_HP_MULTIPLIER' ) ) or 0
-end
-
----获取金钱数
----@param entity number
----@return number money
-function get_money( entity )
-	local wallet_comp, money = EntityGetFirstComponent( entity, 'WalletComponent' ), 0
-
-	if ( wallet_comp ) then
-		money = ComponentGetValue2( wallet_comp, 'money' ) or 0
-	end
-
-	return money
-end
-
----移除投射物速度组件的速度上限
----@param projectile number|number[]|nil
-function remove_speed_limit( projectile )
-	if ( type( projectile ) == 'number' ) then
-		projectile = { projectile }
-	end
-
-	for _, proj in ipairs( projectile or { } ) do
-		local v_comps = EntityGetComponent( proj, 'VelocityComponent' ) or { }
-
-		for _, v_comp in ipairs( v_comps or { } ) do
-			if ( v_comp ~= 0 ) then
-				ComponentSetValue2( v_comp, 'terminal_velocity', math.huge )
-				ComponentSetValue2( v_comp, 'apply_terminal_velocity', false )
-				ComponentSetValue2( v_comp, 'limit_to_max_velocity', false )
-			end
-		end
-	end
-end
-
----为 entity 增加类型为 comp_type 的以 comp_table 构建的组件, 返回影响组件的数量; 
----会删除多余的组件
----@param entity number
----@param comp_type string
----@param tag string|nil
----@param comp_table table
----@return number comps_count
-function add_comp_remove_dupli( entity, comp_type, tag, comp_table )
-	local comps, count = nil, 0
-
-	if ( type( tag ) == 'string' ) then
-		comps = EntityGetComponent( entity, comp_type, tag )
-	else
-		comps = EntityGetComponent( entity, comp_type )
-	end
-
-	if ( not comps ) then
-		count = 1
-
-		EntityAddComponent2( entity, comp_type, comp_table )
-	else
-		count = #comps
-
-		for _, comp in ipairs( comps ) do
-			if ( _ == 1 ) then
-				for k, v in pairs( comp_table ) do
-					ComponentSetValue2( comp, k, v )
-				end
-			else
-				EntityRemoveComponent( entity, comp )
-			end
-		end
-	end
-
-	return count
-end
-
----将 entity 所有类型为 comp_type 的组件的值按照 value_table 设置, 返回设置组件的数量
----@param entity number
----@param comp_type string
----@param tag string|nil
----@param value_table table|nil
----@param func function|nil?
----@return integer comps_count
-function set_comp_value( entity, comp_type, tag, value_table, func )
-	local comps = nil
-
-	if ( type( tag ) == 'string' ) then
-		comps = EntityGetComponent( entity, comp_type, tag ) or { }
-	else
-		comps = EntityGetComponent( entity, comp_type ) or { }
-	end
-
-	if ( func ) then
-		for _, comp in ipairs( comps ) do
-			func( comp )
-		end
-	else
-		for _, comp in ipairs( comps ) do
-			for k, v in pairs( value_table or { } ) do
-				if ( type( v ) == 'table' ) then
-					ComponentSetValue2( comp, k, unpack( v ) )
-				else
-					ComponentSetValue2( comp, k, v )
-				end
-			end
-		end
-	end
-
-	return #comps
-end
-
----移除 entity 所有类型为 comp_type 的组件
----@param entity number
----@param comp_type string
----@param tag string|nil?
----@return integer comps_count
-function remove_all_comp( entity, comp_type, tag )
-	local comps = nil
-
-	if ( type( tag ) == 'string' ) then
-		comps = EntityGetComponent( entity, comp_type, tag ) or { }
-	else
-		comps = EntityGetComponent( entity, comp_type ) or { }
-	end
-
-	for _, comp in ipairs( comps ) do
-		EntityRemoveComponent( entity, comp )
-	end
-
-	return #comps
 end
 
 ---返回任意数据的全大写数据类型
@@ -567,6 +396,405 @@ function loc_shuffle( loc )
 	end
 
 	return loc
+end
+
+---检查 search_table 内是否包含 value
+---@param value any
+---@param search_table table|nil
+---@return boolean is_in
+function is_in( value, search_table )
+	if ( type( search_table ) ~= 'table' ) then
+		return false
+	end
+
+	for _, v in ipairs( search_table ) do
+		if ( v == value ) then
+			return true
+		end
+	end
+
+	return false
+end
+
+---在不更改速度方向的状态下将速度大小变为 speed
+---@param vel_x number
+---@param vel_y number
+---@param speed number
+---@return number vel_x
+---@return number vel_y
+function change_vel( vel_x, vel_y, speed )
+	if ( vel_x == 0 and vel_y == 0 ) then
+		return 0, 0
+	else
+		vel_x, vel_y = vec_normalize( vel_x, vel_y )
+
+		return vel_x * speed, vel_y * speed
+	end
+end
+
+---从 (x1, y1) 出发，向 (x2, y2) 方向移动 dis 距离, 返回终点坐标
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@param dis number|nil?
+---@return number
+---@return number
+function move_toward( x1, y1, x2, y2, dis )
+	if ( not dis or dis == 0 ) then
+		return x1, y1
+	else
+		local dx, dy = change_vel( x2 - x1, y2 - y1, dis )
+
+		return x1 + dx, y1 + dy
+	end
+end
+
+---将角度 deg 转换为弧度 rad
+---@param deg number
+---@return number rad
+function deg_to_rad( deg )
+	local rad = math.fmod( deg * math.pi / 180.0, p2 )
+
+	if ( rad > math.pi ) then
+		rad = rad - p2
+	elseif ( rad < -math.pi ) then
+		rad = rad + p2
+	end
+
+	return rad
+end
+
+---在不更改速度大小的状态下将速度方向在原基础上逆时针旋转 angle°
+---@param vel_x number
+---@param vel_y number
+---@param angle number
+---@return number vel_x
+---@return number vel_y
+function rot_vel( vel_x, vel_y, angle )
+	if ( vel_x == 0 and vel_y == 0 ) then
+		return 0, 0
+	else
+		local rad = deg_to_rad( -angle )
+		local sin, cos = math.sin( rad ), math.cos( rad )
+
+		return cos * vel_x - sin * vel_y, sin * vel_x + cos * vel_y
+	end
+end
+
+---在不更改速度大小的状态下将速度方向在正右方基础上逆时针旋转 angle°
+---@param vel_x number
+---@param vel_y number
+---@param angle number
+---@return number vel_x
+---@return number vel_y
+function abs_rot_vel( vel_x, vel_y, angle )
+	if ( vel_x == 0 and vel_y == 0 ) then
+		return 0, 0
+	else
+		local rad, speed = deg_to_rad( -angle ), math.sqrt( vel_x * vel_x + vel_y * vel_y )
+		local sin, cos = math.sin( rad ), math.cos( rad )
+
+		return cos * speed, sin * speed
+	end
+end
+
+---获取 NG+ 数
+---@return number NG_count
+function get_ng_num( )
+	return tonumber( SessionNumbersGetValue( 'NEW_GAME_PLUS_COUNT' ) ) or 0
+end
+
+---获取缩放比例
+---@return number
+function get_scale( )
+	return tonumber( MagicNumbersGetValue( 'GUI_HP_MULTIPLIER' ) ) or 0
+end
+
+---判断实体是否为玩家
+---@param entity number
+---@return boolean
+function is_player( entity )
+	return entity ~= NULL_ENTITY and ( EntityHasTag( entity, 'player_unit' ) or EntityHasTag( entity, 'polymorphed_player' ) )
+end
+
+---获取金钱数
+---@param entity number
+---@return number money
+function get_money( entity )
+	local wallet_comp, money = EntityGetFirstComponent( entity, 'WalletComponent' ), 0
+
+	if ( wallet_comp ) then
+		money = ComponentGetValue2( wallet_comp, 'money' ) or 0
+	end
+
+	return money
+end
+
+---移除投射物速度组件的速度上限
+---@param projectile number|number[]|nil
+function remove_speed_limit( projectile )
+	if ( type( projectile ) == 'number' ) then
+		projectile = { projectile }
+	end
+
+	for _, proj in ipairs( projectile or { } ) do
+		local v_comps = EntityGetComponent( proj, 'VelocityComponent' ) or { }
+
+		for _, v_comp in ipairs( v_comps or { } ) do
+			if ( v_comp ~= 0 ) then
+				ComponentSetValue2( v_comp, 'terminal_velocity', math.huge )
+				ComponentSetValue2( v_comp, 'apply_terminal_velocity', false )
+				ComponentSetValue2( v_comp, 'limit_to_max_velocity', false )
+			end
+		end
+	end
+end
+
+---获取 comp 组件所在的根实体
+---@param comp any
+---@return number
+function comp_get_entity( comp )
+	return EntityGetRootEntity( ComponentGetEntity( comp ) )
+end
+
+---获取每个 entity 实体类型为 comp_type 的组件
+---@param entity number|number[]
+---@param comp_type string
+---@param tag string|nil
+---@return number[] comps
+function get_all_comp( entity, comp_type, tag )
+	local comps = { }
+
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+
+	if ( type( tag ) == 'string' ) then
+		for _, e in ipairs( entity ) do
+			add_table( comps, EntityGetComponent( e, comp_type, tag ) or { } )
+		end
+	else
+		for _, e in ipairs( entity ) do
+			add_table( comps, EntityGetComponent( e, comp_type ) or { } )
+		end
+	end
+
+	return comps
+end
+
+---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件; 
+---当元素为字符串时，增量为 comp_table[ 元素 ] ; 
+---当元素为 { key, inc } 表时，增量为 inc ; 
+---会删除多余的组件, 返回影响组件的总数、操作方法以及受影响后仍存在的组件表
+---@param entity number|number[]
+---@param comp_type string
+---@param tag string|nil
+---@param comp_table table
+---@param prolong_table (string|{[1]:string,[2]:number})[]|nil?
+---@return number comps_count
+---@return string method
+---@return table affect_comps
+function add_comp_prolong( entity, comp_type, tag, comp_table, prolong_table )
+	local count, method = 0, ''
+
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+
+	local comps = get_all_comp( entity, comp_type, tag )
+
+	if ( #comps == 0 ) then
+		method, comps = 'add', { }
+
+		for _, e in ipairs( entity ) do
+			local comp = EntityAddComponent2( e, comp_type, comp_table )
+
+			table.insert( comps, comp )
+		end
+
+		count = #comps
+	else
+		method, count = 'prolong', #comps
+		local op_comps, oped_entity = { }, { }
+
+		add_table( op_comps, comps, false, true )
+
+		for _, comp in ipairs( op_comps ) do
+			local op_entity = comp_get_entity( comp )
+
+			if ( is_in( op_entity, oped_entity ) ) then
+				EntityRemoveComponent( op_entity, comp )
+			else
+				table.insert( oped_entity, op_entity )
+
+				for i, k in ipairs( prolong_table or { } ) do
+					if ( type( k ) == 'table' and type( k[ 1 ] ) == 'string' and type( k[ 2 ] ) == 'number' ) then
+						local value = ComponentGetValue2( comp, k[ 1 ] )
+						ComponentSetValue2( comp, k[ 1 ], value + k[ 2 ] )
+					elseif ( type( k ) == 'string' and type( comp_table[ k ] ) == 'number' ) then
+						local value = ComponentGetValue2( comp, k )
+						ComponentSetValue2( comp, k, value + comp_table[ k ] )
+					end
+				end
+
+				table.insert( comps, comp )
+			end
+		end
+	end
+
+	return count, method, comps
+end
+
+---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件; 
+---会删除多余的组件, 返回影响组件的总数、操作方法以及受影响后仍存在的组件表
+---@param entity number|number[]
+---@param comp_type string
+---@param tag string|nil
+---@param comp_table table
+---@return number comps_count
+---@return string method
+---@return table affect_comps
+function add_comp_remove_dupli( entity, comp_type, tag, comp_table )
+	local count, method = 0, ''
+
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+
+	local comps = get_all_comp( entity, comp_type, tag )
+
+	if ( #comps == 0 ) then
+		method, comps = 'add', { }
+
+		for _, e in ipairs( entity ) do
+			local comp = EntityAddComponent2( e, comp_type, comp_table )
+
+			table.insert( comps, comp )
+		end
+
+		count = #comps
+	else
+		method, count = 'change', #comps
+		local op_comps, oped_entity = { }, { }
+
+		add_table( op_comps, comps, false, true )
+
+		for _, comp in ipairs( op_comps ) do
+			local op_entity = comp_get_entity( comp )
+
+			if ( is_in( op_entity, oped_entity ) ) then
+				EntityRemoveComponent( op_entity, comp )
+			else
+				table.insert( oped_entity, op_entity )
+
+				for k, v in pairs( comp_table ) do
+					ComponentSetValue2( comp, k, v )
+				end
+
+				table.insert( comps, comp )
+			end
+		end
+	end
+
+	return count, method, comps
+end
+
+---将每个 entity 实体所有类型为 comp_type 的组件的值按照 value_table 设置; 
+---或在传入 func 时对每个类型为 comp_type 的组件执行一次 func ; 
+---返回影响组件的总数以及受影响的组件表
+---@param entity number|number[]
+---@param comp_type string
+---@param tag string|nil
+---@param value_table table|nil
+---@param func function|nil?
+---@return number comps_count
+---@return table affect_comps
+function set_comp_value( entity, comp_type, tag, value_table, func )
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+
+	local comps = get_all_comp( entity, comp_type, tag )
+
+	if ( func ) then
+		for _, comp in ipairs( comps ) do
+			func( comp )
+		end
+	else
+		for _, comp in ipairs( comps ) do
+			for k, v in pairs( value_table or { } ) do
+				if ( type( v ) == 'table' ) then
+					ComponentSetValue2( comp, k, unpack( v ) )
+				else
+					ComponentSetValue2( comp, k, v )
+				end
+			end
+		end
+	end
+
+	return #comps, comps
+end
+
+---移除每个 entity 实体所有类型为 comp_type 的组件; 
+---返回影响组件的总数
+---@param entity number|number[]
+---@param comp_type string
+---@param tag string|nil?
+---@return number comps_count
+function remove_all_comp( entity, comp_type, tag )
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+
+	local comps = get_all_comp( entity, comp_type, tag )
+
+	for _, comp in ipairs( comps ) do
+		EntityRemoveComponent( EntityGetRootEntity( ComponentGetEntity( comp ) ), comp )
+	end
+
+	return #comps
+end
+
+---返回每个 entity 实体上的所有子实体
+---@param entity number|number[]
+---@param tag string|nil
+---@return number[] childs
+function get_all_child( entity, tag )
+	local childs = { }
+
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+
+	if ( type( tag ) == 'string' ) then
+		for _, e in ipairs( entity ) do
+			add_table( childs, EntityGetAllChildren( e, tag ) or { } )
+		end
+	else
+		for _, e in ipairs( entity ) do
+			add_table( childs, EntityGetAllChildren( e ) or { } )
+		end
+	end
+
+	return childs
+end
+
+---移除每个 entity 实体上的所有子实体; 
+---返回影响子实体的总数
+---@param entity number|number[]
+---@param tag string|nil
+---@return number child_count
+function remove_all_child( entity, tag )
+	local childs = get_all_child( entity, tag )
+
+	for _, child in ipairs( childs or { } ) do
+		EntityRemoveFromParent( child )
+
+		EntityKill( child )
+	end
+
+	return #childs
 end
 
 ---检查 str 是否表示 16 进制数

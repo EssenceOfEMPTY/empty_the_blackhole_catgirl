@@ -847,7 +847,7 @@ local new_perks =
 					script_source_file = empty_path .. 'scripts/perks/curse_illiterate.lua',
 				}
 			)
-			local content_need_obfuscate = backup_common_csv()
+			local content_need_obfuscate = backup_common_csv( )
 			obfuscate_common_csv( content_need_obfuscate )
 		end,
 		func_remove = function( entity_who_picked ) --[[
@@ -863,7 +863,7 @@ local new_perks =
 					EntityRemoveComponent( entity_who_picked, each )
 				end
 			end
-			reset_common_csv()
+			reset_common_csv( )
 		end,
 	},]]--
 	{
@@ -876,8 +876,8 @@ local new_perks =
 				melee = 0.5,
 				projectile = 0.5,
 				explosion = 0.5,
-				electricity = 0.5,
 				fire = 0.5,
+				electricity = 0.5,
 				drill = 0.5,
 				slice = 0.5,
 				ice = 0.5,
@@ -893,7 +893,7 @@ local new_perks =
 				damageMultipliers.curse = 0.5 * damageMultipliers.curse
 			end
 
-			if ( EntityHasTag( entity_who_picked, 'player_unit' ) or EntityHasTag( entity_who_picked, 'polymorphed_player' ) ) then
+			if ( is_player( entity_who_picked ) ) then
 				GlobalsSetValue( 'EMPTY_CURSE_MONK', '1' )
 
 				local comp = {
@@ -920,9 +920,11 @@ local new_perks =
 					end
 
 					perk_pickup( nil, player, 'GOLD_IS_FOREVER', false, false, true )
+
 					for _ = 1, 5 do
 						perk_pickup( nil, player, 'ATTRACT_ITEMS', false, false, true )
 					end
+
 					perk_pickup( nil, player, 'EMPTY_PERCENTAGE_OFF', false, false, true )
 				end
 			else
@@ -941,8 +943,8 @@ local new_perks =
 				melee = 0.5,
 				projectile = 0.5,
 				explosion = 0.5,
-				electricity = 0.5,
 				fire = 0.5,
+				electricity = 0.5,
 				drill = 0.5,
 				slice = 0.5,
 				ice = 0.5,
@@ -958,7 +960,7 @@ local new_perks =
 				damageMultipliers.curse = 0.5 * damageMultipliers.curse
 			end
 
-			if ( EntityHasTag( entity_who_picked, 'player_unit' ) or EntityHasTag( entity_who_picked, 'polymorphed_player' ) ) then
+			if ( is_player( entity_who_picked ) ) then
 				GlobalsSetValue( 'EMPTY_CURSE_MONK', '0' )
 
 				local tags_to_remove = {
@@ -1101,39 +1103,56 @@ local new_perks =
 		usable_by_enemies = true,
 		not_in_default_perk_pool = true,
 		func = function( entity_perk_empty_item, entity_who_picked, item_name )
-			if ( EntityHasTag( entity_who_picked, 'player_unit' ) or EntityHasTag( entity_who_picked, 'polymorphed_player' ) ) then
+			local curse = 'CURSE_MALICE_WASHES_OVER'
+
+			if ( is_player( entity_who_picked ) ) then
 				local players = EntityGetWithTag( 'player_unit' ) or { }
 				local poly_players = EntityGetWithTag( 'polymorphed_player' ) or { }
 
 				add_table( players, poly_players, false, true )
 
 				for _, player in ipairs( players ) do
-					EntityAddComponent2( player, 'LuaComponent', {
-						script_source_file = empty_path .. 'scripts/perks/curse_malice_washes_over_delay.lua',
-						execute_every_n_frame = 300,
-						remove_after_executed = true,
-					} )
+					if ( EntityGetIsAlive( player ) ) then
+						local x, y = EntityGetTransform( player )
+
+						add_comp_remove_dupli( player, 'VariableStorageComponent', curse, {
+							_tags = curse,
+							value_float = x,
+							value_string = tostring( y ),
+						} )
+
+						add_comp_remove_dupli( player, 'LuaComponent', curse, {
+							_tags = curse,
+							script_source_file = empty_path .. 'scripts/perks/curse_malice_washes_over_delay.lua',
+							execute_every_n_frame = 180,
+							remove_after_executed = true,
+						} )
+					end
 				end
 			else
-				EntityAddComponent2( entity_who_picked, 'LuaComponent', {
+				local x, y = EntityGetTransform( entity_who_picked )
+
+				add_comp_remove_dupli( entity_who_picked, 'VariableStorageComponent', curse, {
+					_tags = curse,
+					value_float = x,
+					value_string = tostring( y ),
+				} )
+
+				add_comp_remove_dupli( entity_who_picked, 'LuaComponent', curse, {
+					_tags = curse,
 					script_source_file = empty_path .. 'scripts/perks/curse_malice_washes_over_delay.lua',
-					execute_every_n_frame = 300,
+					execute_every_n_frame = 180,
 					remove_after_executed = true,
 				} )
 			end
 		end,
 		func_remove = function( entity_who_picked )
-			local effect_comps = EntityGetComponent( entity_who_picked, 'GameEffectComponent' )
-			if ( effect_comps ) then
-				for _, effect_comp in ipairs( effect_comps ) do
-					local effect = ComponentGetValue2( effect_comp, 'effect' )
-					local custom_effect_id = ComponentGetValue2( effect_comp, 'custom_effect_id' )
-					if ( effect == 'CUSTOM' and custom_effect_id == 'CURSE_CLOUD_02' ) then
-						EntityRemoveComponent( entity_who_picked, effect_comp )
-						break
-					end
-				end
-			end
+			local curse = 'CURSE_MALICE_WASHES_OVER'
+
+			remove_all_comp( entity_who_picked, 'VariableStorageComponent', curse )
+			remove_all_comp( entity_who_picked, 'LuaComponent', curse )
+
+			remove_all_child( entity_who_picked, curse )
 		end,
 	},
 	{
@@ -1143,7 +1162,7 @@ local new_perks =
 		not_in_default_perk_pool = true,
 		func = function( entity_perk_empty_item, entity_who_picked, item_name )
 			local x, y = EntityGetTransform( entity_who_picked )
-			local a, b, c = time_for_vec3()
+			local a, b, c = time_for_vec3( )
 
 			fungal_shift( entity_who_picked, x + a + c, y + b + c, true )
 			fungal_shift( entity_who_picked, x + a + c, y + b - c, true )
@@ -1171,8 +1190,8 @@ local new_perks =
 				melee = 4.0,
 				projectile = 4.0,
 				explosion = 4.0,
-				electricity = 4.0,
 				fire = 4.0,
+				electricity = 4.0,
 				drill = 4.0,
 				slice = 4.0,
 				ice = 4.0,
@@ -1188,7 +1207,7 @@ local new_perks =
 				damageMultipliers.curse = 0.5 * damageMultipliers.curse
 			end
 
-			if ( EntityHasTag( entity_who_picked, 'player_unit' ) or EntityHasTag( entity_who_picked, 'polymorphed_player' ) ) then
+			if ( is_player( entity_who_picked ) ) then
 				GlobalsSetValue( 'EMPTY_CURSE_GUARANTEED_LOSE', '1' )
 
 				local players = EntityGetWithTag( 'player_unit' ) or { }
@@ -1223,7 +1242,7 @@ local new_perks =
 			end
 		end,
 		func_remove = function( entity_who_picked )
-			if ( EntityHasTag( entity_who_picked, 'player_unit' ) or EntityHasTag( entity_who_picked, 'polymorphed_player' ) ) then
+			if ( is_player( entity_who_picked ) ) then
 				GlobalsSetValue( 'EMPTY_CURSE_GUARANTEED_LOSE', '0' )
 			end
 
@@ -1232,8 +1251,8 @@ local new_perks =
 				melee = 4.0,
 				projectile = 4.0,
 				explosion = 4.0,
-				electricity = 4.0,
 				fire = 4.0,
+				electricity = 4.0,
 				drill = 4.0,
 				slice = 4.0,
 				ice = 4.0,
@@ -1272,7 +1291,7 @@ local new_perks =
 				fly_velocity_x = 0,
 			}, nil )
 
-			if ( EntityHasTag( entity_who_picked, 'player_unit' ) or EntityHasTag( entity_who_picked, 'polymorphed_player' ) ) then
+			if ( is_player( entity_who_picked ) ) then
 				local x, y = EntityGetTransform( entity_who_picked )
 
 				CreateItemActionEntity( 'HOOK', x, y )
@@ -1338,9 +1357,25 @@ local new_perks =
 				set_comp_value( entity_who_picked, 'CharacterPlatformingComponent', nil, {
 					pixel_gravity = values.pixel_gravity * 1.2,
 					run_velocity = values.run_velocity / 1.2,
-					fly_velocity_x = values.fly_velocity_x * 1.2,
+					fly_velocity_x = values.fly_velocity_x / 1.2,
 				}, nil )
 			end
+		end,
+	},
+	{
+		info = 'curse_furious_cocktail',
+		stackable = STACKABLE_NO,
+		usable_by_enemies = true,
+		not_in_default_perk_pool = true,
+		func = function ( entity_perk_empty_item, entity_who_picked, item_name )
+			add_comp_remove_dupli( entity_who_picked, 'LuaComponent', 'CURSE_FURIOUS_COCKTAIL', {
+				_tags = 'CURSE_FURIOUS_COCKTAIL',
+				script_source_file = empty_path .. 'scripts/perks/curse_furious_cocktail.lua',
+				execute_every_n_frame = 540,
+			} )
+		end,
+		func_remove = function ( entity_who_picked )
+			remove_all_comp( entity_who_picked, 'LuaComponent', 'CURSE_FURIOUS_COCKTAIL' )
 		end,
 	},
 }

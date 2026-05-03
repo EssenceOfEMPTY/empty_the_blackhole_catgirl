@@ -2,7 +2,7 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 测试用代码 >>>>>>>>>>>>>>>>>>>>>>>>---
 
-info_print( spawn_material_checker )
+--
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 翻译 >>>>>>>>>>>>>>>>>>>>>>>>---
 
@@ -15,6 +15,8 @@ else
 	add_str = '\n' .. ModTextFileGetContent( empty_path .. 'translations/empty_translation.csv' )
 end
 
+---<<<<<<<<<<<<<<<<<<<<<<<< 设置: 伊芙琳娜翻译 >>>>>>>>>>>>>>>>>>>>>>>>---
+
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.SVAROG_TRANSLATION' ) ) then
 	add_str = add_str .. '\n' .. ModTextFileGetContent( empty_path .. 'translations/yifulinna_translation.csv' )
 end
@@ -23,19 +25,28 @@ translation = translation .. add_str
 
 ModTextFileSetContent( 'data/translations/common.csv', translation )
 
----<<<<<<<<<<<<<<<<<<<<<<<< 魔数 >>>>>>>>>>>>>>>>>>>>>>>>---
+---<<<<<<<<<<<<<<<<<<<<<<<< 通用魔数 >>>>>>>>>>>>>>>>>>>>>>>>---
 
 ModMagicNumbersFileAdd( empty_path .. 'magic_numbers/default.xml' )
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.NO_KUMMITUS' ) ) then
-	ModMagicNumbersFileAdd( empty_path .. 'magic_numbers/no_kummitus.xml' )
+---<<<<<<<<<<<<<<<<<<<<<<<< 设置: 再无幻影 / 移除闪屏 / 视野提升 - 魔数 / 四通八达 >>>>>>>>>>>>>>>>>>>>>>>>---
+
+local magics = {
+	'NO_KUMMITUS',
+	'REMOVE_LOW_HP_FLASH',
+	'VISION_IMPROVE',
+	'CHAOS_CONNECTED_WORLD',
+}
+
+for _, magic in ipairs( magics ) do
+	if ( ModSettingGet( 'empty_the_blackhole_catgirl.' .. magic ) ) then
+		ModMagicNumbersFileAdd( empty_path .. 'magic_numbers/' .. string.lower( magic ) .. '.xml' )
+	end
 end
 
----<<<<<<<<<<<<<<<<<<<<<<<< 设置: 视野提升 >>>>>>>>>>>>>>>>>>>>>>>>---
+---<<<<<<<<<<<<<<<<<<<<<<<< 设置: 视野提升 - 渲染范围 >>>>>>>>>>>>>>>>>>>>>>>>---
 
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.VISION_IMPROVE' ) ) then
-	ModMagicNumbersFileAdd( empty_path .. 'magic_numbers/zoom.xml' )
-
 	local post_final = {
 		'shaders/post_final.frag',
 		'shaders/post_final.vert',
@@ -46,7 +57,7 @@ if ( ModSettingGet( 'empty_the_blackhole_catgirl.VISION_IMPROVE' ) ) then
 	end
 end
 
----<<<<<<<<<<<<<<<<<<<<<<<< 生物群系追加 >>>>>>>>>>>>>>>>>>>>>>>>---
+---<<<<<<<<<<<<<<<<<<<<<<<< 生物群系通用追加 >>>>>>>>>>>>>>>>>>>>>>>>---
 
 local biomes_append = {
 	'alchemist_secret',
@@ -124,6 +135,7 @@ function OnPlayerSpawned( player )
 			'CURSE_GUARANTEED_LOSE',
 			'CURSE_GRAVITY_FREE',
 			'CURSE_DEATH_TRAIL',
+			--'CURSE_FURIOUS_COCKTAIL',
 		}
 
 		for _, curse in ipairs( all_curses ) do

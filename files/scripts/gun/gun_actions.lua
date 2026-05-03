@@ -7192,7 +7192,7 @@ add_table( actions, new_actions, false, false )
 local template, need_replace = { }, false
 
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.UNLOCK_ALL_SPELL' ) ) then
-	template.spawn_requires_flag = nil
+	template.spawn_requires_flag = '<nil>'
 
 	need_replace = true
 end
@@ -7204,9 +7204,8 @@ if ( ModSettingGet( 'empty_the_blackhole_catgirl.SPELL_ALL_EQUAL' ) ) then
 	need_replace = true
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.UNLIMITED_SPELLS' ) ) then
-	template.max_uses = nil
-	template.never_unlimited = nil
+if ( ModSettingGet( 'empty_the_blackhole_catgirl.TRUE_POWER_OF_UNLIMITED_SPELLS' ) ) then
+	template.never_unlimited = '<nil>'
 
 	need_replace = true
 end
@@ -7214,7 +7213,11 @@ end
 if ( need_replace ) then
 	for _, action in ipairs( actions or { } ) do
 		for key, value in pairs( template ) do
-			action[ key ] = value
+			if ( value == '<nil>' ) then
+				action[ key ] = nil
+			else
+				action[ key ] = value
+			end
 		end
 	end
 end

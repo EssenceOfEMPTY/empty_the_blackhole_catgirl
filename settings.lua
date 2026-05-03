@@ -142,11 +142,11 @@ if ( language:find( '中文' ) or language:find( '汉化' ) ) then
 			_folded = true,
 			settings = {
 				{
-					id = 'UNLIMITED_SPELLS',
+					id = 'TRUE_POWER_OF_UNLIMITED_SPELLS',
 					ui_name = '[ 无限法术 ] 力量解放',
 					ui_description =
 						'令 [ 无限法术 ] 天赋对此模组、位于此模组加载前加载的模组\n'
-						.. b1 .. '以及原版 Noita 中包含的所有法术均生效',
+						.. '以及原版 Noita 中包含的所有法术均生效',
 					value_default = false,
 					scope = MOD_SETTING_SCOPE_NEW_GAME,
 				},
@@ -263,14 +263,45 @@ if ( language:find( '中文' ) or language:find( '汉化' ) ) then
 					ui_description = '新游戏开始时, 你获得 [ 诅咒: 死亡轨迹 ]',
 					value_default = false,
 					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},--[[
+				{
+					id = 'CURSE_FURIOUS_COCKTAIL',
+					ui_name = '狂乱的鸡尾酒',
+					ui_description = '新游戏开始时, 你获得 [ 诅咒: 狂乱的鸡尾酒 ]',
+					value_default = false,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},]]--
+			},
+		},
+		{
+			category_id = 'SETTINGS_VISIONS',
+			ui_name = '视觉设置',
+			foldable = true,
+			_folded = true,
+			settings = {
+				{
+					id = 'VISION_IMPROVE',
+					ui_name = '视野提升',
+					ui_description = '150% 视野宽高',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'REMOVE_LOW_HP_FLASH',
+					ui_name = '移除闪屏',
+					ui_description = '低生命值时不再闪烁屏幕警告',
+					value_default = false,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
 				},
 			},
 		},
 		{
-			id = 'VISION_IMPROVE',
-			ui_name = '视野提升',
-			ui_description = '150% 视野宽高',
-			value_default = true,
+			id = 'CHAOS_CONNECTED_WORLD',
+			ui_name = '四通八达',
+			ui_description =
+				'令各生物群系之间增加数量繁多的通路\n'
+				.. '代价是区域混乱不堪',
+			value_default = false,
 			scope = MOD_SETTING_SCOPE_NEW_GAME,
 		},
 		{
@@ -396,16 +427,16 @@ else
 		},
 		{
 			category_id = 'SETTINGS_PERKS',
-			ui_name = 'Settings about perks',
+			ui_name = 'Settings about Perks',
 			foldable = true,
 			_folded = true,
 			settings = {
 				{
-					id = 'UNLIMITED_SPELLS',
+					id = 'TRUE_POWER_OF_UNLIMITED_SPELLS',
 					ui_name = 'True Power of [ Unlimited Spells ]',
 					ui_description =
 						'Make [ Unlimited Spells ] perk effective for all spells in this mod,\n'
-						.. b1 .. 'mods loaded before this mod, and vanilla Noita',
+						.. 'mods loaded before this mod, and vanilla Noita',
 					value_default = false,
 					scope = MOD_SETTING_SCOPE_NEW_GAME,
 				},
@@ -413,7 +444,7 @@ else
 		},
 		{
 			category_id = 'SETTINGS_SPELLS',
-			ui_name = 'Settings about spells',
+			ui_name = 'Settings about Spells',
 			foldable = true,
 			_folded = true,
 			settings = {
@@ -435,7 +466,7 @@ else
 		},
 		{
 			category_id = 'SETTINGS_ENEMIES',
-			ui_name = 'Settings about enemies',
+			ui_name = 'Settings about Enemies',
 			foldable = true,
 			_folded = true,
 			settings = {
@@ -522,15 +553,46 @@ else
 					ui_description = 'At beginning of new round of game, you get [ Curse: Death Trail ]',
 					value_default = false,
 					scope = MOD_SETTING_SCOPE_NEW_GAME,
-				},
+				},--[[
+				{
+					id = 'CURSE_FURIOUS_COCKTAIL',
+					ui_name = 'Furious Cocktail',
+					ui_description = 'At beginning of new round of game, you get [ Curse: Furious Cocktail ]',
+					value_default = false,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},]]--
 			},
 		},
 		{
-			id = 'VISION_IMPROVE',
-			ui_name = 'Vision Improve',
-			ui_description = '150% vision width and height',
-			value_default = true,
+			id = 'CHAOS_CONNECTED_WORLD',
+			ui_name = 'Thoroughfare',
+			ui_description =
+				'Adds numerous passages between biomes\n'
+				.. 'but making area chaotic',
+			value_default = false,
 			scope = MOD_SETTING_SCOPE_NEW_GAME,
+		},
+		{
+			category_id = 'SETTINGS_VISIONS',
+			ui_name = 'Settings about Visions',
+			foldable = true,
+			_folded = true,
+			settings = {
+				{
+					id = 'VISION_IMPROVE',
+					ui_name = 'Vision Improve',
+					ui_description = '150% vision width and height',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'REMOVE_LOW_HP_FLASH',
+					ui_name = 'Remove Screen Flash',
+					ui_description = 'No longer flash screen warning when at low health',
+					value_default = false,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+			},
 		},
 		{
 			id = 'COMMAND_FEEDBACK',

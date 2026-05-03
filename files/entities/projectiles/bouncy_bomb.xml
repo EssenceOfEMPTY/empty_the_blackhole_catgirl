@@ -176,8 +176,8 @@
 	<AudioLoopComponent
 		file="data/audio/Desktop/projectiles.bank"
 		event_name="projectiles/fuse_burn_slow"
-		auto_play="1">
-	</AudioLoopComponent>
+		auto_play="1"
+	></AudioLoopComponent>
 
 	<VariableStorageComponent
 		name="projectile_file"
