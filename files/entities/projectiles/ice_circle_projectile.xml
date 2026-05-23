@@ -4,6 +4,7 @@
 
 		<VelocityComponent
  			gravity_y="0"
+			air_friction="0"
 			mass="0.5"
 		></VelocityComponent>
 
@@ -11,8 +12,8 @@
 
 	<ProjectileComponent
 		_enabled="1"
-		speed_min="50"
-		speed_max="50"
+		speed_min="500"
+		speed_max="500"
 		die_on_low_velocity="0"
 		on_death_explode="1"
 		on_death_gfx_leave_sprite="0"

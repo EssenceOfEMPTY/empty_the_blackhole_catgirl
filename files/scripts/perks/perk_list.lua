@@ -442,10 +442,11 @@ local new_perks =
 				script_shot = empty_path .. 'scripts/perks/protection_teleport.lua',
 			} )
 
-			add_comp_remove_dupli( entity_who_picked, 'GameEffectComponent', 'protection_teleport', {
-				effect = 'PROTECTION_DURING_TELEPORT',
-				frames = -1,
-			} )
+			--LoadGameEffectEntityTo( entity_who_picked,  )
+			--add_comp_remove_dupli( entity_who_picked, 'GameEffectComponent', 'protection_teleport', {
+			--	effect = 'PROTECTION_DURING_TELEPORT',
+			--	frames = -1,
+			--} )
 		end,
 		func_remove = function( entity_who_picked )
 			EntityAddTag( entity_who_picked, 'teleportable' )
@@ -453,7 +454,8 @@ local new_perks =
 			EntityRemoveTag( entity_who_picked, 'no_swap' )
 
 			remove_all_comp( entity_who_picked, 'LuaComponent', 'empty_protection_teleport' )
-			remove_all_comp( entity_who_picked, 'LuaComponent', 'empty_protection_teleport' )
+
+			-- TODO: 移除 GameEffect
 		end,
 	},
 	{
@@ -521,37 +523,7 @@ local new_perks =
 				end
 			end
 		end,
-	}, --[[
-	{
-		info = 'protection_curse',
-		stackable = STACKABLE_NO,
-		usable_by_enemies = true,
-		func = function( entity_perk_empty_item, entity_who_picked, item_name )
-			local targetMaterials = { 'rock_static_cursed', 'rock_static_cursed_green', 'cursed_liquid' }
-			for materialCount = 1, #targetMaterials do
-				EntitySetDamageFromMaterial( entity_who_picked, targetMaterials[ materialCount ], 0 )
-			end
-			local damagemodels = EntityGetComponent( entity_who_picked, 'DamageModelComponent' )
-			if ( damagemodels ) then
-				for _, damagemodel in ipairs( damagemodels ) do
-					ComponentObjectSetValue2( damagemodel, 'damage_multipliers', 'curse', 0 )
-				end
-			end
-		end,
-		func_remove = function( entity_who_picked )
-			local targetMaterials = { 'rock_static_cursed', 'rock_static_cursed_green', 'cursed_liquid' }
-			local defaultDamage = { 0.005, 0.004, 0.0005 }
-			for materialCount = 1, #targetMaterials do
-				EntitySetDamageFromMaterial( entity_who_picked, targetMaterials[ materialCount ], defaultDamage[ materialCount ] )
-			end
-			local damagemodels = EntityGetComponent( entity_who_picked, 'DamageModelComponent' )
-			if ( damagemodels ) then
-				for _, damagemodel in ipairs( damagemodels ) do
-					ComponentObjectSetValue2( damagemodel, 'damage_multipliers', 'curse', 1 )
-				end
-			end
-		end,
-	}, ]]--
+	},
 	{
 		info = 'protection_touch_magic',
 		stackable = STACKABLE_NO,
@@ -630,7 +602,7 @@ local new_perks =
 			EntityAddTag( entity_who_picked, 'drillable' )
 
 			local damagemodels = EntityGetComponent( entity_who_picked, 'DamageModelComponent' )
-			local damageMultipliers = {
+			local d_muls = {
 				melee = 0.5,
 				projectile = 0.5,
 				explosion = 0.5,
@@ -647,7 +619,7 @@ local new_perks =
 			}
 
 			for _, damagemodel in ipairs( damagemodels or { } ) do
-				for damageType, multiplier in pairs( damageMultipliers ) do
+				for damageType, multiplier in pairs( d_muls ) do
 					local currentMultiplier = tonumber( ComponentObjectGetValue2( damagemodel, 'damage_multipliers', damageType ) ) or 1.0
 					ComponentObjectSetValue2( damagemodel, 'damage_multipliers', damageType, currentMultiplier * multiplier )
 				end
@@ -657,7 +629,7 @@ local new_perks =
 			EntityRemoveTag( entity_who_picked, 'drillable' )
 
 			local damagemodels = EntityGetComponent( entity_who_picked, 'DamageModelComponent' )
-			local damageMultipliers = {
+			local d_muls = {
 				melee = 0.5,
 				projectile = 0.5,
 				explosion = 0.5,
@@ -674,7 +646,7 @@ local new_perks =
 			}
 
 			for _, damagemodel in ipairs( damagemodels or { } ) do
-				for damageType, multiplier in pairs( damageMultipliers ) do
+				for damageType, multiplier in pairs( d_muls ) do
 					local currentMultiplier = tonumber( ComponentObjectGetValue2( damagemodel, 'damage_multipliers', damageType ) ) or 1.0
 					ComponentObjectSetValue2( damagemodel, 'damage_multipliers', damageType, currentMultiplier / multiplier )
 				end
@@ -794,6 +766,58 @@ local new_perks =
 			remove_all_comp( entity_who_picked, 'LuaComponent', 'empty_sanctuary_shield_tracker' )
 			remove_all_comp( entity_who_picked, 'VariableStorageComponent', 'empty_sanctuary_shield_data' )
 			remove_all_comp( entity_who_picked, 'VariableStorageComponent', 'empty_sanctuary_shield_position' )
+		end,
+	},
+	{
+		info = 'adjust',
+		stackable = STACKABLE_YES,
+		stackable_maximum = 3,
+		usable_by_enemies = true,
+		func = function( entity_perk_empty_item, entity_who_picked, item_name )
+			local tag = 'empty_adjust'
+
+			if ( is_player( entity_who_picked ) ) then
+				local count = tonumber( GlobalsGetValue( 'EMPTY_ADJUST_COUNT', '0' ) ) + 1
+
+				GlobalsSetValue( 'EMPTY_ADJUST_COUNT', tostring( count ) )
+			end
+
+			if ( not is_has_comp( entity_who_picked, 'VariableStorageComponent', tag, nil ) ) then
+				add_comp_remove_dupli( entity_who_picked, 'VariableStorageComponent', tag, {
+					_tags = tag,
+					value_int = 0,
+				}, nil )
+			end
+
+			if ( not is_has_comp( entity_who_picked, 'LuaComponent', tag, nil ) ) then
+				add_comp_remove_dupli( entity_who_picked, 'LuaComponent', tag, {
+					_tags = tag,
+					script_source_file = empty_path .. 'scripts/perks/adjust_add_frame.lua',
+					execute_every_n_frame = 0,
+				}, nil )
+			end
+
+			if ( not is_has_comp( entity_who_picked, 'ShotEffectComponent', tag, nil ) ) then
+				add_comp_remove_dupli( entity_who_picked, 'ShotEffectComponent', tag, {
+					_tags = tag,
+					extra_modifier = 'empty_adjust',
+				}, nil )
+			end
+		end,
+		func_remove = function( entity_who_picked )
+			local count, tag = 0, 'empty_adjust'
+
+			if ( is_player( entity_who_picked ) ) then
+				count = tonumber( GlobalsGetValue( 'EMPTY_ADJUST_COUNT', '0' ) ) - 1
+
+				GlobalsSetValue( 'EMPTY_ADJUST_COUNT', tostring( math.max( count, 0 ) ) )
+			end
+
+			if ( count < 1 ) then
+				remove_all_comp( entity_who_picked, 'VariableStorageComponent', tag, nil )
+				remove_all_comp( entity_who_picked, 'LuaComponent', tag, nil )
+				remove_all_comp( entity_who_picked, 'ShotEffectComponent', tag, nil )
+			end
 		end,
 	},
 	{

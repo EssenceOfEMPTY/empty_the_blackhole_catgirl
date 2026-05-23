@@ -141,6 +141,7 @@ local lua_append = {
 	'scripts/perks/perk_list',
 	'scripts/gun/gun',
 	'scripts/gun/gun_actions',
+	'scripts/gun/gun_extra_modifiers',
 	'scripts/gun/procedural/gun_procedural',
 	'scripts/gun/procedural/gun_procedural_better',
 }
@@ -153,13 +154,12 @@ end
 
 dofile_once( 'data/scripts/perks/perk.lua' )
 dofile_once( 'data/scripts/perks/perk_utilities.lua' )
---[[
+
 function OnMagicNumbersAndWorldSeedInitialized( )
 	local perks_info = ''
 
 	for i, _ in ipairs( perk_list ) do
-		perks_info = perks_info .. ( [[["%s"] = "%s",%s]]-- ) : format( _.ui_name, _.id, '\n' )
-		--[[
+		perks_info = perks_info .. ( [[["%s"] = "%s",%s]] ) : format( _.ui_name, _.id, '\n' )
 	end
 
 	perks_info = 'return {\n' .. perks_info .. '}'
@@ -167,7 +167,7 @@ function OnMagicNumbersAndWorldSeedInitialized( )
 
 	ModTextFileSetContent( empty_path .. '_virtual/perks_info.lua', perks_info )
 end
-]]--
+
 function OnPlayerSpawned( player )
 	if ( GlobalsGetValue( 'EMPTY_STARTING_CHANGE', '0' ) == '0' ) then
 		GlobalsSetValue( 'EMPTY_STARTING_CHANGE', '1' )

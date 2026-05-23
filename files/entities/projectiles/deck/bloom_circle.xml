@@ -1,10 +1,8 @@
 <Entity tags="projectile" >
 
-	<Base file="data/entities/base_projectile.xml" ></Base>
-
 	<ProjectileComponent
 		_enabled="1"
-		lifetime="5"
+		lifetime="3"
 		damage="0"
 		collide_with_world="0"
 		on_collision_die="0"

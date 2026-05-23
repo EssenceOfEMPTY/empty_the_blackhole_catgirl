@@ -584,6 +584,41 @@ function loc_shuffle( loc )
 	return loc
 end
 
+---获取速度的模
+---@param vel_x number
+---@param vel_y number
+---@return number length
+function get_len( vel_x, vel_y )
+	if ( vel_x == 0 ) then
+		if ( vel_y == 0 ) then
+			return 0
+		else
+			return vel_y
+		end
+	else
+		if ( vel_y == 0 ) then
+			return vel_x
+		else
+			return math.sqrt( vel_x ^ 2 + vel_y ^ 2 )
+		end
+	end
+end
+
+---标准化向量
+---@param vel_x number
+---@param vel_y number
+---@return number vel_x
+---@return number vel_y
+function normalize( vel_x, vel_y )
+	if ( vel_x == 0 and vel_y == 0 ) then
+		return 0, 0
+	else
+		local len = get_len( vel_x, vel_y )
+
+		return vel_x / len, vel_y / len
+	end
+end
+
 ---在不更改速度方向的状态下将速度大小变为 speed
 ---@param vel_x number
 ---@param vel_y number
@@ -594,7 +629,7 @@ function change_vel( vel_x, vel_y, speed )
 	if ( vel_x == 0 and vel_y == 0 ) then
 		return 0, 0
 	else
-		vel_x, vel_y = vec_normalize( vel_x, vel_y )
+		vel_x, vel_y = normalize( vel_x, vel_y )
 
 		return vel_x * speed, vel_y * speed
 	end
@@ -1041,6 +1076,28 @@ function get_comp_obj_info( entity, comp_type, tag, field_table, name )
 	end
 
 	return unpack( values )
+end
+
+---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件
+---@param entity number|number[]
+---@param comp_type string
+---@param comp_table table
+---@return number comps_count
+---@return table affect_comps
+function add_comp( entity, comp_type, comp_table )
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+
+	local comps = { }
+
+	for _, e in ipairs( entity ) do
+		local comp = EntityAddComponent2( e, comp_type, comp_table )
+
+		table.insert( comps, comp )
+	end
+
+	return #comps, comps
 end
 
 ---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件; 
