@@ -8,7 +8,7 @@ local cur_hp, max_hp = get_comp_info( entity, 'DamageModelComponent', nil, {
 }, nil )
 
 if ( cur_hp < max_hp ) then
-	local heal = math.min( max_hp - cur_hp, 0.015 * max_hp )
+	local heal = math.min( max_hp - cur_hp, 0.04 * max_hp )
 
 	if ( heal > 0 ) then
 		EntityInflictDamage( entity, -heal, 'DAMAGE_HEALING', '', 'NONE', 0, 0, entity )

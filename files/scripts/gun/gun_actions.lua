@@ -289,7 +289,7 @@ local new_actions =
 			c.screenshake = c.screenshake + 1.5
 			c.damage_critical_chance = c.damage_critical_chance + 15
 
-			add_projectile_trigger_complex( 'data/entities/projectiles/deck/light_bullet_blue.xml', {
+			add_projectile_complex( 'data/entities/projectiles/deck/light_bullet_blue.xml', {
 				{
 					trigger_type = 'trigger',
 					draw_count = 1,
@@ -431,13 +431,13 @@ local new_actions =
 							break
 						end
 					elseif ( _ <= #deck + #hand ) then
-						if ( hand[ _ ].id == 'MANA_REDUCE' ) then
+						if ( hand[ _ - #deck ].id == 'MANA_REDUCE' ) then
 							is_has_mana = true
 
 							break
 						end
 					else
-						if ( discarded[ _ ].id == 'MANA_REDUCE' ) then
+						if ( discarded[ _ - #deck + #hand ].id == 'MANA_REDUCE' ) then
 							is_has_mana = true
 
 							break
@@ -446,7 +446,7 @@ local new_actions =
 				end
 
 				if ( is_has_mana ) then
-					c.spread_degrees = 45
+					c.spread_degrees = 30
 
 					for _ = 1, 7, 1 do
 						add_projectile( empty_path .. 'entities/projectiles/deck/holy_orb.xml' )
@@ -559,6 +559,47 @@ local new_actions =
 			c.fire_rate_wait = c.fire_rate_wait + 30
 
 			add_projectile( empty_path .. 'entities/projectiles/orb_timer_spiral_no_copy.xml' )
+		end,
+	},
+	{
+		info = 'shot_blocker_empty',
+		series = {
+			blocker = true,
+		},
+		related_projectiles	= { empty_path .. 'entities/projectiles/empty_shot.xml' },
+		type		= ACTION_TYPE_PROJECTILE,
+		spawn_level						= '0,10', -- SHOT_BLOCKER_EMPTY
+		spawn_probability				= '0.1,0.1', -- SHOT_BLOCKER_EMPTY
+		price = 20,
+		mana = 0,
+		action = function ( )
+			if ( not c.empty_shot_blocker_empty ) then
+				c.empty_shot_blocker_empty = true
+
+				add_projectile( empty_path .. 'entities/projectiles/empty_shot.xml' )
+			end
+		end,
+	},
+	{
+		info = 'shot_blocker_draw',
+		series = {
+			blocker = true,
+		},
+		related_projectiles	= { empty_path .. 'entities/projectiles/empty_shot.xml' },
+		type		= ACTION_TYPE_PROJECTILE,
+		spawn_level						= '0,10', -- SHOT_BLOCKER_DRAW
+		spawn_probability				= '0.1,0.1', -- SHOT_BLOCKER_DRAW
+		price = 20,
+		mana = 0,
+		max_uses = 8000,
+		action = function ( )
+			if ( not c.empty_shot_blocker_draw ) then
+				c.empty_shot_blocker_draw = true
+
+				add_projectile( empty_path .. 'entities/projectiles/empty_shot.xml' )
+			end
+
+			draw_actions( 1, false )
 		end,
 	},
 	--[[
@@ -803,7 +844,7 @@ local new_actions =
 
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/nuke_ray_line.xml,'
 
-			draw_actions( 1,true )
+			draw_actions( 1, true )
 		end,
 	},
 	{
@@ -814,12 +855,17 @@ local new_actions =
 		type		= ACTION_TYPE_MODIFIER,
 		spawn_level						= '2,3,4,5', -- EMPTY_FIRE_RATE_WAIT_INCREASE_DAMAGE
 		spawn_probability				= '0.5,0.8,0.8,0.5', -- EMPTY_FIRE_RATE_WAIT_INCREASE_DAMAGE
-		price = 120,
-		mana = 25,
+		price = 160,
+		mana = 0,
 		action = function ( )
 			current_reload_time = current_reload_time + 60
 
-			c.damage_drill_add = c.damage_drill_add + ( ( 1 + get_ng_count( ) ) * c.fire_rate_wait - 10 ) / get_scale( )
+			if ( reflecting ) then
+				c.damage_drill_add = c.damage_drill_add - 10 / get_scale( )
+			else
+				local drill_add = ( ( c.fire_rate_wait - 10 ) ^ ( 1 + 0.05 * get_ng_count( ) ) ) / get_scale( )
+				c.damage_drill_add = c.damage_drill_add + drill_add
+			end
 
 			draw_actions( 1, true )
 		end,
@@ -832,12 +878,17 @@ local new_actions =
 		type		= ACTION_TYPE_MODIFIER,
 		spawn_level						= '2,3,4,5', -- EMPTY_RELOAD_TIME_INCREASE_DAMAGE
 		spawn_probability				= '0.5,0.8,0.8,0.5', -- EMPTY_RELOAD_TIME_INCREASE_DAMAGE
-		price = 120,
-		mana = 25,
+		price = 160,
+		mana = 0,
 		action = function ( )
 			c.fire_rate_wait = c.fire_rate_wait + 60
 
-			c.damage_slice_add = c.damage_slice_add + ( ( 1 + get_ng_count( ) ) * current_reload_time - 10 ) / get_scale( )
+			if ( reflecting ) then
+				c.damage_slice_add = c.damage_slice_add - 10 / get_scale( )
+			else
+				local slice_add = ( ( current_reload_time - 10 ) ^ ( 1 + 0.05 * get_ng_count( ) ) ) / get_scale( )
+				c.damage_slice_add = c.damage_slice_add + slice_add
+			end
 
 			draw_actions( 1, true )
 		end,
@@ -850,32 +901,75 @@ local new_actions =
 		type		= ACTION_TYPE_MODIFIER,
 		spawn_level						= '2,3,4,5', -- EMPTY_USES_INCREASE_DAMAGE
 		spawn_probability				= '0.5,0.8,0.8,0.5', -- EMPTY_USES_INCREASE_DAMAGE
-		price = 120,
-		mana = 25,
+		price = 240,
+		mana = 30,
 		action = function ( )
 			if ( reflecting ) then
-				draw_actions( 1, true )
+				c.damage_ice_add = c.damage_ice_add + 1 / get_scale( )
 			else
-				local sum, sum_max_uses, sum_uses_remaining = 0, 0, 0
+				local sum = 0
 
-				for _, data in ipairs( deck ) do
-					if ( data.max_uses and data.uses_remaining and data.uses_remaining > -1 ) then
-						sum_max_uses = sum_max_uses + data.max_uses
-						sum_uses_remaining = sum_uses_remaining + data.uses_remaining
+				for _ = 1, #deck + #hand + #discarded, 1 do
+					local data = { }
+
+					if ( _ <= #deck ) then
+						data = deck[ _ ]
+					elseif ( _ <= #deck + #hand ) then
+						data = hand[ _ - #deck ]
+					else
+						data = discarded[ _ - #deck - #hand ]
+					end
+
+					if ( data.max_uses and data.uses_remaining > -1 and data.max_uses ~= data.uses_remaining ) then
+						sum = sum + data.max_uses - data.uses_remaining
 					end
 				end
 
-				if ( sum_max_uses > sum_uses_remaining ) then
-					sum = sum_max_uses - sum_uses_remaining
-
-					c.damage_ice_add = c.damage_ice_add + ( 1 + get_ng_count( ) ) * sum / get_scale( )
-
+				if ( sum > 0 ) then
 					c.fire_rate_wait = c.fire_rate_wait + 20
 					current_reload_time = current_reload_time + 20
-				end
 
-				draw_actions( 1, true )
+					local ice_add = ( sum ^ ( 1 + 0.05 * get_ng_count( ) ) ) / get_scale( )
+					c.damage_ice_add = c.damage_ice_add + ice_add
+				end
 			end
+
+			draw_actions( 1, true )
+		end,
+	},
+	{
+		info = 'hp_increase_damage',
+		series = {
+			increase_damage = true,
+		},
+		type		= ACTION_TYPE_MODIFIER,
+		spawn_level						= '3,4,5,6,7', -- EMPTY_HP_INCREASE_DAMAGE
+		spawn_probability				= '0.1,0.3,0.5,0.7,0.4', -- EMPTY_HP_INCREASE_DAMAGE
+		price = 320,
+		mana = 0,
+		action = function ( )
+			if ( reflecting ) then
+				mana = mana + 1
+
+				c.damage_fire_add = c.damage_fire_add + 1 / get_scale( )
+			else
+				local entity = get_root_entity( )
+				local hp, hp_max = get_comp_info( entity, 'DamageModelComponent', nil, {
+					{ 'hp', 0 },
+					{ 'max_hp', 0 },
+				}, nil )
+
+				if ( is_not_0_num( hp ) and is_not_0_num( hp_max ) and hp_max > hp ) then
+					local delta = ( hp_max - hp ) * get_scale( )
+					local log = ( math.log( delta, math_e ) ^ ( 1 + 0.05 * get_ng_count( ) ) ) / get_scale( )
+
+					mana = mana + math.floor( log )
+
+					c.damage_fire_add = c.damage_fire_add + log
+				end
+			end
+
+			draw_actions( 1, true )
 		end,
 	},
 	{
@@ -1022,7 +1116,7 @@ local new_actions =
 		price = 120,
 		mana = 25,
 		action = function ( )
-			current_reload_time = current_reload_time + 180
+			c.fire_rate_wait = c.fire_rate_wait + 180
 
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/remove/remove_self_damage.xml,'
 
@@ -1426,14 +1520,17 @@ local new_actions =
 					c.lifetime_add = c.lifetime_add + 120
 
 					if ( rec == 0 ) then
-						c.extra_entities = c.extra_entities .. 'data/entities/misc/piercing_shot.xml,'
+						c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/pierce.xml,'
 					end
 
 					if ( rec == 1 ) then
-						c.extra_entities = c.extra_entities .. 'data/entities/misc/clipping_shot.xml,'
+						c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/remove/remove_air_friction.xml,'
+						c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/remove/remove_liquid_friction.xml,'
+						c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/remove/remove_solid_friction.xml,'
+						c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/remove/remove_gravity.xml,'
 					end
 
-					if ( rec == 2 ) then
+					if ( rec > 1 ) then
 						c.extra_entities = c.extra_entities .. 'data/entities/misc/homing.xml,'
 					end
 				else
@@ -1932,8 +2029,8 @@ local new_actions =
 				local count = #deck
 
 				if ( count > 0 ) then
-					local damage_add = ( ( count + 1 ) * ( count + 1 ) ) / get_scale( )
-					c.damage_curse_add = c.damage_curse_add + damage_add
+					local curse_add = ( ( count + 1 ) * ( count + 1 ) / get_scale( ) ) ^ ( 1 + 0.05 * get_ng_count( ) )
+					c.damage_curse_add = c.damage_curse_add + curse_add
 
 					add_table( discarded, deck, false, true )
 					add_table_1( discarded, deck )
@@ -1944,7 +2041,10 @@ local new_actions =
 		end,
 	},
 	{
-		info = 'spell_recharge',
+		info = 'spell_reload',
+		series = {
+			spell = true,
+		},
 		type		= ACTION_TYPE_UTILITY,
 		spawn_level						= '3,4,5,6,10', -- EMPTY_SPELL_RECHARGE
 		spawn_probability				= '1,0.9,0.8,0.5,0.2', -- EMPTY_SPELL_RECHARGE
@@ -1956,25 +2056,73 @@ local new_actions =
 			current_reload_time = current_reload_time + 120
 
 			if ( not reflecting ) then
-				for _, data in ipairs( deck ) do
-					if ( data.uses_remaining > -1 and data.max_uses and data.uses_remaining < data.max_uses ) and ( data.id ~= 'EMPTY_SPELL_RECHARGE' ) then
+				for _ = 1, #deck + #hand + #discarded, 1 do
+					local data = { }
+
+					if ( _ <= #deck ) then
+						data = deck[ _ ]
+					elseif ( _ <= #deck + #hand ) then
+						data = hand[ _ - #deck ]
+					else
+						data = discarded[ _ - #deck - #hand ]
+					end
+
+					if ( data.max_uses and data.uses_remaining > -1 and data.uses_remaining < data.max_uses ) and ( data.id ~= 'EMPTY_SPELL_RECHARGE' ) then
 						data.uses_remaining = data.uses_remaining + 1
+
+						ActionUsesRemainingChanged( data.inventoryitem_id, data.uses_remaining )
+					end
+				end
+			end
+		end,
+	},
+	{
+		info = 'spell_unload',
+		series = {
+			spell = true,
+		},
+		type		= ACTION_TYPE_UTILITY,
+		spawn_level						= '0,10', -- EMPTY_SPELL_CLEAR
+		spawn_probability				= '0.1,0.1', -- EMPTY_SPELL_CLEAR
+		price = 600,
+		mana = 0,
+		action = function ( rec, iter, series, specific )
+			if ( not reflecting ) then
+				local count = 0
+
+				for _ = 1, #deck + #hand + #discarded, 1 do
+					local data = { }
+
+					if ( _ <= #deck ) then
+						data = deck[ _ ]
+					elseif ( _ <= #deck + #hand ) then
+						data = hand[ _ - #deck ]
+					else
+						data = discarded[ _ - #deck - #hand ]
+					end
+info_print( data.id, 'spell_clear - id' )
+info_print( data.max_uses, 'spell_clear - max_uses' )
+info_print( data.uses_remaining, 'spell_clear - uses_remaining' )
+					if ( data.max_uses and data.uses_remaining > 0 ) then
+						local rec_new = check_recursion( data, rec )
+
+						if ( rec_new > -1 ) then
+							for _ = 1, data.uses_remaining, 1 do
+								data.action( rec_new, nil, {
+									spell = true,
+								}, 'clear' )
+							end
+						end
+
+						count, data.uses_remaining = count + 1, 0
+
 						ActionUsesRemainingChanged( data.inventoryitem_id, data.uses_remaining )
 					end
 				end
 
-				for _, data in ipairs( hand ) do
-					if ( data.uses_remaining > -1 and data.max_uses and data.uses_remaining < data.max_uses ) and ( data.id ~= 'EMPTY_SPELL_RECHARGE' ) then
-						data.uses_remaining = data.uses_remaining + 1
-						ActionUsesRemainingChanged( data.inventoryitem_id, data.uses_remaining )
-					end
-				end
-
-				for _, data in ipairs( discarded ) do
-					if ( data.uses_remaining > -1 and data.max_uses and data.uses_remaining < data.max_uses ) and ( data.id ~= 'EMPTY_SPELL_RECHARGE' ) then
-						data.uses_remaining = data.uses_remaining + 1
-						ActionUsesRemainingChanged( data.inventoryitem_id, data.uses_remaining )
-					end
+				if ( count > 0 ) then
+					c.fire_rate_wait = c.fire_rate_wait - 180
+					current_reload_time = current_reload_time - 180
 				end
 			end
 		end,
@@ -2420,8 +2568,8 @@ local new_actions =
 		info = 'create_potion',
 		related_projectiles	= { 'data/entities/items/pickup/potion.xml' },
 		type		= ACTION_TYPE_UTILITY,
-		spawn_level						= '4,5,6,10', -- EMPTY_CREATE_POTION
-		spawn_probability				= '0.4,0.4,0.4,0.5', -- EMPTY_CREATE_POTION
+		spawn_level						= '3,4,5,6,10', -- EMPTY_CREATE_POTION
+		spawn_probability				= '0.3,0.3,0.4,0.4,0.5', -- EMPTY_CREATE_POTION
 		price = 600,
 		mana = 300,
 		max_uses = 3,
@@ -2439,8 +2587,8 @@ local new_actions =
 			summon = true,
 		},
 		type		= ACTION_TYPE_UTILITY,
-		spawn_level						= '2,3,5,10', -- EMPTY_SUMMON_SELL_HOLE
-		spawn_probability				= '0.1,0.15,0.25,0.5', -- EMPTY_SUMMON_SELL_HOLE
+		spawn_level						= '0,1,2,3,4,5,6,7,8,9,10', -- EMPTY_SUMMON_SELL_HOLE
+		spawn_probability				= '0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1', -- EMPTY_SUMMON_SELL_HOLE
 		price = 720,
 		mana = 300,
 		max_uses = 1,
@@ -4145,8 +4293,8 @@ local new_actions =
 
 			local rec = check_recursion( data, recursion_level )
 
-			if ( data ) and ( rec > -1 ) and ( data.uses_remaining ~= 0 ) then
-				local firerate, reload = c.fire_rate_wait, current_reload_time
+			if ( data ) and ( rec > -1 ) then
+				local firerate, reload, mana_before = c.fire_rate_wait, current_reload_time, mana
 
 				for _ = 1, count, 1 do
 					dont_draw_actions = true
@@ -4174,16 +4322,7 @@ local new_actions =
 
 				dont_draw_actions = false
 
-				c.fire_rate_wait, current_reload_time = firerate, reload
-
-				if ( data.uses_remaining > 0 ) then
-					data.uses_remaining = data.uses_remaining - 1
-
-					local reduce_uses = ActionUsesRemainingChanged( data.inventoryitem_id, data.uses_remaining )
-					if ( not reduce_uses ) then
-						data.uses_remaining = data.uses_remaining + 1
-					end
-				end
+				c.fire_rate_wait, current_reload_time, mana = firerate, reload, mana_before
 
 				if ( iter == 1 ) then
 					add_table_count( deck, discarded, iter_max )
@@ -4232,8 +4371,8 @@ local new_actions =
 
 			local rec = check_recursion( data, recursion_level )
 
-			if ( data ) and ( rec > -1 ) and ( data.uses_remaining ~= 0 ) then
-				local firerate, reload = c.fire_rate_wait, current_reload_time
+			if ( data ) and ( rec > -1 ) then
+				local firerate, reload, mana_before = c.fire_rate_wait, current_reload_time, mana
 
 				for _ = 1, count, 1 do
 					dont_draw_actions = true
@@ -4261,16 +4400,7 @@ local new_actions =
 
 				dont_draw_actions = false
 
-				c.fire_rate_wait, current_reload_time = firerate, reload
-
-				if ( data.uses_remaining > 0 ) then
-					data.uses_remaining = data.uses_remaining - 1
-
-					local reduce_uses = ActionUsesRemainingChanged( data.inventoryitem_id, data.uses_remaining )
-					if ( not reduce_uses ) then
-						data.uses_remaining = data.uses_remaining + 1
-					end
-				end
+				c.fire_rate_wait, current_reload_time, mana = firerate, reload, mana_before
 
 				if ( iter == 1 ) then
 					add_table_count( deck, discarded, iter_max )
@@ -4319,8 +4449,8 @@ local new_actions =
 
 			local rec = check_recursion( data, recursion_level )
 
-			if ( data ) and ( rec > -1 ) and ( data.uses_remaining ~= 0 ) then
-				local firerate, reload = c.fire_rate_wait, current_reload_time
+			if ( data ) and ( rec > -1 ) then
+				local firerate, reload, mana_before = c.fire_rate_wait, current_reload_time, mana
 
 				for _ = 1, count, 1 do
 					dont_draw_actions = true
@@ -4348,16 +4478,7 @@ local new_actions =
 
 				dont_draw_actions = false
 
-				c.fire_rate_wait, current_reload_time = firerate, reload
-
-				if ( data.uses_remaining > 0 ) then
-					data.uses_remaining = data.uses_remaining - 1
-
-					local reduce_uses = ActionUsesRemainingChanged( data.inventoryitem_id, data.uses_remaining )
-					if ( not reduce_uses ) then
-						data.uses_remaining = data.uses_remaining + 1
-					end
-				end
+				c.fire_rate_wait, current_reload_time, mana = firerate, reload, mana_before
 
 				if ( iter == 1 ) then
 					add_table_count( deck, discarded, iter_max )
@@ -4408,8 +4529,8 @@ local new_actions =
 
 			local rec = check_recursion( data, recursion_level )
 
-			if ( data ) and ( rec > -1 ) and ( data.uses_remaining ~= 0 ) then
-				local firerate, reload = c.fire_rate_wait, current_reload_time
+			if ( data ) and ( rec > -1 ) then
+				local firerate, reload, mana_before = c.fire_rate_wait, current_reload_time, mana
 
 				for _ = 1, count, 1 do
 					dont_draw_actions = true
@@ -4437,16 +4558,7 @@ local new_actions =
 
 				dont_draw_actions = false
 
-				c.fire_rate_wait, current_reload_time = firerate, reload
-
-				if ( data.uses_remaining > 0 ) then
-					data.uses_remaining = data.uses_remaining - 1
-
-					local reduce_uses = ActionUsesRemainingChanged( data.inventoryitem_id, data.uses_remaining )
-					if ( not reduce_uses ) then
-						data.uses_remaining = data.uses_remaining + 1
-					end
-				end
+				c.fire_rate_wait, current_reload_time, mana = firerate, reload, mana_before
 
 				if ( iter == 1 ) then
 					add_table_count( deck, discarded, iter_max )
@@ -5535,7 +5647,7 @@ local new_actions =
 				if ( #paras == 1 ) then
 					e_cmd_funcs[ command ].action_1_paras( c, false, shooter, paras[ 1 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5569,7 +5681,7 @@ local new_actions =
 				elseif ( #paras == 2 ) then
 					e_cmd_funcs[ command ].action_2_paras( c, false, shooter, paras[ 1 ], paras[ 2 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5603,7 +5715,7 @@ local new_actions =
 				elseif ( #paras == 2 ) then
 					e_cmd_funcs[ command ].action_2_paras( c, false, shooter, paras[ 1 ], paras[ 2 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5635,7 +5747,7 @@ local new_actions =
 				if ( #paras == 1 ) then
 					e_cmd_funcs[ command ].action_1_paras( c, false, shooter, paras[ 1 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5667,7 +5779,7 @@ local new_actions =
 				if ( #paras == 2 ) then
 					e_cmd_funcs[ command ].action_2_paras( c, false, shooter, paras[ 1 ], paras[ 2 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '2', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '2', tostring( #paras ) )
 					return
 				end
 
@@ -5706,7 +5818,7 @@ local new_actions =
 
 					e_cmd_funcs[ command ].action_1_paras( c, false, shooter, paras[ 1 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5747,7 +5859,7 @@ local new_actions =
 
 					e_cmd_funcs[ command ].action_1_paras( c, false, shooter, paras[ 1 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5783,7 +5895,7 @@ local new_actions =
 				elseif ( #paras == 2 ) then
 					e_cmd_funcs[ command ].action_2_paras( c, false, shooter, paras[ 1 ], paras[ 2 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5819,7 +5931,7 @@ local new_actions =
 				elseif ( #paras == 2 ) then
 					e_cmd_funcs[ command ].action_2_paras( c, false, shooter, paras[ 1 ], paras[ 2 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5853,7 +5965,7 @@ local new_actions =
 				if ( #paras == 1 ) then
 					e_cmd_funcs[ command ].action_1_paras( c, false, shooter, paras[ 1 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5889,7 +6001,7 @@ local new_actions =
 				elseif ( #paras == 2 ) then
 					e_cmd_funcs[ command ].action_2_paras( c, false, shooter, paras[ 1 ], paras[ 2 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5925,7 +6037,7 @@ local new_actions =
 				elseif ( #paras == 2 ) then
 					e_cmd_funcs[ command ].action_2_paras( c, false, shooter, paras[ 1 ], paras[ 2 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5959,7 +6071,7 @@ local new_actions =
 				if ( #paras == 1 ) then
 					e_cmd_funcs[ command ].action_1_paras( c, false, shooter, paras[ 1 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -5999,7 +6111,7 @@ local new_actions =
 				elseif ( #paras == 4 ) then
 					e_cmd_funcs[ command ].action_4_paras( c, false, shooter, paras[ 1 ], paras[ 2 ], paras[ 3 ], paras[ 4 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -6039,7 +6151,7 @@ local new_actions =
 				elseif ( #paras == 4 ) then
 					e_cmd_funcs[ command ].action_4_paras( c, false, shooter, paras[ 1 ], paras[ 2 ], paras[ 3 ], paras[ 4 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '1', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '1', tostring( #paras ) )
 					return
 				end
 
@@ -6075,7 +6187,7 @@ local new_actions =
 				elseif ( #paras == 3 ) then
 					e_cmd_funcs[ command ].action_3_paras( c, false, shooter, paras[ 1 ], paras[ 2 ], paras[ 3 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '2', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '2', tostring( #paras ) )
 					return
 				end
 
@@ -6111,7 +6223,7 @@ local new_actions =
 				elseif ( #paras == 3 ) then
 					e_cmd_funcs[ command ].action_3_paras( c, false, shooter, paras[ 1 ], paras[ 2 ], paras[ 3 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '2', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '2', tostring( #paras ) )
 					return
 				end
 
@@ -6148,7 +6260,7 @@ local new_actions =
 				elseif ( #paras == 3 ) then
 					e_cmd_funcs[ command ].action_3_paras( c, false, shooter, paras[ 1 ], paras[ 2 ], paras[ 3 ] )
 				else
-					command_print( command .. '(', '$empty_command_error_lack_paras', '2', to_string( #paras ) )
+					command_print( command .. '(', '$empty_command_error_lack_paras', '2', tostring( #paras ) )
 					return
 				end
 
@@ -6186,7 +6298,7 @@ local new_actions =
 					elseif ( #paras == 3 ) then
 						e_cmd_funcs[ command ].action_3_paras( c, false, shooter, paras[ 1 ], paras[ 2 ], paras[ 3 ] )
 					else
-						command_print( command .. '(', '$empty_command_error_lack_paras', '2', to_string( #paras ) )
+						command_print( command .. '(', '$empty_command_error_lack_paras', '2', tostring( #paras ) )
 						return
 					end
 

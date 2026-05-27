@@ -1,1 +1,7 @@
-<Entity tags="projectile" ></Entity>
+<Entity tags="projectile" >
+
+	<LifetimeComponent
+		lifetime="1"
+	></LifetimeComponent>
+
+</Entity>

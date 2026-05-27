@@ -18,13 +18,17 @@ if ( is_has_comp( entity, 'ProjectileComponent', nil ) ) then
 		}, nil, nil )
 
 		if ( is_has_comp( entity, 'AreaDamageComponent', nil ) ) then
-			if ( is_player( entity ) ) then
+			if ( is_player( shooter ) ) then
 				set_comp_value( entity, 'AreaDamageComponent', nil, {
 					entities_with_tag = all_tag.enemy,
 				}, nil, nil )
-			else
+			elseif ( is_enemy( shooter ) ) then
 				set_comp_value( entity, 'AreaDamageComponent', nil, {
 					entities_with_tag = all_tag.player,
+				}, nil, nil )
+			else
+				set_comp_value( entity, 'AreaDamageComponent', nil, {
+					entities_with_tag = all_tag.hit,
 				}, nil, nil )
 			end
 		end
@@ -33,6 +37,10 @@ if ( is_has_comp( entity, 'ProjectileComponent', nil ) ) then
 			set_comp_obj_value( entity, 'LightningComponent', nil, {
 				{ 'config_explosion', 'dont_damage_this', shooter },
 			}, nil, nil )
+		end
+
+		if ( is_has_comp( entity, 'LaserEmitterComponent', nil ) ) then
+			EntityAddChild( shooter, entity )
 		end
 	end
 end

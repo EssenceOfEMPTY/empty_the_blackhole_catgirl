@@ -4,11 +4,7 @@ local entity = get_root_entity( )
 local x, y = EntityGetTransform( entity )
 
 local how_many, theta, length = 8, 0, 300
-local angle_inc = p2 / how_many
-
-local shooter = get_comp_info( entity, 'ProjectileComponent', nil, {
-	{ 'mWhoShot', 0 },
-}, nil )
+local angle_inc = math_2p / how_many
 
 for _ = 1, how_many do
 	local vel_x, vel_y = math.cos( theta ) * length, math.sin( theta ) * length

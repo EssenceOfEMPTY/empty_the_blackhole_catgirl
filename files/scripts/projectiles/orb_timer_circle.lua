@@ -4,7 +4,7 @@ local entity, length = get_root_entity( ), 100
 local x, y = EntityGetTransform( entity )
 
 local how_many = 8
-local angle_inc = p2 / how_many
+local angle_inc = math_2p / how_many
 
 GameEntityPlaySound( entity, 'duplicate' )
 

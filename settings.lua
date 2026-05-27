@@ -214,7 +214,7 @@ if ( language:find( '中文' ) or language:find( '汉化' ) ) then
 					id = 'EFFECT_CHANGE_BOMB',
 					ui_name = '效果更改: 炸弹',
 					ui_description =
-						'增加 [ 炸弹 ] 法术的最大使用次数'
+						'增加 [ 炸弹 ] 法术的最大使用次数\n'
 						.. '对 [ 粘性炸弹 ] 与 [ 弹性炸弹 ] 法术也生效',
 					value_default = true,
 					scope = MOD_SETTING_SCOPE_NEW_GAME,
@@ -649,7 +649,7 @@ else
 					id = 'EFFECT_CHANGE_BOMB',
 					ui_name = 'Effect Change: Bomb',
 					ui_description =
-						'increase max uses of [ Bomb ] spell'
+						'increase max uses of [ Bomb ] spell\n'
 						.. 'also affect [ Sticky bomb ] and [ Bouncy bomb ] spell',
 					value_default = true,
 					scope = MOD_SETTING_SCOPE_NEW_GAME,

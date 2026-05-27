@@ -152,7 +152,7 @@
 
 	<LuaComponent
 		_tags="curse_cloud_script"
-		script_source_file="mods/empty_the_blackhole_catgirl/files/scripts/perks/curse_malice_washes_over.lua"
+		script_source_file="mods/empty_the_blackhole_catgirl/files/scripts/perks/curse/curse_malice_washes_over.lua"
 		execute_every_n_frame="1"
 	></LuaComponent>
 

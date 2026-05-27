@@ -52,9 +52,7 @@ end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 通用文本文件覆写 >>>>>>>>>>>>>>>>>>>>>>>>---
 
-local overwrite = {
-	--
-}
+local overwrite = { }
 
 --世界设置
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.EASY_NG+' )
@@ -99,13 +97,13 @@ if ( ModSettingGet( 'empty_the_blackhole_catgirl.BUGFIX_CONNOISSEUR_OF_WANDS' ) 
 	table.insert( overwrite, 'entities/animals/boss_pit/boss_pit_logic.lua' )
 end
 
-for _, each in ipairs( overwrite ) do
-	ModTextFileSetContent( 'data/' .. each, ModTextFileGetContent( empty_path .. each ) )
+for i, _ in ipairs( overwrite ) do
+	ModTextFileSetContent( 'data/' .. _, ModTextFileGetContent( empty_path .. _ ) )
 end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 通用群系追加 >>>>>>>>>>>>>>>>>>>>>>>>---
 
-local biomes_append = {
+local biome_append = {
 	'alchemist_secret',
 	'boss_arena', 'boss_arena_top', 'boss_limbs_arena',
 	'clouds',
@@ -128,8 +126,8 @@ local biomes_append = {
 	'winter', 'wizardcave',
 }
 
-for _, each in ipairs( biomes_append ) do
-	ModLuaFileAppend( 'data/scripts/biomes/' .. each .. '.lua', empty_path .. 'scripts/biomes/biome_append.lua' )
+for i, _ in ipairs( biome_append ) do
+	ModLuaFileAppend( 'data/scripts/biomes/' .. _ .. '.lua', empty_path .. 'scripts/biomes/biome_append.lua' )
 end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 通用 lua 追加 >>>>>>>>>>>>>>>>>>>>>>>>---
@@ -146,8 +144,8 @@ local lua_append = {
 	'scripts/gun/procedural/gun_procedural_better',
 }
 
-for _, each in ipairs( lua_append ) do
-	ModLuaFileAppend( 'data/' .. each .. '.lua', empty_path .. each .. '.lua' )
+for i, _ in ipairs( lua_append ) do
+	ModLuaFileAppend( 'data/' .. _ .. '.lua', empty_path .. _ .. '.lua' )
 end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 开局更改 >>>>>>>>>>>>>>>>>>>>>>>>---
@@ -163,7 +161,6 @@ function OnMagicNumbersAndWorldSeedInitialized( )
 	end
 
 	perks_info = 'return {\n' .. perks_info .. '}'
-	info_print( perks_info, 'perks_info' )
 
 	ModTextFileSetContent( empty_path .. '_virtual/perks_info.lua', perks_info )
 end

@@ -122,7 +122,7 @@ end
 ---发射复合型触发投射物
 ---@param entity_filename string
 ---@param trigger_table table<string, any>
-function add_projectile_trigger_complex( entity_filename, trigger_table )
+function add_projectile_complex( entity_filename, trigger_table )
 	if ( reflecting ) then
 		Reflection_RegisterProjectile( entity_filename )
 		return

@@ -10,13 +10,13 @@ if ( entity ~= NULL_ENTITY and not ( EntityHasTag( entity, command_speed ) and E
 	local paras = parse_and_evaluate_command_paras( command, entity, e_cmd_funcs[ command ].para_names.all )
 
 	if ( paras ) then
-		if ( paras.speed ) then
+		if ( EntityHasTag( entity, command_speed ) and paras.speed ) then
 			e_cmd_funcs[ command ].action_1_paras( { }, true, paras.shooter, paras.speed )
 
 			EntityAddTag( entity, command_speed )
 		end
 
-		if ( paras.vel_x and paras.vel_y ) then
+		if ( EntityHasTag( entity, command_xy ) and paras.vel_x and paras.vel_y ) then
 			e_cmd_funcs[ command ].action_2_paras( { }, true, paras.shooter, paras.vel_x, paras.vel_y )
 
 			EntityAddTag( entity, command_xy )

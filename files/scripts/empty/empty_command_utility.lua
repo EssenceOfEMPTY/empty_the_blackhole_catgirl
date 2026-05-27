@@ -773,7 +773,7 @@ e_cmd_funcs = {
 			else
 				add_desc_by_info( c, {
 					replace = true,
-					update = false,
+					update = true,
 					merge = false,
 				}, {
 					id = command,
@@ -845,7 +845,7 @@ e_cmd_funcs = {
 			else
 				add_desc_by_info( c, {
 					replace = true,
-					update = false,
+					update = true,
 					merge = false,
 				}, {
 					id = command,
@@ -915,7 +915,7 @@ e_cmd_funcs = {
 			else
 				add_desc_by_info( c, {
 					replace = true,
-					update = true,
+					update = false,
 					merge = false,
 				}, {
 					id = command,
@@ -1029,7 +1029,7 @@ e_cmd_funcs = {
 			else
 				add_desc_by_info( c, {
 					replace = true,
-					update = true,
+					update = false,
 					merge = false,
 				}, {
 					id = command,

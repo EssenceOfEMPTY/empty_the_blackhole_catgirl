@@ -1,8 +1,6 @@
-dofile_once( 'data/scripts/lib/utilities.lua' )
-dofile_once( 'data/scripts/gun/procedural/gun_action_utils.lua' )
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity = GetUpdatedEntityID( )
+local entity = get_root_entity( )
 local projectile_comp = EntityGetFirstComponent( entity, 'ProjectileComponent' )
 local shooter
 

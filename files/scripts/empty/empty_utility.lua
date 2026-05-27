@@ -2,8 +2,9 @@
 empty_path = 'mods/empty_the_blackhole_catgirl/files/'
 
 int_huge = 2147483647
+math_2p = 2 * math.pi
+math_e = math.exp( 1 )
 epsilon = 0.0003
-p2 = 2 * math.pi
 
 all_curses = {
 	'CURSE_MONK',
@@ -100,6 +101,7 @@ all_proj_dmg_0_dmg_by_type = {
 }
 
 all_tag = {
+	hit = 'hittable',
 	player = 'player_unit',
 	poly_player = 'polymorphed_player',
 	enemy = 'enemy',
@@ -111,6 +113,7 @@ orbit_loc_fix = {
 	{ x = -12, y = 12 },
 	{ x = -12, y = -12 },
 }
+
 ---打印一切信息, 此函数仅用于调试; 
 ---正式版本中不应该看见任何地方调用这个函数
 ---@param info any
@@ -235,11 +238,65 @@ function create_all_table( k_table, v )
 	return v_table
 end
 
+---Lanczos 近似系数 ( g = 7, n = 9 )
+local lanc_coeff = {
+	0.99999999999980993,
+	676.5203681218851,
+	-1259.1392167224028,
+	771.32342877765313,
+	-176.61502916214059,
+	12.507343278686905,
+	-0.13857109526572012,
+	9.9843695780195716e-6,
+	1.5056327351493116e-7,
+}
+
+---math.log( Γ( z ) )
+---@param z number
+---@return number log_Γ_z
+function ln_gamma( z )
+	if ( z < 0.5 ) then
+		return math.log( math.pi / math.sin( math.pi * z ) ) - ln_gamma( 1 - z )
+	else
+		z = z - 1
+
+		local x = lanc_coeff[ 1 ]
+
+		for i = 2, #lanc_coeff, 1 do
+			x = x + lanc_coeff[ i ] / ( z + i - 1 )
+		end
+
+		local t = z + #lanc_coeff - 0.5
+
+		return math.log( math.sqrt( math_2p ) ) + ( z + 0.5 ) * math.log( t ) - t + math.log( x )
+	end
+end
+
+---Γ( z )
+---@param z number
+---@return number Γ_z
+function gamma( z )
+	return math.exp( ln_gamma( z ) )
+end
+
+---z 的阶乘, 支持解析延拓
+---@param z number
+---@return number fact_z
+function fact( z )
+	if ( z == 0 ) then
+		return 1
+	elseif ( z < 0 and z == math.floor( z ) ) then
+		return 0
+	else
+		return gamma( z + 1 )
+	end
+end
+
 ---检测 num 是否是数值且不为 0
 ---@param num any
 ---@return boolean is_not_0_num
 function is_not_0_num( num )
-	return type( num ) == 'number' and num ~= 0
+	return type( num ) == 'number' and num ~= 0 and num == num
 end
 
 ---检测 str 是否是字符串且不为空字符串
@@ -260,21 +317,30 @@ end
 ---@param num any
 ---@return boolean is_int
 function is_int( num )
-	return type( num ) == 'number' and num % 1 == 0
+	return type( num ) == 'number' and num == math.floor( num )
 end
 
 ---判断实体是否存活
 ---@param entity number
----@return boolean
+---@return boolean is_alive
 function is_alive( entity )
 	return ( is_not_0_num( entity ) and EntityGetIsAlive( entity ) )
 end
 
 ---判断实体是否为玩家, 含变形
 ---@param entity number
----@return boolean
+---@return boolean is_player
 function is_player( entity )
-	return ( is_not_0_num( entity ) and ( EntityHasTag( entity, 'player_unit' ) or EntityHasTag( entity, 'polymorphed_player' ) ) )
+	return ( is_not_0_num( entity )
+		and ( EntityHasTag( entity, 'player_unit' ) or EntityHasTag( entity, 'polymorphed_player' ) ) )
+end
+
+---判断实体是否为敌怪
+---@param entity number
+---@return boolean is_enemy
+function is_enemy( entity )
+	return ( is_not_0_num( entity )
+		and ( EntityHasTag( entity, 'enemy' ) ) )
 end
 
 ---检查 search 内是否包含 value
@@ -687,12 +753,12 @@ end
 ---@param deg number
 ---@return number rad
 function deg_to_rad( deg )
-	local rad = math.fmod( deg * math.pi / 180.0, p2 )
+	local rad = math.fmod( deg * math.pi / 180.0, math_2p )
 
 	if ( rad > math.pi ) then
-		rad = rad - p2
+		rad = rad - math_2p
 	elseif ( rad < -math.pi ) then
-		rad = rad + p2
+		rad = rad + math_2p
 	end
 
 	return rad
@@ -900,7 +966,7 @@ end
 
 ---获取每个 entity 实体中类型为 comp_type 的组件
 ---@param entity number|number[]
----@param comp_type string?
+---@param comp_type string|nil?
 ---@param tag string|nil?
 ---@param name string|nil?
 ---@return number[] comps
@@ -914,11 +980,11 @@ function get_all_comp( entity, comp_type, tag, name )
 	if ( is_not_nil_str( comp_type ) ) then
 		if ( is_not_nil_str( tag ) ) then
 			for i, _ in ipairs( entity ) do
-				add_table( comps, EntityGetComponent( _, comp_type, tag ) or { } )
+				add_table( comps, EntityGetComponentIncludingDisabled( _, comp_type, tag ) or { } )
 			end
 		else
 			for i, _ in ipairs( entity ) do
-				add_table( comps, EntityGetComponent( _, comp_type ) or { } )
+				add_table( comps, EntityGetComponentIncludingDisabled( _, comp_type ) or { } )
 			end
 		end
 	else
@@ -928,9 +994,9 @@ function get_all_comp( entity, comp_type, tag, name )
 	end
 
 	if ( is_not_nil_str( name ) ) then
-		for o = #comps, 1, -1 do
-			if ( ComponentGetValue2( comps[ o ], 'name' ) ~= name ) then
-				table.remove( comps, o )
+		for _ = #comps, 1, -1 do
+			if ( ComponentGetValue2( comps[ _ ], 'name' ) ~= name ) then
+				table.remove( comps, _ )
 			end
 		end
 	end
@@ -2380,11 +2446,12 @@ function parse_and_evaluate_command_paras( action_id, entity_id, param_names )
 		return nil
 	end
 
-	local shooter = tonumber( values[ 'shooter' ] ) or 0
+	local shooter = tonumber( values.shooter ) or 0
 	local x, y = EntityGetTransform( entity_id )
 
-	local result_table = {}
-	result_table.shooter = shooter
+	local result_table = {
+		shooter = shooter,
+	}
 
 	for _, param_name in ipairs( param_names ) do
 		local raw_value = values[ param_name ]

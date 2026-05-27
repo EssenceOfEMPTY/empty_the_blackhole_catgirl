@@ -896,7 +896,7 @@ local new_perks =
 				{
 					_tags = 'empty_curse_illiterate,perk_component',
 					execute_every_n_frame = 15,
-					script_source_file = empty_path .. 'scripts/perks/curse_illiterate.lua',
+					script_source_file = empty_path .. 'scripts/perks/curse/curse_illiterate.lua',
 				}
 			)
 			local content_need_obfuscate = backup_common_csv( )
@@ -951,7 +951,7 @@ local new_perks =
 				add_comp_remove_dupli( entity_who_picked, 'LuaComponent', 'empty_curse_monk', {
 					_tags = 'empty_curse_monk,perk_component',
 					execute_every_n_frame = 60,
-					script_source_file = empty_path .. 'scripts/perks/curse_monk.lua',
+					script_source_file = empty_path .. 'scripts/perks/curse/curse_monk.lua',
 				} )
 
 				set_comp_obj_value( entity_who_picked, 'DamageModelComponent', nil, nil, function ( comp )
@@ -1137,7 +1137,7 @@ local new_perks =
 
 						add_comp_remove_dupli( player, 'LuaComponent', curse, {
 							_tags = curse,
-							script_source_file = empty_path .. 'scripts/perks/curse_malice_washes_over_delay.lua',
+							script_source_file = empty_path .. 'scripts/perks/curse/curse_malice_washes_over_delay.lua',
 							execute_every_n_frame = 300,
 							remove_after_executed = true,
 						} )
@@ -1154,7 +1154,7 @@ local new_perks =
 
 				add_comp_remove_dupli( entity_who_picked, 'LuaComponent', curse, {
 					_tags = curse,
-					script_source_file = empty_path .. 'scripts/perks/curse_malice_washes_over_delay.lua',
+					script_source_file = empty_path .. 'scripts/perks/curse/curse_malice_washes_over_delay.lua',
 					execute_every_n_frame = 180,
 					remove_after_executed = true,
 				} )
@@ -1349,14 +1349,14 @@ local new_perks =
 
 			add_comp_remove_dupli( entity_who_picked, 'LuaComponent', curse, {
 				_tags = curse,
-				script_source_file = empty_path .. 'scripts/perks/curse_death_trail.lua',
+				script_source_file = empty_path .. 'scripts/perks/curse/curse_death_trail.lua',
 				execute_every_n_frame = 0,
 				remove_after_executed = true,
 			} )
 
 			add_comp_remove_dupli( entity_who_picked, 'LuaComponent', curse, {
 				_tags = curse,
-				script_source_file = empty_path .. 'scripts/perks/curse_death_trail.lua',
+				script_source_file = empty_path .. 'scripts/perks/curse/curse_death_trail.lua',
 				execute_every_n_frame = 2,
 			} )
 
@@ -1407,7 +1407,7 @@ local new_perks =
 		func = function ( entity_perk_empty_item, entity_who_picked, item_name )
 			add_comp_remove_dupli( entity_who_picked, 'LuaComponent', 'CURSE_FURIOUS_COCKTAIL', {
 				_tags = 'CURSE_FURIOUS_COCKTAIL',
-				script_source_file = empty_path .. 'scripts/perks/curse_furious_cocktail.lua',
+				script_source_file = empty_path .. 'scripts/perks/curse/curse_furious_cocktail.lua',
 				execute_every_n_frame = 540,
 			} )
 		end,
