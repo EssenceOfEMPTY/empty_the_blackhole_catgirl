@@ -923,7 +923,7 @@ local new_perks =
 		func_remove = function( entity_who_picked )
 			remove_all_comp( entity_who_picked, 'LuaComponent', 'empty_health_regeneration' )
 		end,
-	},
+	},--[[
 	{
 		info = 'red_reset',
 		stackable = STACKABLE_YES,
@@ -936,7 +936,7 @@ local new_perks =
 
 			--TODO
 		end,
-	},--[[
+	},
 	{
 		info = 'dewborne_breeze',
 		stackable = STACKABLE_NO,
