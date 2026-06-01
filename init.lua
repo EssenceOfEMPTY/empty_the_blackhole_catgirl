@@ -15,8 +15,7 @@ else
 	add_str = '\n' .. ModTextFileGetContent( empty_path .. 'translations/empty_translation.csv' )
 end
 
----<<<<<<<<<<<<<<<<<<<<<<<< 追加翻译: 伊芙琳娜 >>>>>>>>>>>>>>>>>>>>>>>>---
-
+--追加翻译: 伊芙琳娜
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.SVAROG_TRANSLATION' ) ) then
 	add_str = add_str .. '\n' .. ModTextFileGetContent( empty_path .. 'translations/svarog_translation.csv' )
 end
@@ -50,7 +49,7 @@ for _, magic in ipairs( magics ) do
 	end
 end
 
----<<<<<<<<<<<<<<<<<<<<<<<< 通用文本文件覆写 >>>>>>>>>>>>>>>>>>>>>>>>---
+---<<<<<<<<<<<<<<<<<<<<<<<< 通用文件覆写 >>>>>>>>>>>>>>>>>>>>>>>>---
 
 local overwrite = { }
 
@@ -82,6 +81,19 @@ if ( ModSettingGet( 'empty_the_blackhole_catgirl.BUGFIX_DUPE_MAX_HP_FROM_HEARTY'
 	}
 
 	add_table( overwrite, hearty )
+else
+	local hearty = {
+		{
+			source = 'scripts/status_effects/hearty_start.lua',
+			replace = 'scripts/status_effects/hearty_start_can_dupe.lua',
+		},
+		{
+			source = 'scripts/status_effects/hearty_end.lua',
+			replace = 'scripts/status_effects/hearty_end_can_dupe.lua',
+		},
+	}
+
+	add_table( overwrite, hearty )
 end
 
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.BUGFIX_DUPE_DMG_MULTI_FROM_VULNERABLE' ) ) then
@@ -98,7 +110,11 @@ if ( ModSettingGet( 'empty_the_blackhole_catgirl.BUGFIX_CONNOISSEUR_OF_WANDS' ) 
 end
 
 for i, _ in ipairs( overwrite ) do
-	ModTextFileSetContent( 'data/' .. _, ModTextFileGetContent( empty_path .. _ ) )
+	if ( type( _ ) == 'table' ) then
+		ModTextFileSetContent( 'data/' .. _.source, ModTextFileGetContent( empty_path .. _.replace ) )
+	elseif ( type( _ ) == 'string' ) then
+		ModTextFileSetContent( 'data/' .. _, ModTextFileGetContent( empty_path .. _ ) )
+	end
 end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 通用群系追加 >>>>>>>>>>>>>>>>>>>>>>>>---

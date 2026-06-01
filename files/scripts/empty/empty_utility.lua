@@ -880,21 +880,24 @@ end
 
 ---获取实体;
 ---可选是否获取为 table
----@param is_group boolean|nil? -- 默认为 false
----@return number|number[]
-function get_entity( is_group )
+---@return number
+function get_up_entity( )
 	local update = GetUpdatedEntityID( )
 
-	if ( is_group ) then
-		local root = EntityGetRootEntity( update )
+	return update
+end
 
-		return {
-			root = root,
-			update = update,
-		}
-	else
-		return update
-	end
+---获取实体;
+---可选是否获取为 table
+---@return table<string, number>
+function get_up_entity_table( )
+	local update = GetUpdatedEntityID( )
+	local root = EntityGetRootEntity( update )
+
+	return {
+		root = root,
+		update = update,
+	}
 end
 
 ---获取 comp 组件所在的实体
@@ -1508,7 +1511,7 @@ end
 ---移除每个 entity 实体所有类型为 comp_type 的组件; 
 ---返回影响组件的总数
 ---@param entity number|number[]
----@param comp_type string
+---@param comp_type string?
 ---@param tag string|nil?
 ---@param name string|nil?
 ---@return number comps_count
@@ -1559,6 +1562,14 @@ function get_all_child( entity, tag, name )
 	return childs
 end
 
+---解除子实体的挂载, 然后删除
+---@param child number
+function remove_child( child )
+	EntityRemoveFromParent( child )
+
+	EntityKill( child )
+end
+
 ---移除每个 entity 实体上的所有子实体; 
 ---返回影响子实体的总数
 ---@param entity number|number[]
@@ -1568,9 +1579,7 @@ function remove_all_child( entity, tag, name )
 	local childs = get_all_child( entity, tag, name )
 
 	for _, child in ipairs( childs or { } ) do
-		EntityRemoveFromParent( child )
-
-		EntityKill( child )
+		remove_child( child )
 	end
 
 	return #childs

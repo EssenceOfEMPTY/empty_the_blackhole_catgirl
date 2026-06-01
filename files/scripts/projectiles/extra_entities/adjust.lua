@@ -10,12 +10,19 @@ if ( paras ) then
 	if ( is_not_0_num( paras.frames ) and is_not_0_num( paras.level ) ) then
 		remove_speed_limit( proj )
 
+		local sp_min, sp_max = get_comp_info( proj, 'ProjectileComponent', nil, {
+			{ 'speed_min', 1000 },
+			{ 'speed_max', 1000 },
+		}, nil )
+
+		local mul = ( 8 * paras.level - 4 ) * ( paras.frames / max_adjust )
+
 		local attri = {
-			speed_min = ( paras.frames * paras.level ) / max_adjust,
-			speed_max = ( paras.frames * paras.level ) / max_adjust,
+			speed_min = sp_min * mul,
+			speed_max = sp_max * mul,
 		}
 
-		local mul = ( 6 + 7 * paras.level ) * ( paras.frames / max_adjust )
+		mul = ( 6 + 7 * paras.level ) * ( paras.frames / max_adjust )
 
 		local p_dmg = get_comp_info( proj, 'ProjectileComponent', nil, {
 			{ 'damage', 0 },

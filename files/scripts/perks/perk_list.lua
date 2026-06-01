@@ -525,6 +525,24 @@ local new_perks =
 		end,
 	},
 	{
+		info = 'protection_plasma',
+		stackable = STACKABLE_NO,
+		usable_by_enemies = true,
+		func = function( entity_perk_empty_item, entity_who_picked, item_name )
+			local tag = 'protection_plasma'
+
+			add_comp_remove_dupli( entity_who_picked, 'LuaComponent', tag, {
+				_tags = tag,
+				script_damage_about_to_be_received = empty_path .. 'scripts/perks/protection_plasma.lua',
+			}, nil )
+		end,
+		func_remove = function( entity_who_picked )
+			local tag = 'protection_plasma'
+
+			remove_all_comp( entity_who_picked, 'LuaComponent', tag, nil )
+		end,
+	},
+	{
 		info = 'protection_touch_magic',
 		stackable = STACKABLE_NO,
 		usable_by_enemies = true,
@@ -544,6 +562,50 @@ local new_perks =
 		end,
 		func_remove = function( entity_who_picked )
 			EntityRemoveTag( entity_who_picked, 'polymorphable_NOT' )
+		end,
+	},
+	{
+		info = 'protection_blindness',
+		stackable = STACKABLE_NO,
+		usable_by_enemies = true,
+		func = function( entity_perk_empty_item, entity_who_picked, item_name )
+			EntityAddTag( entity_who_picked, 'empty_blindness_immunity' )
+		end,
+		func_remove = function( entity_who_picked )
+			EntityRemoveTag( entity_who_picked, 'empty_blindness_immunity' )
+		end,
+	},
+	{
+		info = 'protection_neutralized',
+		stackable = STACKABLE_NO,
+		usable_by_enemies = true,
+		func = function( entity_perk_empty_item, entity_who_picked, item_name )
+			EntityAddTag( entity_who_picked, 'empty_neutralized_immunity' )
+		end,
+		func_remove = function( entity_who_picked )
+			EntityRemoveTag( entity_who_picked, 'empty_neutralized_immunity' )
+		end,
+	},
+	{
+		info = 'protection_twitchy',
+		stackable = STACKABLE_NO,
+		usable_by_enemies = true,
+		func = function( entity_perk_empty_item, entity_who_picked, item_name )
+			EntityAddTag( entity_who_picked, 'empty_twitchy_immunity' )
+		end,
+		func_remove = function( entity_who_picked )
+			EntityRemoveTag( entity_who_picked, 'empty_twitchy_immunity' )
+		end,
+	},
+	{
+		info = 'protection_hearty',
+		stackable = STACKABLE_NO,
+		usable_by_enemies = true,
+		func = function( entity_perk_empty_item, entity_who_picked, item_name )
+			EntityAddTag( entity_who_picked, 'empty_hearty_immunity' )
+		end,
+		func_remove = function( entity_who_picked )
+			EntityRemoveTag( entity_who_picked, 'empty_hearty_immunity' )
 		end,
 	},
 	{
@@ -816,7 +878,22 @@ local new_perks =
 			end
 		end,
 		func_remove = function( entity_who_picked )
-			-- TODO
+			local tag = 'adjust'
+
+			local frames, level = get_comp_info( entity_who_picked, 'VariableStorageComponent', tag, {
+				{ 'value_int', 0 },
+				{ 'value_float', 1 },
+			}, nil )
+
+			if ( level > 1 ) then
+				set_comp_value( entity_who_picked, 'VariableStorageComponent', nil, {
+					value_int = frames,
+					value_float = level - 1,
+				}, nil, nil )
+			else
+				remove_all_comp( entity_who_picked, nil, tag, nil )
+				remove_all_child( entity_who_picked, tag, nil )
+			end
 		end,
 	},
 	{
@@ -845,6 +922,19 @@ local new_perks =
 		end,
 		func_remove = function( entity_who_picked )
 			remove_all_comp( entity_who_picked, 'LuaComponent', 'empty_health_regeneration' )
+		end,
+	},
+	{
+		info = 'red_reset',
+		stackable = STACKABLE_YES,
+		usable_by_enemies = false,
+		func = function( entity_perk_empty_item, entity_who_picked, item_name )
+			local x = tonumber( MagicNumbersGetValue( 'DESIGN_PLAYER_START_POS_X' ) ) or 227
+			local y = tonumber( MagicNumbersGetValue( 'DESIGN_PLAYER_START_POS_Y' ) ) or -85
+
+			EntitySetTransform( entity_who_picked, x, y )
+
+			--TODO
 		end,
 	},--[[
 	{
@@ -1416,7 +1506,7 @@ local new_perks =
 	},]]--
 }
 
-local changed_perks = {
+local changed_perks = {--[[
 	{
 		id = 'BREATH_UNDERWATER',
 		func = function( entity_perk_item, entity_who_picked, item_name )
@@ -1459,7 +1549,7 @@ local changed_perks = {
 
 			set_comp_value( entity_who_picked, 'CharacterPlatformingComponent', nil, swim, nil, nil )
 		end,
-	},
+	},]]--
 	{
 		id = 'GOLD_IS_FOREVER',
 		func = function( entity_perk_item, entity_who_picked, item_name )

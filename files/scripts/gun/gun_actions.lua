@@ -1060,9 +1060,6 @@ local new_actions =
 		price = 500,
 		mana = 0,
 		action = function ( )
-			c.fire_rate_wait = c.fire_rate_wait + 120
-			current_reload_time = current_reload_time + 120
-
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/remove/remove_solid_friction.xml,'
 
 			draw_actions( 1, true )
@@ -1116,7 +1113,7 @@ local new_actions =
 		price = 120,
 		mana = 25,
 		action = function ( )
-			c.fire_rate_wait = c.fire_rate_wait + 180
+			c.fire_rate_wait = c.fire_rate_wait + 120
 
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/remove/remove_self_damage.xml,'
 
@@ -1135,6 +1132,9 @@ local new_actions =
 		price = 100,
 		mana = 0,
 		action = function ( )
+			c.fire_rate_wait = c.fire_rate_wait - 180
+			current_reload_time = current_reload_time - 180
+
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/remove/remove_lua.xml,'
 
 			draw_actions( 1, true )

@@ -64,8 +64,8 @@ for _ = 1, deck_cap do
 end
 
 if ( gun.mana_max[ 1 ] < total_mana ) then
-	gun.mana_max[ 1 ] = total_mana
-	gun.mana_max[ 2 ] = total_mana * 2
+	gun.mana_max[ 1 ] = total_mana * 2
+	gun.mana_max[ 2 ] = total_mana * 5
 end
 
 local mana_max = get_random_between_range( gun.mana_max )

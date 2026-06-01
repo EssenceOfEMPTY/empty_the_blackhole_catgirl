@@ -1,0 +1,39 @@
+<Entity>
+
+	<InheritTransformComponent>
+	</InheritTransformComponent>
+
+	<VariableStorageComponent
+		_tags="effect_name"
+		value_string="twitchy"
+	></VariableStorageComponent>
+
+	<LuaComponent
+		script_source_file="mods/empty_the_blackhole_catgirl/files/scripts/status_effects/game_effect_protection.lua"
+		execute_on_added="1"
+	></LuaComponent>
+
+	<LuaComponent
+		script_source_file="data/scripts/status_effects/twitchy.lua"
+		execute_every_n_frame="60"
+	></LuaComponent>
+
+	<LuaComponent
+		script_shot="data/scripts/status_effects/twitchy_shot.lua"
+		execute_every_n_frame="-1"
+	></LuaComponent>
+
+	<LifetimeComponent
+		lifetime="1200"
+	></LifetimeComponent>
+
+	<UIIconComponent
+		name="$status_twitchy"
+		description="$statusdesc_twitchy"
+		icon_sprite_file="data/ui_gfx/status_indicators/twitchy.png"
+		is_perk="0"
+		display_above_head="0"
+		display_in_hud="1"
+	></UIIconComponent>
+
+</Entity>

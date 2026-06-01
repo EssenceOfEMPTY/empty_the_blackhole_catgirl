@@ -18,7 +18,7 @@ new_modifiers = {
 				.. empty_path .. 'entities/misc/remove/remove_gravity.xml,'
 		end
 
-		c.spread_degrees = c.spread_degrees - ( 1 + level ) * ( 30 - frames / 2 )
+		c.spread_degrees = c.spread_degrees + ( 1 + level ) * ( 30 - frames / 2 )
 
 		add_desc_by_info( c, {
 			replace = true,
