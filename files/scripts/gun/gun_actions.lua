@@ -437,7 +437,7 @@ local new_actions =
 							break
 						end
 					else
-						if ( discarded[ _ - #deck + #hand ].id == 'MANA_REDUCE' ) then
+						if ( discarded[ _ - #deck - #hand ].id == 'MANA_REDUCE' ) then
 							is_has_mana = true
 
 							break
@@ -562,14 +562,31 @@ local new_actions =
 		end,
 	},
 	{
+		info = 'teleport_at_speed_of_light',
+		series = {
+			teleport = true,
+		},
+		related_projectiles	= { empty_path .. 'entities/projectiles/deck/teleport_at_speed_of_light.xml' },
+		type		= ACTION_TYPE_PROJECTILE,
+		spawn_level						= '0,1,2,3,4,5,6,7,8,9,10', -- EMPTY_TELEPORT_AT_SPEED_OF_LIGHT
+		spawn_probability				= '0.005,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1', -- EMPTY_TELEPORT_AT_SPEED_OF_LIGHT
+		price = 320,
+		mana = 60,
+		action = function ( )
+			c.spread_degrees = -15
+
+			add_projectile( empty_path .. 'entities/projectiles/deck/teleport_at_speed_of_light.xml' )
+		end,
+	},
+	{
 		info = 'shot_blocker_empty',
 		series = {
 			blocker = true,
 		},
 		related_projectiles	= { empty_path .. 'entities/projectiles/empty_shot.xml' },
 		type		= ACTION_TYPE_PROJECTILE,
-		spawn_level						= '0,10', -- SHOT_BLOCKER_EMPTY
-		spawn_probability				= '0.1,0.1', -- SHOT_BLOCKER_EMPTY
+		spawn_level						= '0,10', -- EMPTY_SHOT_BLOCKER_EMPTY
+		spawn_probability				= '0.1,0.1', -- EMPTY_SHOT_BLOCKER_EMPTY
 		price = 20,
 		mana = 0,
 		action = function ( )
@@ -587,8 +604,8 @@ local new_actions =
 		},
 		related_projectiles	= { empty_path .. 'entities/projectiles/empty_shot.xml' },
 		type		= ACTION_TYPE_PROJECTILE,
-		spawn_level						= '0,10', -- SHOT_BLOCKER_DRAW
-		spawn_probability				= '0.1,0.1', -- SHOT_BLOCKER_DRAW
+		spawn_level						= '0,10', -- EMPTY_SHOT_BLOCKER_DRAW
+		spawn_probability				= '0.1,0.1', -- EMPTY_SHOT_BLOCKER_DRAW
 		price = 20,
 		mana = 0,
 		max_uses = 8000,
@@ -629,8 +646,8 @@ local new_actions =
 		},
 		related_projectiles		= { empty_path .. 'entities/projectiles/colorful/iter_buckshot_alt.xml' },
 		type		= ACTION_TYPE_PROJECTILE,
-		spawn_level						= '2,4,6,8', -- EMPTY_COLORFUL_ITER_PROJECTILE_BUCKSHOT
-		spawn_probability				= '0.1,0.2,0.3,0.4', -- EMPTY_COLORFUL_ITER_PROJECTILE_BUCKSHOT
+		spawn_level						= '6,7,8,9,10', -- EMPTY_COLORFUL_ITER_PROJECTILE_BUCKSHOT
+		spawn_probability				= '0.1,0.1,0.2,0.2,0.3', -- EMPTY_COLORFUL_ITER_PROJECTILE_BUCKSHOT
 		price = 160,
 		mana = 60,
 		action = function ( recursion_level, iteration, copy_series, copy_specific )
@@ -688,8 +705,8 @@ local new_actions =
 		},
 		related_projectiles		= { empty_path .. 'entities/projectiles/colorful/rec_iter_chainsaw_alt.xml' },
 		type		= ACTION_TYPE_PROJECTILE,
-		spawn_level						= '3,5,7,9', -- EMPTY_COLORFUL_REC_ITER_PROJECTILE_CHAINSAW
-		spawn_probability				= '0.2,0.3,0.4,0.5', -- EMPTY_COLORFUL_REC_ITER_PROJECTILE_CHAINSAW
+		spawn_level						= '8,9,10', -- EMPTY_COLORFUL_REC_ITER_PROJECTILE_CHAINSAW
+		spawn_probability				= '0.1,0.2,0.3', -- EMPTY_COLORFUL_REC_ITER_PROJECTILE_CHAINSAW
 		price = 160,
 		mana = 0,
 		action = function ( recursion_level, iteration, copy_series, copy_specific )
@@ -756,18 +773,18 @@ local new_actions =
 		},
 		related_projectiles = { 'data/entities/projectiles/deck/bouncy_orb.xml' },
 		type		= ACTION_TYPE_PROJECTILE,
-		spawn_level						= '1,3,5,7,9', --EMPTY_COLORFUL_REC_ITER_PROJECTILE_HOLE
-		spawn_probability				= '0.2,0.4,0.6,0.8,1', --EMPTY_COLORFUL_REC_ITER_PROJECTILE_HOLE
+		spawn_level						= '10', --EMPTY_COLORFUL_REC_ITER_PROJECTILE_HOLE
+		spawn_probability				= '0.1', --EMPTY_COLORFUL_REC_ITER_PROJECTILE_HOLE
 		price = 320,
 		mana = 160,
-		action = function ( recursion_level, iteration, copy_series, copy_specific )
+		action = function ( rec, iter, series, specific )
 			if ( reflecting ) then
 				c.fire_rate_wait = c.fire_rate_wait + 60
 				current_reload_time = current_reload_time + 60
 
 				add_projectile( 'data/entities/projectiles/deck/bouncy_orb.xml' )
 			else
-				local rec, iter, proj = recursion_level, iteration, nil
+				local proj = nil
 				local has_rec, has_iter = rec and rec > -1, iter and iter > 0
 
 				if ( has_rec ) then
@@ -796,6 +813,11 @@ local new_actions =
 
 					if ( has_iter ) then
 						current_reload_time = current_reload_time + 60
+					end
+
+					if ( not has_rec and not has_iter ) then
+						c.fire_rate_wait = c.fire_rate_wait + 300
+						current_reload_time = current_reload_time + 300
 					end
 
 					add_projectile( proj )
@@ -954,13 +976,13 @@ local new_actions =
 				c.damage_fire_add = c.damage_fire_add + 1 / get_scale( )
 			else
 				local entity = get_root_entity( )
-				local hp, hp_max = get_comp_info( entity, 'DamageModelComponent', nil, {
+				local hp, max_hp = get_comp_info( entity, 'DamageModelComponent', nil, {
 					{ 'hp', 0 },
 					{ 'max_hp', 0 },
 				}, nil )
 
-				if ( is_not_0_num( hp ) and is_not_0_num( hp_max ) and hp_max > hp ) then
-					local delta = ( hp_max - hp ) * get_scale( )
+				if ( is_not_0_num( hp ) and is_not_0_num( max_hp ) and max_hp > hp ) then
+					local delta = ( max_hp - hp ) * get_scale( )
 					local log = ( math.log( delta, math_e ) ^ ( 1 + 0.05 * get_ng_count( ) ) ) / get_scale( )
 
 					mana = mana + math.floor( log )
@@ -988,6 +1010,23 @@ local new_actions =
 			c.fire_rate_wait = c.fire_rate_wait + 300
 
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/lifetime_infinite.xml,'
+
+			draw_actions( 1, true )
+		end,
+	},
+	{
+		info = 'keep_loaded',
+		series = {
+			keep = true,
+		},
+		related_extra_entities	= { empty_path .. 'entities/misc/keep_loaded.xml' },
+		type		= ACTION_TYPE_MODIFIER,
+		spawn_level						= '0,1,2,3,4,5,6,7,8,9,10', -- EMPTY_KEEP_LOADED
+		spawn_probability				= '0.005,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1', -- EMPTY_KEEP_LOADED
+		price = 600,
+		mana = 0,
+		action = function ( )
+			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/keep_loaded.xml,'
 
 			draw_actions( 1, true )
 		end,
@@ -1041,7 +1080,7 @@ local new_actions =
 		spawn_level						= '2,4,6,8,10', -- EMPTY_REMOVE_LIQUID_FRICTION
 		spawn_probability				= '0.5,0.4,0.4,0.3,0.3', -- EMPTY_REMOVE_LIQUID_FRICTION
 		price = 50,
-		mana = 1,
+		mana = 0,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/remove/remove_liquid_friction.xml,'
 
@@ -1183,7 +1222,7 @@ local new_actions =
 		spawn_level						= '0,1,2,3,4', -- EMPTY_DAMAGE_TO_PROJECTILE
 		spawn_probability				= '0.1,0.2,0.4,0.2,0.1', -- EMPTY_DAMAGE_TO_PROJECTILE
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_projectile.xml,'
 
@@ -1200,7 +1239,7 @@ local new_actions =
 		spawn_level						= '0,1,2,3,4', -- EMPTY_DAMAGE_TO_FIRE
 		spawn_probability				= '0.1,0.2,0.4,0.2,0.1', -- EMPTY_DAMAGE_TO_FIRE
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_fire.xml,'
 
@@ -1217,7 +1256,7 @@ local new_actions =
 		spawn_level						= '0,1,2,3,4', -- EMPTY_DAMAGE_TO_EXPLOSION
 		spawn_probability				= '0.1,0.2,0.4,0.2,0.1', -- EMPTY_DAMAGE_TO_EXPLOSION
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_explosion.xml,'
 
@@ -1234,7 +1273,7 @@ local new_actions =
 		spawn_level						= '2,3,4,5,6', -- EMPTY_DAMAGE_TO_ELECTRICITY
 		spawn_probability				= '0.1,0.2,0.4,0.2,0.1', -- EMPTY_DAMAGE_TO_ELECTRICITY
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_electricity.xml,'
 
@@ -1251,7 +1290,7 @@ local new_actions =
 		spawn_level						= '1,2,3,4,5', -- EMPTY_DAMAGE_TO_ICE
 		spawn_probability				= '0.1,0.2,0.4,0.2,0.1', -- EMPTY_DAMAGE_TO_ICE
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_ice.xml,'
 
@@ -1268,7 +1307,7 @@ local new_actions =
 		spawn_level						= '1,2,3,4,5', -- EMPTY_DAMAGE_TO_RADIOACTIVE
 		spawn_probability				= '0.1,0.2,0.4,0.2,0.1', -- EMPTY_DAMAGE_TO_RADIOACTIVE
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_radioactive.xml,'
 
@@ -1285,7 +1324,7 @@ local new_actions =
 		spawn_level						= '6,7,8,9,10', -- EMPTY_DAMAGE_TO_POISON
 		spawn_probability				= '0.1,0.2,0.4,0.2,0.1', -- EMPTY_DAMAGE_TO_POISON
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_poison.xml,'
 
@@ -1302,7 +1341,7 @@ local new_actions =
 		spawn_level						= '2,4,6,8,10', -- EMPTY_DAMAGE_TO_SLICE
 		spawn_probability				= '0.1,0.2,0.4,0.2,0.1', -- EMPTY_DAMAGE_TO_SLICE
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_slice.xml,'
 
@@ -1319,7 +1358,7 @@ local new_actions =
 		spawn_level						= '1,3,5,7,9', -- EMPTY_DAMAGE_TO_DRILL
 		spawn_probability				= '0.1,0.2,0.4,0.2,0.1', -- EMPTY_DAMAGE_TO_DRILL
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_drill.xml,'
 
@@ -1336,7 +1375,7 @@ local new_actions =
 		spawn_level						= '0,1,2,9,10', -- EMPTY_DAMAGE_TO_MELEE
 		spawn_probability				= '0.4,0.2,0.1,0.1,0.2', -- EMPTY_DAMAGE_TO_MELEE
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_melee.xml,'
 
@@ -1353,7 +1392,7 @@ local new_actions =
 		spawn_level						= '0,1,8,9,10', -- EMPTY_DAMAGE_TO_PHYSICS_HIT
 		spawn_probability				= '0.2,0.1,0.1,0.2,0.4', -- EMPTY_DAMAGE_TO_PHYSICS_HIT
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_physics_hit.xml,'
 
@@ -1370,7 +1409,7 @@ local new_actions =
 		spawn_level						= '8,9,10', -- EMPTY_DAMAGE_TO_CURSE
 		spawn_probability				= '0.2,0.4,0.8', -- EMPTY_DAMAGE_TO_CURSE
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_curse.xml,'
 
@@ -1387,7 +1426,7 @@ local new_actions =
 		spawn_level						= '0,1,2', -- EMPTY_DAMAGE_TO_HOLY
 		spawn_probability				= '0.8,0.4,0.2', -- EMPTY_DAMAGE_TO_HOLY
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_holy.xml,'
 
@@ -1404,7 +1443,7 @@ local new_actions =
 		spawn_level						= '0,10', -- EMPTY_DAMAGE_TO_HEALING
 		spawn_probability				= '0.5,0.5', -- EMPTY_DAMAGE_TO_HEALING
 		price = 300,
-		mana = 50,
+		mana = 20,
 		action = function ( )
 			c.extra_entities = c.extra_entities .. empty_path .. 'entities/misc/damage_to/damage_to_healing.xml,'
 
@@ -2100,9 +2139,7 @@ local new_actions =
 					else
 						data = discarded[ _ - #deck - #hand ]
 					end
-info_print( data.id, 'spell_clear - id' )
-info_print( data.max_uses, 'spell_clear - max_uses' )
-info_print( data.uses_remaining, 'spell_clear - uses_remaining' )
+
 					if ( data.max_uses and data.uses_remaining > 0 ) then
 						local rec_new = check_recursion( data, rec )
 

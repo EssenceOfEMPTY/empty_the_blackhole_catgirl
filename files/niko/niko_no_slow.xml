@@ -1,0 +1,10 @@
+<Entity tags="niko,niko_no_slow">
+
+	<InheritTransformComponent/>
+
+	<GameEffectComponent
+		effect="NO_SLIME_SLOWDOWN"
+		frames="-1"
+	></GameEffectComponent >
+
+</Entity>

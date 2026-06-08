@@ -60,7 +60,7 @@ for _ = 1, deck_cap do
 	local card = get_random_from( gun.actions )
 	AddGunAction( e_id, card[ 1 ] )
 
-	total_mana = total_mana + card[ 2 ] * 2
+	total_mana = total_mana + card[ 2 ] * 3
 end
 
 if ( gun.mana_max[ 1 ] < total_mana ) then

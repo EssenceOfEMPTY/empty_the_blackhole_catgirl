@@ -1,15 +1,16 @@
 <Entity name="$projectile_default" >
 
 	<Base file="data/entities/base_projectile.xml" >
+
 		<VelocityComponent
 			gravity_y="0"
 			air_friction="0.5"
 			mass="0.06"
 		></VelocityComponent>
+
 	</Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		lob_min="0.8"
 		lob_max="1.0"
 		speed_min="120"
@@ -63,6 +64,7 @@
 			stains_image="data/temp/explosion_stain.png"
 			audio_event_name="explosions/magic_small"
 		></config_explosion>
+
 	</ProjectileComponent>
 
 	<ParticleEmitterComponent
@@ -100,7 +102,6 @@
 	></ParticleEmitterComponent>
 
 	<SpriteComponent
-		_enabled="1"
 		alpha="1"
 		image_file="mods/empty_the_blackhole_catgirl/files/projectiles_gfx/orb_blue_big.xml"
 		next_rect_animation=""
@@ -111,7 +112,6 @@
 	></SpriteComponent>
 
 	<SpriteComponent
-		_enabled="1"
 		alpha="1"
 		image_file="mods/empty_the_blackhole_catgirl/files/projectiles_gfx/orb_blue_big.xml"
 		next_rect_animation=""
@@ -124,7 +124,6 @@
 	></SpriteComponent>
 
 	<LightComponent
-		_enabled="1"
 		radius="150"
 		r="45"
 		g="45"

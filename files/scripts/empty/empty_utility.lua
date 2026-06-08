@@ -2,6 +2,7 @@
 empty_path = 'mods/empty_the_blackhole_catgirl/files/'
 
 int_huge = 2147483647
+
 math_2p = 2 * math.pi
 math_e = math.exp( 1 )
 epsilon = 0.0003
@@ -37,21 +38,20 @@ all_d_muls = {
 	'healing',
 }
 
-all_d_muls_0 = {
-	melee = 0,
-	projectile = 0,
-	explosion = 0,
-	electricity = 0,
-	fire = 0,
-	ice = 0,
-	drill = 0,
-	slice = 0,
-	physics_hit = 0,
-	radioactive = 0,
-	poison = 0,
-	curse = 0,
-	holy = 0,
-	healing = 0,
+all_d_muls_no_healing = {
+	'melee',
+	'projectile',
+	'explosion',
+	'electricity',
+	'fire',
+	'ice',
+	'drill',
+	'slice',
+	'physics_hit',
+	'radioactive',
+	'poison',
+	'curse',
+	'holy',
 }
 
 all_proj_dmg = {
@@ -70,22 +70,6 @@ all_proj_dmg = {
 	'healing',
 }
 
-all_proj_dmg_0 = {
-	melee = 0,
-	explosion = 0,
-	electricity = 0,
-	fire = 0,
-	ice = 0,
-	slice = 0,
-	drill = 0,
-	physics_hit = 0,
-	radioactive = 0,
-	poison = 0,
-	curse = 0,
-	holy = 0,
-	healing = 0,
-}
-
 all_proj_dmg_0_dmg_by_type = {
 	{ 'damage_by_type', 'melee', 0 },
 	{ 'damage_by_type', 'explosion', 0 },
@@ -100,6 +84,29 @@ all_proj_dmg_0_dmg_by_type = {
 	{ 'damage_by_type', 'curse', 0 },
 	{ 'damage_by_type', 'holy', 0 },
 	{ 'damage_by_type', 'healing', 0 },
+}
+
+all_pos_protect_perk = {
+	'PROTECTION_FIRE',
+	'PROTECTION_RADIOACTIVITY',
+	'PROTECTION_EXPLOSION',
+	'PROTECTION_MELEE',
+	'PROTECTION_ELECTRICITY',
+	'EMPTY_PROTECTION_GLUE',
+	'EMPTY_PROTECTION_SHOCK',
+	'EMPTY_PROTECTION_FREEZE',
+	'EMPTY_PROTECTION_VENOMOUS_CURSE',
+	'EMPTY_PROTECTION_LAVA',
+	'EMPTY_PROTECTION_ACID',
+	'EMPTY_PROTECTION_SLICE',
+	'EMPTY_PROTECTION_POISON',
+	'EMPTY_PROTECTION_PLASMA',
+	'EMPTY_PROTECTION_TOUCH_MAGIC',
+	'EMPTY_PROTECTION_POLYMORPH',
+	'EMPTY_PROTECTION_BLINDNESS',
+	'EMPTY_PROTECTION_NEUTRALIZED',
+	'EMPTY_PROTECTION_TWITCHY',
+	'EMPTY_PROTECTION_HEARTY',
 }
 
 all_tag = {
@@ -118,11 +125,11 @@ orbit_loc_fix = {
 
 max_adjust = 180
 
----打印一切信息, 此函数仅用于调试; 
+---打印一切信息, 此函数仅用于调试;
 ---正式版本中不应该看见任何地方调用这个函数
 ---@param info any
----@param key string|nil
----@param tab_count number|nil
+---@param key string|nil?
+---@param tab_count number|nil?
 function info_print( info, key, tab_count )
 	if ( key == nil ) then
 		key = ''
@@ -159,8 +166,8 @@ function info_print( info, key, tab_count )
 end
 
 ---显示重要信息
----@param title string|nil
----@param desc string|nil
+---@param title string
+---@param desc string|nil?
 function imp_print( title, desc )
 	if ( type( title ) == 'string' and type( desc ) == 'string' ) then
 		GamePrintImportant( title, desc )
@@ -384,6 +391,47 @@ function is_in( value, search )
 	return false
 end
 
+---深度拷贝表, 支持嵌套表和循环引用保护
+---@param t table
+---@return table t
+function deep_copy( t )
+	local visited = { }
+
+	local function _deep_copy( t )
+		if ( type( t ) ~= 'table' ) then
+			return t
+		end
+
+		if ( visited[ t ] ) then
+			return visited[ t ]
+		end
+
+		local copy = { }
+		visited[ t ] = copy
+
+		for k, v in pairs( t ) do
+			copy[ _deep_copy( k ) ] = _deep_copy( v )
+		end
+
+		return copy
+	end
+
+	return _deep_copy( t )
+end
+
+---构造承伤乘数表 t
+---@param num number
+---@return table<string, number> d_muls
+function construct_d_muls( num )
+	local t = { }
+
+	for i, _ in ipairs( all_d_muls ) do
+		t[ _ ] = num
+	end
+
+	return t
+end
+
 ---以包含 2 项的数组作为最值获取随机数
 ---@param target number[]
 ---@return number
@@ -431,8 +479,8 @@ function add_table( main, merge, is_clean_main, is_clean_merge )
 	end
 end
 
----在 main 内通过 id 查找并替换 replace 内的每项; 
----设置 pre_id 的场合, 将对比 pre_id 并将 id 更改为新的 id; 
+---在 main 内通过 id 查找并替换 replace 内的每项;
+---设置 pre_id 的场合, 将对比 pre_id 并将 id 更改为新的 id;
 ---可在替换后清空 replace
 ---@param main table
 ---@param replace table
@@ -473,7 +521,7 @@ function update_table_by_id( main, replace, is_clean_replace )
 	end
 end
 
----将 main 逆序并返回; 
+---将 main 逆序并返回;
 ---可修改 main
 ---@param main table
 ---@param is_change_main boolean|nil? --默认为 true
@@ -594,8 +642,8 @@ function ensure_table( check, keys )
 	return check
 end
 
----从 random_table 中随机选取 count 项; 
----count 或 random_table 的长度小于 1 时返回空表; 
+---从 random_table 中随机选取 count 项;
+---count 或 random_table 的长度小于 1 时返回空表;
 ---count 大于 random_table 的长度时变作与 random_table 的长度相同
 ---@param random_table table
 ---@param count number
@@ -637,7 +685,7 @@ function remove_duplicates( num_str_table )
 	return res
 end
 
----为 location 排序; 
+---为 location 排序;
 ---仅可用于法术的 action( ) 中对 卡组 · 手卡 · 墓地 的操作
 ---@param location table[]
 ---@return table[] location_sort
@@ -656,7 +704,7 @@ function loc_sort( location )
 	return location
 end
 
----打乱 loc 的顺序; 
+---打乱 loc 的顺序;
 ---仅可用于法术的 action( ) 中对 卡组 · 手卡 · 墓地 的操作
 ---@param loc table
 ---@return table location_shuffle
@@ -693,6 +741,25 @@ function get_len( vel_x, vel_y )
 	end
 end
 
+---根据 num 在 min_num 与 max_num 之间的位置对数地获取 mul
+---@param num number
+---@param paras table<string, number>
+---@return number log_mul
+function get_log_mul( num, paras )
+	if ( num <= paras.min_num ) then
+		return paras.min_log
+	elseif ( num >= paras.max_num ) then
+		return paras.max_log
+	end
+
+	local num_range = paras.max_num - paras.min_num
+	local log_range = paras.max_log - paras.min_log
+
+	local log_mul = math.log( num - paras.min_num + 1 ) / math.log( num_range + 1 )
+
+	return paras.min_log + log_range * log_mul
+end
+
 ---标准化向量
 ---@param vel_x number
 ---@param vel_y number
@@ -724,7 +791,7 @@ function change_vel( vel_x, vel_y, speed )
 	end
 end
 
----将 count 个点以 gap 为间距排列在 x 轴上，整体中心位于 x = 0; 
+---将 count 个点以 gap 为间距排列在 x 轴上，整体中心位于 x = 0;
 ---返回第 num 个点的 x 坐标
 ---@param count number
 ---@param gap number
@@ -887,8 +954,7 @@ function get_up_entity( )
 	return update
 end
 
----获取实体;
----可选是否获取为 table
+---获取实体
 ---@return table<string, number>
 function get_up_entity_table( )
 	local update = GetUpdatedEntityID( )
@@ -960,23 +1026,13 @@ function get_closest_player( tar_id, tar_x, tar_y )
 end
 
 ---移除投射物速度组件的速度上限
----@param projectile number|number[]|nil
-function remove_speed_limit( projectile )
-	if ( type( projectile ) == 'number' ) then
-		projectile = { projectile }
-	end
-
-	for _, proj in ipairs( projectile or { } ) do
-		local v_comps = EntityGetComponent( proj, 'VelocityComponent' ) or { }
-
-		for _, v_comp in ipairs( v_comps or { } ) do
-			if ( v_comp ~= 0 ) then
-				ComponentSetValue2( v_comp, 'terminal_velocity', math.huge )
-				ComponentSetValue2( v_comp, 'apply_terminal_velocity', false )
-				ComponentSetValue2( v_comp, 'limit_to_max_velocity', false )
-			end
-		end
-	end
+---@param projs number|number[]
+function remove_speed_limit( projs )
+	set_comp_value( projs, 'VelocityComponent', nil, {
+		apply_terminal_velocity = false,
+		terminal_velocity = int_huge,
+		limit_to_max_velocity = false,
+	}, nil, nil )
 end
 
 ---检测法术是否是被复制的
@@ -1000,6 +1056,8 @@ function get_all_comp( entity, comp_type, tag, name )
 
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
+	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
+		return { }
 	end
 
 	if ( is_not_nil_str( comp_type ) ) then
@@ -1041,7 +1099,7 @@ function is_has_comp( entity, comp_type, tag, name )
 	return #comps > 0
 end
 
----返回 entity 实体中首个类型为 comp_type 的组件内属性为 field_table 每个 "键" 的值; 
+---返回 entity 实体中首个类型为 comp_type 的组件内属性为 field_table 每个 "键" 的值;
 ---没有的场合用 field_table 对应"键"的值代替
 ---@param entity number
 ---@param comp_type string
@@ -1088,13 +1146,23 @@ function get_comp_info( entity, comp_type, tag, field_table, name )
 
 	if ( comp ) then
 		for _, t in ipairs( field_table or { } ) do
-			local v = ComponentGetValue2( comp, t[ 1 ] )
+			local a, b, c, d, e = ComponentGetValue2( comp, t[ 1 ] )
 
-			if ( v == nil ) then
-				v = t[ 2 ]
+			if ( a == nil ) then
+				table.insert( values, t[ 2 ] )
+			else
+				if ( b == nil ) then
+					table.insert( values, a )
+				else
+					table.insert( values, {
+						v_1 = a,
+						v_2 = b,
+						v_3 = c,
+						v_4 = d,
+						v_5 = e
+					} )
+				end
 			end
-
-			table.insert( values, v )
 		end
 	else
 		for _, t in ipairs( field_table or { } ) do
@@ -1174,10 +1242,12 @@ end
 ---@param comp_type string
 ---@param comp_table table
 ---@return number comps_count
----@return table affect_comps
+---@return number[] affect_comps
 function add_comp( entity, comp_type, comp_table )
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
+	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
+		return 0, { }
 	end
 
 	local comps = { }
@@ -1191,9 +1261,9 @@ function add_comp( entity, comp_type, comp_table )
 	return #comps, comps
 end
 
----为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件; 
----当元素为字符串时，增量为 comp_table[ 元素 ] ; 
----当元素为 { key, inc } 表时，增量为 inc ; 
+---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件;
+---当元素为字符串时，增量为 comp_table[ 元素 ] ;
+---当元素为 { key, inc } 表时，增量为 inc ;
 ---会删除多余的组件, 返回影响组件的总数、操作方法以及受影响后仍存在的组件表
 ---@param entity number|number[]
 ---@param comp_type string
@@ -1203,12 +1273,14 @@ end
 ---@param name string|nil
 ---@return number comps_count
 ---@return string method
----@return table affect_comps
+---@return number[] affect_comps
 function add_comp_prolong( entity, comp_type, tag, comp_table, prolong_table, name )
-	local count, method = 0, ''
+	local count, method = 0, 'nil'
 
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
+	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
+		return 0, method, { }
 	end
 
 	local comps = get_all_comp( entity, comp_type, tag, name )
@@ -1255,7 +1327,7 @@ function add_comp_prolong( entity, comp_type, tag, comp_table, prolong_table, na
 	return count, method, comps
 end
 
----为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件; 
+---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件;
 ---会删除多余的组件, 返回影响组件的总数、操作方法以及受影响后仍存在的组件表
 ---@param entity number|number[]
 ---@param comp_type string
@@ -1264,12 +1336,14 @@ end
 ---@param name string|nil?
 ---@return number comps_count
 ---@return string method
----@return table affect_comps
+---@return number[] affect_comps
 function add_comp_remove_dupli( entity, comp_type, tag, comp_table, name )
-	local count, method = 0, ''
+	local count, method = 0, 'nil'
 
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
+	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
+		return 0, method, { }
 	end
 
 	local comps = get_all_comp( entity, comp_type, tag, name )
@@ -1310,8 +1384,8 @@ function add_comp_remove_dupli( entity, comp_type, tag, comp_table, name )
 	return count, method, comps
 end
 
----将每个 entity 实体所有类型为 comp_type 的组件的值按照 v_table 设置; 
----在传入 func 时对每个类型为 comp_type 的组件执行一次 func ; 
+---将每个 entity 实体所有类型为 comp_type 的组件的值按照 v_table 设置;
+---在传入 func 时对每个类型为 comp_type 的组件执行一次 func ;
 ---返回影响组件的总数以及受影响的组件表
 ---@param entity number|number[]
 ---@param comp_type string|nil
@@ -1320,10 +1394,12 @@ end
 ---@param pre_func function|nil?
 ---@param aft_func function|nil?
 ---@return number comps_count
----@return table affect_comps
+---@return number[] affect_comps
 function set_comp_value( entity, comp_type, tag, v_table, pre_func, aft_func )
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
+	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
+		return 0, { }
 	end
 
 	local comps = get_all_comp( entity, comp_type, tag )
@@ -1409,8 +1485,8 @@ function set_comp_value( entity, comp_type, tag, v_table, pre_func, aft_func )
 	return #comps, comps
 end
 
----将每个 entity 实体所有类型为 comp_type 的组件内子对象属性按照 v_table 设置; 
----在传入 func 时对每个类型为 comp_type 的组件执行一次 func ; 
+---将每个 entity 实体所有类型为 comp_type 的组件内子对象属性按照 v_table 设置;
+---在传入 func 时对每个类型为 comp_type 的组件执行一次 func ;
 ---返回影响组件的总数以及受影响的组件表
 ---@param entity number|number[]
 ---@param comp_type string
@@ -1419,10 +1495,12 @@ end
 ---@param pre_func function|nil?
 ---@param aft_func function|nil?
 ---@return number comps_count
----@return table affect_comps
+---@return number[] affect_comps
 function set_comp_obj_value( entity, comp_type, tag, v_table, pre_func, aft_func )
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
+	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
+		return 0, { }
 	end
 
 	local comps = get_all_comp( entity, comp_type, tag )
@@ -1508,7 +1586,7 @@ function set_comp_obj_value( entity, comp_type, tag, v_table, pre_func, aft_func
 	return #comps, comps
 end
 
----移除每个 entity 实体所有类型为 comp_type 的组件; 
+---移除每个 entity 实体所有类型为 comp_type 的组件;
 ---返回影响组件的总数
 ---@param entity number|number[]
 ---@param comp_type string?
@@ -1518,6 +1596,8 @@ end
 function remove_all_comp( entity, comp_type, tag, name )
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
+	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
+		return 0
 	end
 
 	local comps = get_all_comp( entity, comp_type, tag, name )
@@ -1570,7 +1650,7 @@ function remove_child( child )
 	EntityKill( child )
 end
 
----移除每个 entity 实体上的所有子实体; 
+---移除每个 entity 实体上的所有子实体;
 ---返回影响子实体的总数
 ---@param entity number|number[]
 ---@param tag string|nil?
@@ -1586,51 +1666,97 @@ function remove_all_child( entity, tag, name )
 end
 
 ---为投射物进行伤害变换
----@param entity number
+---@param proj number
 ---@param dmg_type string
----@param multi number|nil? --伤害损耗倍率, 默认 50%
+---@param mul number|nil? --伤害倍率, 默认 50%
 ---@param base_dmg number|nil? --基础伤害, 默认 1
-function damage_to( entity, dmg_type, multi, base_dmg )
-	if ( is_has_comp( entity, 'ProjectileComponent', nil ) ) then
+function damage_to( proj, dmg_type, mul, base_dmg )
+	if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
+		mul, base_dmg = mul or 0.5, base_dmg or ( 1 / get_scale( ) )
+
 		local sum = 0
 
-		set_comp_value( entity, 'ProjectileComponent', nil, {
+		set_comp_value( proj, 'ProjectileComponent', nil, {
 			damage = 0,
 		}, function ( comp )
 			sum = sum + math.abs( ComponentGetValue2( comp, 'damage' ) or 0 )
 		end, nil )
 
-		set_comp_obj_value( entity, 'ProjectileComponent', nil, {
+		set_comp_obj_value( proj, 'ProjectileComponent', nil, {
 			{ 'config_explosion', 'damage', 0 },
 		}, function ( comp )
 			sum = sum + math.abs( ComponentObjectGetValue2( comp, 'config_explosion', 'damage' ) or 0 )
 		end, nil )
 
-		set_comp_obj_value( entity, 'ProjectileComponent', nil, all_proj_dmg_0_dmg_by_type,
+		set_comp_obj_value( proj, 'ProjectileComponent', nil, all_proj_dmg_0_dmg_by_type,
 		function ( comp )
 			for i, _ in ipairs( all_proj_dmg ) do
 				sum = sum + math.abs( ComponentObjectGetValue2( comp, 'damage_by_type', _ ) or 0 )
 			end
 		end, nil )
 
-		sum = ( base_dmg or 1 ) / get_scale( ) + sum * ( multi or 0.5 )
+		sum = base_dmg + sum * mul
 
 		if ( dmg_type == 'projectile' ) then
-			set_comp_value( entity, 'ProjectileComponent', nil, {
+			set_comp_value( proj, 'ProjectileComponent', nil, {
 				damage = sum,
 			}, nil, nil )
 		elseif ( dmg_type == 'healing' ) then
-			set_comp_obj_value( entity, 'ProjectileComponent', nil, {
+			set_comp_obj_value( proj, 'ProjectileComponent', nil, {
 				{ 'damage_by_type', dmg_type, -sum },
 			}, nil, nil )
 		else
-			set_comp_obj_value( entity, 'ProjectileComponent', nil, {
+			set_comp_obj_value( proj, 'ProjectileComponent', nil, {
 				{ 'damage_by_type', dmg_type, sum },
 			}, nil, nil )
 		end
 	end
 end
 
+---为投射物全伤害乘以伤害倍率
+---@param proj number
+---@param mul number|nil? --伤害倍率, 默认 200%
+function damage_mul( proj, mul )
+	if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
+		mul = mul or 2
+
+		local p_dmg = get_comp_info( proj, 'ProjectileComponent', nil, {
+			{ 'damage', 0 },
+		}, nil )
+
+		set_comp_value( proj, 'ProjectileComponent', nil, {
+			damage = p_dmg * mul,
+		}, nil, nil )
+
+		local dmg = { }
+
+		local ex_dmg = get_comp_obj_info( proj, 'ProjectileComponent', nil, {
+			{ 'config_explosion', 'damage', 0 },
+		}, nil )
+
+		if ( ex_dmg > 0 ) then
+			table.insert( dmg, {
+				'config_explosion', 'damage', ex_dmg * mul
+			} )
+		end
+
+		for i, _ in ipairs( all_proj_dmg ) do
+			local d = get_comp_obj_info( proj, 'ProjectileComponent', nil, {
+				{ 'damage_by_type', _, 0 },
+			}, nil )
+
+			if ( d > 0 ) then
+				table.insert( dmg, {
+					'damage_by_type', _, d * mul
+				} )
+			end
+		end
+
+		if ( #dmg > 0 ) then
+			set_comp_obj_value( proj, 'ProjectileComponent', nil, dmg, nil, nil )
+		end
+	end
+end
 
 function remove_cards_until_fix( wand, deck_cap, always )
 	local cards = get_all_child( wand )

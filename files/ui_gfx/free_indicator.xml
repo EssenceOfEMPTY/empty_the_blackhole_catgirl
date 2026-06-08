@@ -1,7 +1,6 @@
 <Entity>
 
 	<SpriteComponent
-		_enabled="1"
 		alpha="1"
 		offset_x="5"
 		offset_y="2"

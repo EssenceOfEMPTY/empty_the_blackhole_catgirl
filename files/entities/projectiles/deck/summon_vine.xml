@@ -31,7 +31,6 @@
 
 	<ParticleEmitterComponent
 		_tags="grow"
-		_enabled="0"
 		emitted_material_name="root_growth"
 		offset.x="0"
 		offset.y="0"
@@ -68,7 +67,6 @@
 	<!-- controls the growth movement -->
 	<LuaComponent
 		_tags="grow"
-		_enabled="0"
 		script_source_file="data/scripts/props/root_grower_spread.lua"
 		execute_every_n_frame="5"
 	></LuaComponent>
@@ -76,7 +74,6 @@
 	<!-- the main root has a random chance to spawn root_grower_branch.xml for branching -->
 	<LuaComponent
 		_tags="grow"
-		_enabled="0"
 		script_source_file="data/scripts/props/root_grower_split.lua"
 		execute_every_n_frame="16"
 	></LuaComponent>
@@ -99,7 +96,6 @@
 
 	<LifetimeComponent
 		_tags="grow"
-		_enabled="0"
 		lifetime="400"
 	></LifetimeComponent>
 

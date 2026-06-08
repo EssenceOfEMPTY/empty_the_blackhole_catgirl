@@ -1,0 +1,45 @@
+<Entity tags="niko,niko_respawn">
+
+	<InheritTransformComponent/>
+
+	<GameEffectComponent
+		effect="RESPAWN"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="RESPAWN"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="RESPAWN"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="RESPAWN"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="RESPAWN"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="RESPAWN"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="RESPAWN"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="RESPAWN"
+		frames="-1"
+	></GameEffectComponent>
+
+</Entity>

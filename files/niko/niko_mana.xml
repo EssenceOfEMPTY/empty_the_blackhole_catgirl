@@ -1,0 +1,45 @@
+<Entity tags="niko,niko_mana">
+
+	<InheritTransformComponent/>
+
+	<GameEffectComponent
+		effect="MANA_REGENERATION"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="MANA_REGENERATION"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="MANA_REGENERATION"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="MANA_REGENERATION"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="MANA_REGENERATION"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="MANA_REGENERATION"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="MANA_REGENERATION"
+		frames="-1"
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="MANA_REGENERATION"
+		frames="-1"
+	></GameEffectComponent>
+
+</Entity>

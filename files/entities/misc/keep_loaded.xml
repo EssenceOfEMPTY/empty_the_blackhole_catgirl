@@ -1,0 +1,10 @@
+<Entity>
+
+	<StreamingKeepAliveComponent/>
+
+	<LuaComponent
+		script_source_file="mods/empty_the_blackhole_catgirl/files/scripts/projectiles/keep_loaded.lua"
+		execute_every_n_frame="0"
+	></LuaComponent>
+
+</Entity>

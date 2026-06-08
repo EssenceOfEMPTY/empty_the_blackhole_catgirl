@@ -23,7 +23,6 @@
 	></UIInfoComponent>
 
 	<LightComponent
-		_enabled="1"
 		radius="255"
 		fade_out_time="1.5"
 		r="64"
@@ -33,7 +32,6 @@
 	></LightComponent>
 
 	<LightComponent
-		_enabled="1"
 		radius="64"
 		fade_out_time="1.5"
 		r="64"

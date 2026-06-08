@@ -98,7 +98,7 @@ end
 
 ---继承属性地发射投射物
 ---@param _ table
----@param copy_c table
+---@param copy_c table  传给此函数的 copy_c 必须是属性快照（平表），不是对全局 c 的引用
 function inherit_shot( _, copy_c )
 	local shot = create_shot( _.draw_count )
 
@@ -111,12 +111,20 @@ function inherit_shot( _, copy_c )
 	local old_c = c
 	c = shot.state
 
-	draw_actions( shot.num_of_cards_to_draw, _.reload )
-	register_action( shot.state )
-
-	SetProjectileConfigs( )
+	-- 用 pcall 保护 c 的保存/恢复：draw_actions 中任何异常都不会让 c 永久指向 shot.state
+	local ok, err = pcall( draw_actions, shot.num_of_cards_to_draw, _.reload )
+	if ( ok ) then
+		ok, err = pcall( register_action, shot.state )
+	end
+	if ( ok ) then
+		ok, err = pcall( SetProjectileConfigs )
+	end
 
 	c = old_c
+
+	if ( not ok ) then
+		error( err, 0 )
+	end
 end
 
 ---发射复合型触发投射物
@@ -130,7 +138,9 @@ function add_projectile_complex( entity_filename, trigger_table )
 
 	BeginProjectile( entity_filename )
 
-	local copy_c = c
+	-- 使用 deep_copy 对全局 c 做深拷贝快照，
+	-- 这样即使后续迭代中 c 被修改，copy_c 中的值也不会被污染。
+	local copy_c = deep_copy( c )
 
 	for i, _ in ipairs( trigger_table or { } ) do
 		_.trigger_type = _.trigger_type or 'trigger'

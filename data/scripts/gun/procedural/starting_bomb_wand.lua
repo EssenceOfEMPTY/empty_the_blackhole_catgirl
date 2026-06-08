@@ -56,7 +56,7 @@ end
 
 if ( gun.mana_max[ 1 ] < need_max_mana ) then
 	gun.mana_max[ 1 ] = need_max_mana
-	gun.mana_max[ 2 ] = math.ceil( gun.mana_max[ 1 ] * 1.2 )
+	gun.mana_max[ 2 ] = math.ceil( gun.mana_max[ 1 ] * 1.5 )
 end
 
 local mana_max = get_random_between_range( gun.mana_max )

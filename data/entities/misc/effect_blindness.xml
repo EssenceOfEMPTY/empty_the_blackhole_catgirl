@@ -1,7 +1,6 @@
 <Entity>
 
-	<InheritTransformComponent>
-	</InheritTransformComponent>
+	<InheritTransformComponent/>
 
 	<VariableStorageComponent
 		_tags="effect_name"
@@ -13,7 +12,7 @@
 		execute_on_added="1"
 	></LuaComponent>
 
-	<GameEffectComponent 
+	<GameEffectComponent
 		effect="BLINDNESS"
 		frames="1200"
 	></GameEffectComponent>

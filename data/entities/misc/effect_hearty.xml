@@ -1,7 +1,6 @@
 <Entity>
 
-	<InheritTransformComponent>
-	</InheritTransformComponent>
+	<InheritTransformComponent/>
 
 	<VariableStorageComponent
 		_tags="effect_name"

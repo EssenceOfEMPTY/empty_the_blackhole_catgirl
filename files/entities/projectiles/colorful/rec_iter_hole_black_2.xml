@@ -10,7 +10,6 @@
 	</Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		lob_min="0.8"
 		lob_max="1.0"
 		speed_min="120"
@@ -75,7 +74,6 @@
 
 	<SpriteComponent
 		_tags="enabled_in_hand,enabled_in_world"
-		_enabled="1"
 		offset_x="80"
 		offset_y="80"
 		emissive="1"
@@ -218,8 +216,7 @@
 			collapse_images="data/procedural_gfx/collapse_huge/$[0-14].png"
 		></LooseGroundComponent>
 
-		<InheritTransformComponent>
-		</InheritTransformComponent>
+		<InheritTransformComponent/>
 
 	</Entity>
 

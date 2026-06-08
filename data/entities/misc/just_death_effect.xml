@@ -13,5 +13,5 @@
 	<LifetimeComponent
 		lifetime="2"
 	></LifetimeComponent>
-  
+
 </Entity>

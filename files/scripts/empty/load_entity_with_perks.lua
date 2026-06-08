@@ -65,7 +65,7 @@ function entity_load_give_perks( entity, x, y )
 end
 
 
--- this is used for debug purposes. If you CTRL+O and select a lua file it 
+-- this is used for debug purposes. If you CTRL+O and select a lua file it
 -- will list all the functions in the debug UI and you can just click them from there
 function SPAWN_SHOTGUNNER()
 	local x, y = GameGetCameraPos()

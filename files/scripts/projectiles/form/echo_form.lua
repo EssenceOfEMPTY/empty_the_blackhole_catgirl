@@ -67,10 +67,4 @@ function shot( proj )
 			end
 		end
 	end
-
-	--local l_comps = get_all_comp( proj, 'LuaComponent', nil )
---
-	--if ( #l_comps > 0 ) then
-	--	--
-	--end
 end

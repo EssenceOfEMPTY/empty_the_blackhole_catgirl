@@ -4,7 +4,6 @@
 	</Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		projectile_type="MATERIAL_PARTICLE"
 		lob_min="1.0"
 		lob_max="1.0"
@@ -33,7 +32,6 @@
 	></ProjectileComponent>
 
 	<SpriteComponent
-		_enabled="1"
 		alpha="1"
 		image_file="data/projectiles_gfx/dirt.xml"
 	></SpriteComponent>

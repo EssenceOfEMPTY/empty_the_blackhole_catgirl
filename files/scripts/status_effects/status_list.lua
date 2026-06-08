@@ -26,7 +26,7 @@ end
 
 add_table( status_effects, new_effects )
 --[[
-status_effects = 
+status_effects =
 {
 	{
 		id="WET",
@@ -314,7 +314,7 @@ status_effects =
 		ui_description="$statusdesc_food_poisoning",
 		ui_icon="data/ui_gfx/status_indicators/food_poisoning.png",
 		effect_entity="data/entities/misc/effect_food_poisoning.xml",
-		min_threshold_normalized=0.055,	-- this is little over 3 seconds 
+		min_threshold_normalized=0.055,	-- this is little over 3 seconds
 		ui_timer_offset_normalized=0.055, -- this affects only the UI timer being displayed. With min_threshold and without this the UI status effects times will be offset by min_threshold
 		is_harmful=true,
 	},
@@ -406,14 +406,14 @@ status_effects =
 		ui_icon="data/ui_gfx/status_indicators/protection_polymorph.png",
 		effect_entity="data/entities/misc/effect_protection_polymorph.xml",
 	},
-	{ 
+	{
 		id="WEAKNESS",
 		ui_name="$status_weakness",
 		ui_description="$statusdesc_weakness",
 		ui_icon="data/ui_gfx/status_indicators/weakness.png",
 		effect_entity="data/entities/misc/effect_weakness.xml",
 	},
-	{ 
+	{
 		id="MAMMI_EATER",
 		ui_name="$status_mammi_eater",
 		ui_description="$statusdesc_mammi_eater",

@@ -222,7 +222,6 @@ function spawn_scorpions(x, y)
 end
 
 function init( x, y, w, h )
-	-- print( 'init called: ' .. x .. ', ' .. y )
 end
 
 function spawn_reward_wands( x, y )

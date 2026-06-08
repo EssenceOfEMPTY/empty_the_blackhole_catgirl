@@ -100,6 +100,19 @@ if ( language:find( '中文' ) or language:find( '汉化' ) ) then
 							not_setting = true,
 						},
 						{
+							category_id = 'YAKUMO',
+							ui_name = 'oɯnʞɐʎ',
+							foldable = true,
+							_folded = true,
+							settings = {
+								{
+									ui_name = '为一些神奇实现提供代码帮助',
+									not_setting = true,
+								},
+							},
+							not_setting = true,
+						},
+						{
 							category_id = 'TANKSY',
 							ui_name = 'Tanksy',
 							foldable = true,
@@ -520,6 +533,19 @@ else
 						{
 							category_id = 'IMMORTALDAMNED',
 							ui_name = 'ImmortalDamned',
+							foldable = true,
+							_folded = true,
+							settings = {
+								{
+									ui_name = 'Provide code help for some magical implementations',
+									not_setting = true,
+								},
+							},
+							not_setting = true,
+						},
+						{
+							category_id = 'YAKUMO',
+							ui_name = 'oɯnʞɐʎ',
 							foldable = true,
 							_folded = true,
 							settings = {

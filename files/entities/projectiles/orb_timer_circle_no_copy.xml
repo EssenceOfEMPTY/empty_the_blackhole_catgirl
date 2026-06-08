@@ -9,7 +9,6 @@
 	</Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		lob_min="0.8"
 		lob_max="1.0"
 		speed_min="120"
@@ -100,7 +99,6 @@
 	></ParticleEmitterComponent>
 
 	<SpriteComponent
-		_enabled="1"
 		alpha="1"
 		image_file="mods/empty_the_blackhole_catgirl/files/projectiles_gfx/orb_green_big.xml"
 		next_rect_animation=""
@@ -111,7 +109,6 @@
 	></SpriteComponent>
 
 	<SpriteComponent
-		_enabled="1"
 		alpha="1"
 		image_file="mods/empty_the_blackhole_catgirl/files/projectiles_gfx/orb_green_big.xml"
 		next_rect_animation=""
@@ -124,7 +121,6 @@
 	></SpriteComponent>
 
 	<LightComponent
-		_enabled="1"
 		radius="150"
 		r="30"
 		g="90"

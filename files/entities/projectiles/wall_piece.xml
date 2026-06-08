@@ -10,7 +10,6 @@
 	</Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		lob_min="0.8"
 		lob_max="1.0"
 		speed_min="0"
@@ -37,10 +36,15 @@
 		ground_penetration_coeff="1"
 		collide_with_shooter_frames="2"
 		friendly_fire="1"
-	></ProjectileComponent>
+	>
+
+		<damage_by_type
+			slice="4"
+		></damage_by_type>
+
+	</ProjectileComponent>
 
 	<LightComponent
-		_enabled="1"
 		radius="20"
 		r="30"
 		g="90"
@@ -57,7 +61,7 @@
 		y_vel_min="-2"
 		y_vel_max="2"
 		count_min="1"
-		count_max="1"  
+		count_max="1"
 		lifetime_min="0.05"
 		lifetime_max="0.1"
 		emit_real_particles="0"

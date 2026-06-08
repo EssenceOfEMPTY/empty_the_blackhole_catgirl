@@ -24,40 +24,6 @@ if ( paras ) then
 
 		mul = ( 6 + 7 * paras.level ) * ( paras.frames / max_adjust )
 
-		local p_dmg = get_comp_info( proj, 'ProjectileComponent', nil, {
-			{ 'damage', 0 },
-		} )
-
-		if ( p_dmg > 0 ) then
-			attri.damage = p_dmg * mul
-		end
-
-		set_comp_value( proj, 'ProjectileComponent', nil, attri, nil, nil )
-
-		local ex_dmg = get_comp_obj_info( proj, 'ProjectileComponent', nil, {
-			{ 'config_explosion', 'damage', 0 },
-		}, nil )
-
-		if ( ex_dmg > 0 ) then
-			set_comp_obj_value( proj, 'ProjectileComponent', nil, {
-				{ 'config_explosion', 'damage', ex_dmg * mul }
-			}, nil, nil )
-		end
-
-		local dmg = { }
-
-		for i, _ in ipairs( all_proj_dmg ) do
-			local tmp = get_comp_obj_info( proj, 'ProjectileComponent', nil, {
-				{ 'damage_by_type', _, 0 },
-			}, nil )
-
-			if ( tmp > 0 ) then
-				table.insert( dmg, {
-					'damage_by_type', _, tmp * mul
-				} )
-			end
-		end
-
-		set_comp_obj_value( proj, 'ProjectileComponent', nil, dmg, nil, nil )
+		damage_mul( proj, mul )
 	end
 end

@@ -93,7 +93,6 @@
 
 	<LightComponent
 		_tags="enabled_in_hand,item_identified"
-		_enabled="1"
 		radius="64"
 		fade_out_time="1.5"
 		r="0"

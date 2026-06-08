@@ -206,7 +206,6 @@
 
 	<LightComponent
 		_tags="enabled_in_hand,enabled_in_world,item_identified"
-		_enabled="1"
 		radius="130"
 		fade_out_time="1.5"
 		r="240"
@@ -216,7 +215,6 @@
 
 	<LightComponent
 		_tags="enabled_in_hand,enabled_in_world,item_identified"
-		_enabled="1"
 		radius="16"
 		fade_out_time="1.5"
 		r="255"

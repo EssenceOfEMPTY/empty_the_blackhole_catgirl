@@ -11,7 +11,6 @@
 	</Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		speed_min="500"
 		speed_max="500"
 		die_on_low_velocity="0"
@@ -58,7 +57,6 @@
 	</ProjectileComponent>
 
 	<SpriteComponent
-		_enabled="1"
 		alpha="1"
 		image_file="data/projectiles_gfx/ice.xml"
 		next_rect_animation=""
@@ -116,7 +114,6 @@
 	></ParticleEmitterComponent>
 
 	<LightComponent
-		_enabled="1"
 		radius="20"
 		r="99"
 		g="205"

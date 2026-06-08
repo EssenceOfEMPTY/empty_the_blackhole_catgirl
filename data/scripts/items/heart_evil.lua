@@ -1,60 +1,55 @@
-dofile( 'data/scripts/game_helpers.lua' )
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-function item_pickup( entity_item, entity_who_picked, name )
+function item_pickup( heart, who, name )
+	local x, y = EntityGetTransform( heart )
 
-	local damagemodels = EntityGetComponent( entity_who_picked, 'DamageModelComponent' )
-	local variablestorages = EntityGetComponent( entity_who_picked, 'VariableStorageComponent' )
+	local max_hp, max_hp_cap = get_comp_info( who, 'DamageModelComponent', nil, {
+		{ 'max_hp', 1 / get_scale( ) },
+		{ 'max_hp_cap', 0 },
+	}, nil )
 
-	local max_hp_old = 0
-	local max_hp = 0.0
-	local multiplier = tonumber( GlobalsGetValue( 'HEARTS_MORE_EXTRA_HP_MULTIPLIER', '1' ) )
+	local delta = max_hp
 
+	local add_num = 25 / get_scale( )
+	local mul = tonumber( GlobalsGetValue( 'HEARTS_MORE_EXTRA_HP_MULTIPLIER', '1' ) ) or 1
 	local also_heal = tonumber( GlobalsGetValue( 'EMPTY_HEARTS_ALSO_HEAL', '0' ) ) or 0
-	local add_count = 0.0
 
-	local x, y = EntityGetTransform( entity_item )
+	add_num = add_num * mul
 
-	if ( damagemodels ) then
-		for i,damagemodel in ipairs(damagemodels) do
-			max_hp = tonumber( ComponentGetValue2( damagemodel, 'max_hp' ) ) or 0
-			max_hp_old = max_hp
-			max_hp = max_hp + 2 * multiplier
+	max_hp = max_hp + add_num
 
-			local max_hp_cap = tonumber( ComponentGetValue2( damagemodel, 'max_hp_cap' ) )
-			if max_hp_cap > 0 then
-				max_hp = math.min( max_hp, max_hp_cap )
-			end
-
-			ComponentSetValue2( damagemodel, 'max_hp_old', max_hp_old )
-			ComponentSetValue2( damagemodel, 'max_hp', max_hp )
-			ComponentSetValue2( damagemodel, 'mLastMaxHpChangeFrame', GameGetFrameNum() )
-
-			add_count = max_hp - max_hp_old
-			if ( also_heal > 0 and add_count > 0 ) then
-				local hp = ComponentGetValue2( damagemodel, 'hp' ) or 4
-				hp = hp + add_count
-				ComponentSetValue2( damagemodel, 'hp', hp )
-			end
-		end
+	if ( max_hp_cap > 0 ) then
+		max_hp = math.min( max_hp, max_hp_cap )
 	end
 
-	EntityLoad('data/entities/particles/image_emitters/heart_effect.xml', x, y - 12 )
-	local description = GameTextGet( '$logdesc_heart_evil', tostring( math.floor( max_hp * get_scale( ) ) ) )
-	if ( max_hp == max_hp_old ) then
-		description =  GameTextGet( '$logdesc_heart_blocked', tostring( math.floor( max_hp * get_scale( ) ) ) )
-	else
-		local x_pos, y_pos = EntityGetTransform( entity_who_picked )
-		local child_id = EntityLoad( 'data/entities/misc/effect_poison_big.xml', x_pos, y_pos )
-		EntityAddChild( entity_who_picked, child_id )
+	set_comp_value( who, 'DamageModelComponent', nil, {
+		max_hp = max_hp,
+		max_hp_cap = max_hp_cap,
+	}, nil, nil )
+
+	delta = delta - max_hp
+
+	if ( also_heal > 0 and delta < 0 ) then
+		EntityInflictDamage( who, delta, 'DAMAGE_HEALING', '', 'DISINTEGRATED', 0, 0, 0 )
 	end
 
-	if ( also_heal > 0 and add_count > 0 ) then
-		description = description .. GameTextGet( '$empty_also_heal_extra_text' )
+	EntityLoad( 'data/entities/particles/image_emitters/heart_fullhp_effect.xml', x, y - 12 )
+	EntityLoad( 'data/entities/particles/heart_out.xml', x, y - 8 )
+
+	local desc = GameTextGet( '$logdesc_heart', tostring( math.floor( max_hp * get_scale( ) ) ) )
+
+	if ( delta == 0 ) then
+		desc = GameTextGet( '$logdesc_heart_blocked', tostring( math.floor( max_hp * get_scale( ) ) ) )
+	elseif ( delta < 0 ) then
+		desc = desc .. GameTextGet( '$empty_also_heal_extra_text' )
 	end
 
-	GamePrintImportant( '$log_heart', description )
+	if ( not delta == 0 ) then
+		LoadGameEffectEntityTo( who, 'data/entities/misc/effect_poison_big.xml' )
+	end
+
+	GamePrintImportant( '$log_heart', desc )
 	GameTriggerMusicCue( 'item' )
 
-	EntityKill( entity_item )
+	EntityKill( heart )
 end

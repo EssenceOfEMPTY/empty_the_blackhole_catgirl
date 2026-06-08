@@ -1,7 +1,6 @@
 <Entity>
 
-	<InheritTransformComponent>
-	</InheritTransformComponent>
+	<InheritTransformComponent/>
 
 	<VariableStorageComponent
 		_tags="effect_name"
@@ -14,7 +13,7 @@
 	></LuaComponent>
 
 	<LuaComponent
-		script_shot="data/scripts/projectiles/neutralized.lua" 
+		script_shot="data/scripts/projectiles/neutralized.lua"
 		execute_every_n_frame="-1"
 	></LuaComponent>
 

@@ -39,8 +39,6 @@ function make_random_card( x, y )
 	if ( string.len( item ) > 0 ) then
 		local card_entity = CreateItemActionEntity( item, x, y )
 		return card_entity
-	else
-		print( 'No valid action entity found!' )
 	end
 end
 

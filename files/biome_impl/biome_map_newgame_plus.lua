@@ -132,12 +132,12 @@ local biome_sandcaves = 0xFFE1CD32
 local biomes_snowvault = 0xFF0080A8
 local biome_wandcave = 0xFF006C42
 local biome_crypt = 0xFF786C42
- 
+
 local newgame_n = tonumber( SessionNumbersGetValue("NEW_GAME_PLUS_COUNT") )
 
 if( newgame_n % 2 == 0 ) then
 
-	biome_coalmines = 0xFF3D3E37 
+	biome_coalmines = 0xFF3D3E37
 	biome_collapsedmines = 0xFF3D3E37
 	biome_fungicave = 0xFF3D3E3B
 	biome_excavationsite = 0xFF3D3E38
@@ -154,7 +154,7 @@ end
 -- some of the backgrounds need to be raised upwards
 if( newgame_n % 3 == 0 ) then
 	-- basic biomes
-	all_biomes = { 
+	all_biomes = {
 		0xFFD56517,
 		0xFFD56517,
 		0xFFE861F0,
@@ -253,7 +253,7 @@ if( Random( 0, 100 ) < 65 ) then paint_cave( 27, 27 + Random( 0, 6 ), -1, biome_
 if( Random( 0, 100 ) < 65 ) then paint_cave( 35, 27 + Random( 0, 6 ), 1, biome_sandcaves, Random( 5, 50 ) ) end
 
 
--- biome 1 
+-- biome 1
 paint_biome_area( 32, 14, 3, 2,  biome_coalmines, 0 )
 paint_biome_area( 28, 15, 4, 1,  biome_collapsedmines, 1 )
 
@@ -297,7 +297,7 @@ orb_list[2] = {33,11}
 
 local x = 0
 local y = 0
--- vault 2 
+-- vault 2
 local orb_vault2 = 0xFFFFD102
 x = Random( 0, 5 ) + 10
 y = Random( 0, 2 ) + 18
@@ -365,7 +365,7 @@ for i,v in pairs(orb_list) do
 end
 
 -- boss arena
--- end room 
+-- end room
 local color_end_room = 0xFF50EED7
 local color_boss_arena = 0xFF14EED7
 

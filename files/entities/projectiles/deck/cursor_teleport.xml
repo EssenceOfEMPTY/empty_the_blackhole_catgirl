@@ -3,7 +3,6 @@
 	<Base file="data/entities/base_projectile.xml" ></Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		lifetime="10"
 		damage="0"
 		collide_with_world="0"

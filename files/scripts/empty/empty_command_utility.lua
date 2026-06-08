@@ -717,8 +717,8 @@ e_cmd_funcs = {
 				0,
 			},
 		},
-		---投射物已发射的场合: 在保持方向的状态下将 速度 组件中的 vel_x, vel_y 的模更改为 speed; 
-		---投射物未发射的场合: 将投射物中 投射物 组件的 speed_min 与 speed_max 设为 speed; 
+		---投射物已发射的场合: 在保持方向的状态下将 速度 组件中的 vel_x, vel_y 的模更改为 speed;
+		---投射物未发射的场合: 将投射物中 投射物 组件的 speed_min 与 speed_max 设为 speed;
 		---负值将会反转速度方向
 		---@param c table
 		---@param reflect boolean
@@ -1590,7 +1590,7 @@ e_cmd_funcs = {
 
 			return { angle_delay, inc_delay, delay }
 		end,
-		---经过 delay 帧的延迟后, 在不更改速度大小的状态下将速度方向在正右方基础上每帧逆时针旋转 ( angle_delay + 生效帧数 * inc_delay )°; 
+		---经过 delay 帧的延迟后, 在不更改速度大小的状态下将速度方向在正右方基础上每帧逆时针旋转 ( angle_delay + 生效帧数 * inc_delay )°;
 		---此效果持续 duration 帧
 		---@param c table
 		---@param reflect boolean
@@ -1903,7 +1903,7 @@ e_cmd_funcs = {
 
 			return { angle_delay, inc_delay, delay }
 		end,
-		---经过 delay 帧的延迟后, 在不更改速度大小的状态下将速度方向在正右方基础上每帧逆时针旋转 ( angle_delay + 生效帧数 * inc_delay )°; 
+		---经过 delay 帧的延迟后, 在不更改速度大小的状态下将速度方向在正右方基础上每帧逆时针旋转 ( angle_delay + 生效帧数 * inc_delay )°;
 		---此效果持续 duration 帧
 		---@param c table
 		---@param reflect boolean

@@ -10,7 +10,6 @@
 	</Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		lob_min="0.8"
 		lob_max="1.0"
 		speed_min="0"
@@ -74,7 +73,6 @@
 	</ProjectileComponent>
 	
 	<SpriteComponent
-		_enabled="1"
 		alpha="0.1"
 		image_file="data/projectiles_gfx/black_hole_big_circle.xml"
 		next_rect_animation=""
@@ -113,7 +111,6 @@
 
 
 	<LightComponent
-		_enabled="1"
 		r="255"
 		g="40"
 		b="255"
@@ -127,7 +124,6 @@
 	></BlackHoleComponent>
 
 	<LuaComponent
-		_enabled="1"
 		script_source_file="data/scripts/projectiles/black_hole_big.lua"
 		execute_every_n_frame="3"
 	></LuaComponent>
@@ -163,8 +159,7 @@
 			chunk_probability="0.05"
 		></LooseGroundComponent>
 
-		<InheritTransformComponent>
-		</InheritTransformComponent>
+		<InheritTransformComponent/>
 
 	</Entity>
 	

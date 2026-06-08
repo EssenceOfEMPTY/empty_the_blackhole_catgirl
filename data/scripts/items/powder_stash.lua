@@ -99,7 +99,7 @@ function init( entity_id )
 
 	if ( Random( 0, 100 ) <= 75 ) then
 		-- 0.05% chance of magic_liquid_
-		potion_material = get_random_from( materials_magic ) 
+		potion_material = get_random_from( materials_magic )
 		potion_material = potion_material.material
 	else
 		potion_material = get_random_from( materials_standard )

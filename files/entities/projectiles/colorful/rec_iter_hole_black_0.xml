@@ -10,7 +10,6 @@
 	</Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		lob_min="0.8"
 		lob_max="1.0"
 		speed_min="40"
@@ -73,7 +72,6 @@
 	</ProjectileComponent>
 
 	<SpriteComponent
-		_enabled="1"
 		alpha="1"
 		image_file="data/projectiles_gfx/black_hole.xml"
 		next_rect_animation=""

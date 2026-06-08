@@ -3,7 +3,6 @@
 	<Base file="data/entities/base_projectile.xml" ></Base>
 
 	<ProjectileComponent
-		_enabled="1"
 		lob_min="0.8"
 		lob_max="1.0"
 		speed_min="0"
@@ -101,7 +100,6 @@
 	></AudioLoopComponent>
 
 	<LuaComponent
-		_enabled="1"
 		script_source_file="mods/empty_the_blackhole_catgirl/files/scripts/projectiles/colorful/rec_iter_chainsaw.lua"
 		execute_every_n_frame="1"
 		remove_after_executed="1"
