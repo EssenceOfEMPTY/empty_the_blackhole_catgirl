@@ -1,45 +1,48 @@
-<Entity tags="niko,niko_gold">
-
-	<InheritTransformComponent/>
+<Entity tags="niko,niko_immune">
 
 	<GameEffectComponent
-		effect="EXTRA_MONEY"
+		effect="PROTECTION_MELEE"
 		frames="-1"
 	></GameEffectComponent>
 
 	<GameEffectComponent
-		effect="EXTRA_MONEY"
+		effect="PROTECTION_EXPLOSION"
 		frames="-1"
 	></GameEffectComponent>
 
 	<GameEffectComponent
-		effect="EXTRA_MONEY"
+		effect="PROTECTION_ELECTRICITY"
 		frames="-1"
 	></GameEffectComponent>
 
 	<GameEffectComponent
-		effect="EXTRA_MONEY"
+		effect="PROTECTION_FIRE"
 		frames="-1"
 	></GameEffectComponent>
 
 	<GameEffectComponent
-		effect="EXTRA_MONEY"
+		effect="PROTECTION_FREEZE"
 		frames="-1"
 	></GameEffectComponent>
 
 	<GameEffectComponent
-		effect="EXTRA_MONEY"
+		effect="PROTECTION_RADIOACTIVITY"
 		frames="-1"
 	></GameEffectComponent>
 
 	<GameEffectComponent
-		effect="EXTRA_MONEY"
+		effect="PROTECTION_POLYMORPH"
 		frames="-1"
 	></GameEffectComponent>
 
 	<GameEffectComponent
-		effect="EXTRA_MONEY"
+		effect="PROTECTION_FOOD_POISONING"
 		frames="-1"
 	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="NO_SLIME_SLOWDOWN"
+		frames="-1"
+	></GameEffectComponent >
 
 </Entity>

@@ -1,16 +1,6 @@
 <Entity tags="niko,niko_friendly">
 
 	<GameEffectComponent
-		effect="PROTECTION_FIRE"
-		frames="-1"
-	></GameEffectComponent>
-
-	<GameEffectComponent
-		effect="PROTECTION_ELECTRICITY"
-		frames="-1"
-	></GameEffectComponent>
-
-	<GameEffectComponent
 		effect="FRIEND_FIREMAGE"
 		frames="-1"
 	></GameEffectComponent>

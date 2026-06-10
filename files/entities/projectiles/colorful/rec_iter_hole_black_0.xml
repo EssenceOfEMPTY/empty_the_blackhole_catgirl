@@ -3,6 +3,8 @@
 	<Base file="data/entities/base_projectile.xml" >
 
 		<VelocityComponent
+			liquid_drag="0"
+			air_friction="0"
 			gravity_y="0"
 			mass="0.6"
 		></VelocityComponent>
@@ -80,6 +82,9 @@
 		emissive="1"
 		additive="1"
 		rect_animation="fireball"
+		has_special_scale="1"
+		special_scale_x="3"
+		special_scale_y="3"
 	></SpriteComponent>
 
 	<ParticleEmitterComponent
@@ -107,9 +112,8 @@
 	></ParticleEmitterComponent>
 
 	<CellEaterComponent
-		radius="16"
+		radius="32"
 		eat_dynamic_physics_bodies="1"
-		ignored_material_tag="[indestructible]"
 	></CellEaterComponent>
 
 	<AudioComponent

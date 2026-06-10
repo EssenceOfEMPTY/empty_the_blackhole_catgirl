@@ -1545,15 +1545,67 @@ local changed_perks = {--[[
 		end,
 	},
 	{
-		id = 'PROTECTION_RADIOACTIVITY',
+		id = "PROTECTION_FIRE",
 		func = function( entity_perk_item, who, item_name )
-			set_comp_value( who, 'DamageModelComponent', nil, {
-				radioactive = 0,
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'fire', 0 },
 			}, nil, nil )
 		end,
 		func_remove = function( entity_perk_item, who, item_name )
-			set_comp_value( who, 'DamageModelComponent', nil, {
-				radioactive = 1,
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'fire', 1 },
+			}, nil, nil )
+		end,
+	},
+	{
+		id = "PROTECTION_RADIOACTIVITY",
+		func = function( entity_perk_item, who, item_name )
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'radioactive', 0 },
+			}, nil, nil )
+		end,
+		func_remove = function( entity_perk_item, who, item_name )
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'radioactive', 1 },
+			}, nil, nil )
+		end,
+	},
+	{
+		id = "PROTECTION_EXPLOSION",
+		func = function( entity_perk_item, who, item_name )
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'explosion', 0 },
+			}, nil, nil )
+		end,
+		func_remove = function( entity_perk_item, who, item_name )
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'explosion', 1 },
+			}, nil, nil )
+		end,
+	},
+	{
+		id = "PROTECTION_MELEE",
+		func = function( entity_perk_item, who, item_name )
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'melee', 0 },
+			}, nil, nil )
+		end,
+		func_remove = function( entity_perk_item, who, item_name )
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'melee', 1 },
+			}, nil, nil )
+		end,
+	},
+	{
+		id = "PROTECTION_ELECTRICITY",
+		func = function( entity_perk_item, who, item_name )
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'electricity', 0 },
+			}, nil, nil )
+		end,
+		func_remove = function( entity_perk_item, who, item_name )
+			set_comp_obj_value( who, 'DamageModelComponent', nil, {
+				{ 'damage_multipliers', 'electricity', 1 },
 			}, nil, nil )
 		end,
 	},

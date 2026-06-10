@@ -4,12 +4,12 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility
 
 --
 
----<<<<<<<<<<<<<<<<<<<<<<<< 常规翻译 >>>>>>>>>>>>>>>>>>>>>>>>---
+---<<<<<<<<<<<<<<<<<<<<<<<< 翻译文件 >>>>>>>>>>>>>>>>>>>>>>>>---
 
-local translation = ModTextFileGetContent( 'data/translations/common.csv' )
+local trans = ModTextFileGetContent( 'data/translations/common.csv' )
 local add_str = ''
 
-if ( translation: sub( -1 ) == '\n' ) then
+if ( trans: sub( -1 ) == '\n' ) then
 	add_str = ModTextFileGetContent( empty_path .. 'translations/empty_translation.csv' )
 else
 	add_str = '\n' .. ModTextFileGetContent( empty_path .. 'translations/empty_translation.csv' )
@@ -21,10 +21,10 @@ if ( ModSettingGet( 'empty_the_blackhole_catgirl.SVAROG_TRANSLATION' ) ) then
 end
 
 if ( add_str ~= '' ) then
-	translation = translation .. add_str
+	trans = trans .. add_str
 end
 
-ModTextFileSetContent( 'data/translations/common.csv', translation )
+ModTextFileSetContent( 'data/translations/common.csv', trans )
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 通用魔数设置 >>>>>>>>>>>>>>>>>>>>>>>>---
 
@@ -44,26 +44,24 @@ local magics = {
 }
 
 for _, magic in ipairs( magics ) do
-	local setting = ModSettingGet( 'empty_the_blackhole_catgirl.' .. magic )
-
-	if ( setting or setting == nil ) then
+	if ( ModSettingGet( 'empty_the_blackhole_catgirl.' .. magic ) ) then
 		ModMagicNumbersFileAdd( empty_path .. 'magic_numbers/' .. string.lower( magic ) .. '.xml' )
 	end
 end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 通用文件覆写 >>>>>>>>>>>>>>>>>>>>>>>>---
 
-local overwrite = { }
+local overwrites = { }
 
 --世界设置
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.EASY_NG+' )
 	or ModSettingGet( 'empty_the_blackhole_catgirl.CHAOS_CONNECTED_WORLD' ) ) then
-	table.insert( overwrite, 'scripts/newgame_plus.lua' )
+	table.insert( overwrites, 'scripts/newgame_plus.lua' )
 end
 
 --视觉设置
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.VISION_IMPROVE' ) ) then
-	add_table( overwrite, {
+	add_table( overwrites, {
 		'shaders/post_final.frag',
 		'shaders/post_final.vert',
 	} )
@@ -71,16 +69,16 @@ end
 
 --漏洞 & 轮椅设置
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.BUGFIX_SPELL_TO_POWER' ) ) then
-	table.insert( overwrite, 'scripts/projectiles/spells_to_power.lua' )
+	table.insert( overwrites, 'scripts/projectiles/spells_to_power.lua' )
 end
 
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.BUGFIX_DUPE_MAX_HP_FROM_HEARTY' ) ) then
-	add_table( overwrite, {
+	add_table( overwrites, {
 		'scripts/status_effects/hearty_start.lua',
 		'scripts/status_effects/hearty_end.lua',
 	} )
 else
-	add_table( overwrite, {
+	add_table( overwrites, {
 		{
 			source = 'scripts/status_effects/hearty_start.lua',
 			replace = 'scripts/status_effects/hearty_start_full_restore.lua',
@@ -93,17 +91,17 @@ else
 end
 
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.BUGFIX_DUPE_DMG_MULTI_FROM_VULNERABLE' ) ) then
-	add_table( overwrite, {
+	add_table( overwrites, {
 		'scripts/status_effects/wither_start.lua',
 		'scripts/status_effects/wither_end.lua',
 	} )
 end
 
 if ( ModSettingGet( 'empty_the_blackhole_catgirl.BUGFIX_CONNOISSEUR_OF_WANDS' ) ) then
-	table.insert( overwrite, 'entities/animals/boss_pit/boss_pit_logic.lua' )
+	table.insert( overwrites, 'entities/animals/boss_pit/boss_pit_logic.lua' )
 end
 
-for i, _ in ipairs( overwrite ) do
+for i, _ in ipairs( overwrites ) do
 	if ( type( _ ) == 'string' ) then
 		ModTextFileSetContent( 'data/' .. _, ModTextFileGetContent( empty_path .. _ ) )
 	elseif ( type( _ ) == 'table' ) then
@@ -113,7 +111,7 @@ end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 通用群系追加 >>>>>>>>>>>>>>>>>>>>>>>>---
 
-local biome_append = {
+local biomes = {
 	'alchemist_secret',
 	'boss_arena', 'boss_arena_top', 'boss_limbs_arena',
 	'clouds',
@@ -136,13 +134,13 @@ local biome_append = {
 	'winter', 'wizardcave',
 }
 
-for i, _ in ipairs( biome_append ) do
+for i, _ in ipairs( biomes ) do
 	ModLuaFileAppend( 'data/scripts/biomes/' .. _ .. '.lua', empty_path .. 'scripts/biomes/biome_append.lua' )
 end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 通用 lua 追加 >>>>>>>>>>>>>>>>>>>>>>>>---
 
-local lua_append = {
+local luas = {
 	'scripts/biomes/mountain/mountain_hall',
 	'scripts/biomes/mountain_tree',
 	'scripts/biomes/the_end',
@@ -154,7 +152,7 @@ local lua_append = {
 	'scripts/gun/procedural/gun_procedural_better',
 }
 
-for i, _ in ipairs( lua_append ) do
+for i, _ in ipairs( luas ) do
 	ModLuaFileAppend( 'data/' .. _ .. '.lua', empty_path .. _ .. '.lua' )
 end
 

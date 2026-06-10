@@ -1,0 +1,23 @@
+<Entity tags="niko,niko_remove_mat">
+
+	<InheritTransformComponent/>
+
+	<MagicConvertMaterialComponent
+		from_material_tag="[gas]"
+		to_material="fire"
+		steps_per_frame="128"
+		loop="1"
+		is_circle="1"
+		radius="256"
+	></MagicConvertMaterialComponent>
+
+	<MagicConvertMaterialComponent
+		from_material_tag="[meltable_to_lava_fast],[sand_ground],[rust]"
+		to_material="air"
+		steps_per_frame="128"
+		loop="1"
+		is_circle="1"
+		radius="256"
+	></MagicConvertMaterialComponent>
+  
+</Entity>

@@ -825,15 +825,19 @@ end
 ---@param x2 number
 ---@param y2 number
 ---@param dist_full number
----@param coeff number|nil
+---@param coeff number|nil?
 ---@return number vel_x
 ---@return number vel_y
-function gravity_force_loc( x1, y1, x2, y2, dist_full, coeff )
-	coeff = coeff or 196
+function force_by_loc( x1, y1, x2, y2, dist_full, coeff )
+	coeff = coeff or 72
 
 	local dist = math.sqrt( ( x1 - x2 ) ^ 2 + ( y1 - y2 ) ^ 2 )
-	local dirc = -math.atan2( ( y1 - y2 ), ( x1 - x2 ) )
 
+	if ( dist >= dist_full ) then
+		return 0, 0
+	end
+
+	local dirc = -math.atan2( ( y1 - y2 ), ( x1 - x2 ) )
 	local per = ( dist_full - dist ) / dist_full
 
 	return math.cos( dirc ) * per * coeff, -math.sin( dirc ) * per * coeff
@@ -945,23 +949,19 @@ function get_root_entity( )
 	return EntityGetRootEntity( GetUpdatedEntityID( ) )
 end
 
----获取实体;
----可选是否获取为 table
+---获取当前实体
 ---@return number
 function get_up_entity( )
-	local update = GetUpdatedEntityID( )
-
-	return update
+	return GetUpdatedEntityID( )
 end
 
----获取实体
+---获取当前实体, 返回表
 ---@return table<string, number>
 function get_up_entity_table( )
 	local update = GetUpdatedEntityID( )
-	local root = EntityGetRootEntity( update )
 
 	return {
-		root = root,
+		root = EntityGetRootEntity( update ),
 		update = update,
 	}
 end
