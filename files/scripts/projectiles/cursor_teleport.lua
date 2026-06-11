@@ -1,25 +1,25 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity = get_root_entity( )
-local projectile_comp = EntityGetFirstComponent( entity, 'ProjectileComponent' )
-local shooter
+local proj = get_root_entity( )
+local shooter = get_shooter( proj, 0 )
 
-if ( projectile_comp ) then
-	shooter = ComponentGetValue2( projectile_comp, 'mWhoShot' )
-end
+if ( is_not_0_num( shooter ) and is_alive( shooter ) ) then
+	local cur = get_comp_info( shooter, 'ControlsComponent', nil, {
+		{ 'mMousePosition', {
+			v_1 = 'nil',
+			v_2 = 'nil',
+		} },
+	}, nil )
 
-if ( shooter and shooter ~= NULL_ENTITY ) then
-	local controls = EntityGetFirstComponentIncludingDisabled( shooter, 'ControlsComponent' )
-	if ( controls ) then
-		local cursor_x, cursor_y = ComponentGetValue2( controls, 'mMousePosition' )
-		if ( cursor_x and cursor_y ) then
-			EntitySetTransform( shooter, cursor_x, cursor_y )
+	if ( is_not_nan_num( cur.v_1 ) and is_not_nan_num( cur.v_2 ) ) then
+		tp( shooter, cur.v_1, cur.v_2 )
 
-			local damage_comp = EntityGetFirstComponent( shooter, 'DamageModelComponent' )
-			if ( damage_comp ) then
-				local max_hp = tonumber( ComponentGetValue2( damage_comp, 'max_hp' ) ) or 0
-				EntityInflictDamage( shooter, max_hp * 0.33, 'DAMAGE_CURSE', '$empty_death_msg_cursor_teleport', 'NONE', 0, 0, shooter )
-			end
+		local max_hp = get_comp_info( shooter, 'DamageModelComponent', nil, {
+			{ 'max_hp', 0 },
+		}, nil )
+
+		if ( max_hp > 0 ) then
+			EntityInflictDamage( shooter, max_hp * 0.33, 'DAMAGE_CURSE', '$empty_death_msg_cursor_teleport', 'NONE', 0, 0, shooter )
 		end
 	end
 end

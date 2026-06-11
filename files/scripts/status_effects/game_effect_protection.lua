@@ -7,5 +7,5 @@ local eff = get_comp_info( entity.update, 'VariableStorageComponent', 'effect_na
 }, nil )
 
 if ( is_not_nil_str( eff ) and EntityHasTag( entity.root, 'empty_' .. eff .. '_immunity' ) ) then
-	remove_child( entity.update )
+	rem_del_child( entity.update )
 end

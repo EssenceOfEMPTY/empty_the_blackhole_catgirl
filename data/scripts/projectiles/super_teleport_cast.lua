@@ -1,37 +1,26 @@
-dofile_once( 'data/scripts/lib/utilities.lua' )
+dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity	= GetUpdatedEntityID( )
-local pos_x, pos_y = EntityGetTransform( entity )
+local proj = get_root_entity( )
+local px, py = EntityGetTransform( proj )
 
-local projectile_comp = EntityGetFirstComponent( entity, 'ProjectileComponent' )
-local shooter = NULL_ENTITY
+local vel = get_comp_info( proj, 'VelocityComponent', nil, {
+	{ 'mVelocity', {
+		v_1 = 0,
+		v_2 = 0,
+	} },
+}, nil )
 
-if ( projectile_comp ) then
-	shooter = ComponentGetValue2( projectile_comp, 'mWhoShot' )
-end
+local vel_x, vel_y = vel.v_1, vel.v_2
 
-if ( shooter ~= NULL_ENTITY and EntityHasTag( shooter, 'teleportable_NOT' ) ) then
-	return
-end
+local angle = -math.atan( vel_y, vel_x )
 
-local comp = EntityGetFirstComponent( entity, 'VelocityComponent' )
+local end_x = px + math.cos( angle ) * 120
+local end_y = py - math.sin( angle ) * 120
 
-local vel_x, vel_y = nil, nil
-
-if ( comp ) then
-	vel_x, vel_y = ComponentGetValue2( comp, 'mVelocity' )
-end
-
-local angle = 0 - math.atan( vel_y or 0, vel_x )
-
-local end_x = pos_x + math.cos( angle ) * 120
-local end_y = pos_y - math.sin( angle ) * 120
-
-local success, ex, ey = RaytracePlatforms( pos_x, pos_y, end_x, end_y )
+local success, ex, ey = RaytracePlatforms( px, py, end_x, end_y )
 
 if ( not success ) then
-	ex = end_x
-	ey = end_y
+	ex, ey = end_x, end_y
 end
 
-EntitySetTransform( entity, ex, ey )
+tp( proj, ex, ey )

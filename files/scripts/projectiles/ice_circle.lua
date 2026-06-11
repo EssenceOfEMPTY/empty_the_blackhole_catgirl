@@ -1,6 +1,6 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity = GetUpdatedEntityID( )
+local entity = get_root_entity( )
 local x, y = EntityGetTransform( entity )
 
 local how_many, theta, length = 12, 0, 300

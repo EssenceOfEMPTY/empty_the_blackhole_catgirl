@@ -42,8 +42,7 @@ local new_perks =
 											if ( spell_comp ) then
 												local action_id = ComponentGetValue2( spell_comp, 'action_id' )
 
-												EntityRemoveFromParent( spell )
-												EntitySetTransform( spell, x, y )
+												rem_all_child( spell, x, y )
 
 												local spell_comps = EntityGetAllComponents( spell )
 
@@ -499,28 +498,6 @@ local new_perks =
 		end,
 	},
 	{
-		info = 'protection_touch_magic',
-		stackable = STACKABLE_NO,
-		usable_by_enemies = true,
-		func = function( perk_item, who, item_name )
-			EntityAddTag( who, 'touchmagic_immunity' )
-		end,
-		func_remove = function( who )
-			EntityRemoveTag( who, 'touchmagic_immunity' )
-		end,
-	},
-	{
-		info = 'protection_polymorph',
-		stackable = STACKABLE_NO,
-		usable_by_enemies = true,
-		func = function( perk_item, who, item_name )
-			EntityAddTag( who, 'polymorphable_NOT' )
-		end,
-		func_remove = function( who )
-			EntityRemoveTag( who, 'polymorphable_NOT' )
-		end,
-	},
-	{
 		info = 'protection_blindness',
 		stackable = STACKABLE_NO,
 		usable_by_enemies = true,
@@ -562,6 +539,28 @@ local new_perks =
 		end,
 		func_remove = function( who )
 			EntityRemoveTag( who, 'empty_hearty_immunity' )
+		end,
+	},
+	{
+		info = 'protection_polymorph',
+		stackable = STACKABLE_NO,
+		usable_by_enemies = true,
+		func = function( perk_item, who, item_name )
+			EntityAddTag( who, 'polymorphable_NOT' )
+		end,
+		func_remove = function( who )
+			EntityRemoveTag( who, 'polymorphable_NOT' )
+		end,
+	},
+	{
+		info = 'protection_touch_magic',
+		stackable = STACKABLE_NO,
+		usable_by_enemies = true,
+		func = function( perk_item, who, item_name )
+			EntityAddTag( who, 'touchmagic_immunity' )
+		end,
+		func_remove = function( who )
+			EntityRemoveTag( who, 'touchmagic_immunity' )
 		end,
 	},
 	{
@@ -693,7 +692,7 @@ local new_perks =
 			local remove = 'empty_radiance'
 
 			remove_all_comp( who, 'LuaComponent', remove )
-			remove_all_child( who, remove )
+			rem_del_all_child( who, remove )
 		end,
 	},
 	{
@@ -856,7 +855,7 @@ local new_perks =
 				}, nil, nil )
 			else
 				remove_all_comp( who, nil, tag, nil )
-				remove_all_child( who, tag, nil )
+				rem_del_all_child( who, tag, nil )
 			end
 		end,
 	},
@@ -896,7 +895,7 @@ local new_perks =
 			local x = tonumber( MagicNumbersGetValue( 'DESIGN_PLAYER_START_POS_X' ) ) or 227
 			local y = tonumber( MagicNumbersGetValue( 'DESIGN_PLAYER_START_POS_Y' ) ) or -85
 
-			EntitySetTransform( who, x, y )
+			tp( who, x, y )
 
 			--TODO
 		end,
@@ -1219,7 +1218,7 @@ local new_perks =
 			remove_all_comp( who, 'VariableStorageComponent', curse )
 			remove_all_comp( who, 'LuaComponent', curse )
 
-			remove_all_child( who, curse )
+			rem_del_all_child( who, curse )
 		end,
 	},
 	{

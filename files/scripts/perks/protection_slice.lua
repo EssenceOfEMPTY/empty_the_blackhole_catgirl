@@ -8,9 +8,7 @@ function shot( proj )
 		}, nil, nil )
 
 		if ( count > 0 ) then
-			local shooter = get_comp_info( proj, 'ProjectileComponent', nil, {
-				{ 'mWhoShot', nil },
-			}, nil )
+			local shooter = get_shooter( proj, 0 )
 
 			if ( is_not_0_num( shooter ) ) then
 				if ( is_player( shooter ) ) then

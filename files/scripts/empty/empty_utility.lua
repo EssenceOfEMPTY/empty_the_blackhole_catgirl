@@ -1,3 +1,4 @@
+dofile_once( 'data/scripts/lib/utilities.lua' )
 
 empty_path = 'mods/empty_the_blackhole_catgirl/files/'
 
@@ -101,12 +102,12 @@ all_pos_protect_perk = {
 	'EMPTY_PROTECTION_SLICE',
 	'EMPTY_PROTECTION_POISON',
 	'EMPTY_PROTECTION_PLASMA',
-	'EMPTY_PROTECTION_TOUCH_MAGIC',
-	'EMPTY_PROTECTION_POLYMORPH',
 	'EMPTY_PROTECTION_BLINDNESS',
 	'EMPTY_PROTECTION_NEUTRALIZED',
 	'EMPTY_PROTECTION_TWITCHY',
 	'EMPTY_PROTECTION_HEARTY',
+	'EMPTY_PROTECTION_POLYMORPH',
+	'EMPTY_PROTECTION_TOUCH_MAGIC',
 }
 
 all_tag = {
@@ -322,11 +323,18 @@ function fact( z )
 	end
 end
 
----检测 num 是否是数值且不为 0
+---检测 num 是否是正常数值
+---@param num any
+---@return boolean is_not_0_num
+function is_not_nan_num( num )
+	return type( num ) == 'number' and num == num
+end
+
+---检测 num 是否是正常数值且不为 0
 ---@param num any
 ---@return boolean is_not_0_num
 function is_not_0_num( num )
-	return type( num ) == 'number' and num ~= 0 and num == num
+	return is_not_nan_num( num ) and num ~= 0
 end
 
 ---检测 str 是否是字符串且不为空字符串
@@ -973,6 +981,18 @@ function comp_get_entity( comp )
 	return ComponentGetEntity( comp )
 end
 
+---获取投射物的发射者
+---@param proj number
+---@param def_shooter number
+---@return number shooter
+function get_shooter( proj, def_shooter )
+	local shooter = get_comp_info( proj, 'ProjectileComponent', nil, {
+		{ 'mWhoShot', nil },
+	}, nil )
+
+	return shooter or def_shooter
+end
+
 ---获取所有玩家, 包括变形中的
 ---@return number[] players
 function get_all_players( )
@@ -1033,6 +1053,44 @@ function remove_speed_limit( projs )
 		terminal_velocity = int_huge,
 		limit_to_max_velocity = false,
 	}, nil, nil )
+end
+
+---将实体传送至 ( x, y )
+---@param entity number|number[]
+---@param x number
+---@param y number
+---@param rot number|nil?
+---@return number tp_count
+function tp( entity, x, y, rot )
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+
+	rot = rot or 0
+
+	local count = 0
+
+	for i, _ in ipairs( entity or { } ) do
+		if ( is_not_0_num( _ ) and is_alive( _ ) ) then
+			EntityApplyTransform( _, x, y, rot )
+
+			count = count + 1
+		end
+	end
+
+	return count
+end
+
+---检测此投射物是否需要追踪
+---( 无物吞、无传送组件和猫娘模组内置传送脚本 )
+---@param proj number
+---@return boolean is_need_homing
+function is_need_homing( proj )
+	return not (
+		is_has_comp( proj, 'CellEaterComponent', nil, nil )
+		or is_has_comp( proj, 'TeleportProjectileComponent', nil, nil )
+		or is_has_comp( proj, 'LuaComponent', 'empty_teleport', nil )
+	)
 end
 
 ---检测法术是否是被复制的
@@ -1642,12 +1700,51 @@ function get_all_child( entity, tag, name )
 	return childs
 end
 
----解除子实体的挂载, 然后删除
----@param child number
-function remove_child( child )
-	EntityRemoveFromParent( child )
+---解除子实体的挂载, 并传送至 ( x, y )
+---@param child number|number[]
+---@param x number
+---@param y number
+---@param rot number|nil?
+function rem_child( child, x, y, rot )
+	if ( type( child ) == 'number' ) then
+		child = { child }
+	end
 
-	EntityKill( child )
+	for i, _ in ipairs( child or { } ) do
+		EntityRemoveFromParent( _ )
+	end
+
+	tp( child, x, y, rot )
+end
+
+---解除子实体的挂载, 然后删除
+---@param child number|number[]
+function rem_del_child( child )
+	if ( type( child ) == 'number' ) then
+		child = { child }
+	end
+
+	for i, _ in ipairs( child or { } ) do
+		EntityRemoveFromParent( _ )
+
+		EntityKill( _ )
+	end
+end
+
+---移除每个 entity 实体上的所有子实体;
+---返回影响子实体的总数
+---@param entity number|number[]
+---@param x number
+---@param y number
+---@param rot number|nil?
+---@param tag string|nil?
+---@return number child_count
+function rem_all_child( entity, x, y, rot, tag, name )
+	local child = get_all_child( entity, tag, name )
+
+	rem_child( child, x, y, rot )
+
+	return #child
 end
 
 ---移除每个 entity 实体上的所有子实体;
@@ -1655,14 +1752,12 @@ end
 ---@param entity number|number[]
 ---@param tag string|nil?
 ---@return number child_count
-function remove_all_child( entity, tag, name )
-	local childs = get_all_child( entity, tag, name )
+function rem_del_all_child( entity, tag, name )
+	local child = get_all_child( entity, tag, name )
 
-	for _, child in ipairs( childs or { } ) do
-		remove_child( child )
-	end
+	rem_del_child( child )
 
-	return #childs
+	return #child
 end
 
 ---为投射物进行伤害变换
@@ -1716,7 +1811,11 @@ end
 ---为投射物全伤害乘以伤害倍率
 ---@param proj number
 ---@param mul number|nil? --伤害倍率, 默认 200%
+---@return boolean is_has_dmg
+---@return table<string, number> data
 function damage_mul( proj, mul )
+	local is_has_dmg, data = false, { }
+
 	if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
 		mul = mul or 2
 
@@ -1724,9 +1823,15 @@ function damage_mul( proj, mul )
 			{ 'damage', 0 },
 		}, nil )
 
-		set_comp_value( proj, 'ProjectileComponent', nil, {
-			damage = p_dmg * mul,
-		}, nil, nil )
+		if ( p_dmg > 0 ) then
+			p_dmg = p_dmg * mul
+
+			set_comp_value( proj, 'ProjectileComponent', nil, {
+				damage = p_dmg,
+			}, nil, nil )
+
+			is_has_dmg, data.projectile = true, p_dmg
+		end
 
 		local dmg = { }
 
@@ -1735,9 +1840,13 @@ function damage_mul( proj, mul )
 		}, nil )
 
 		if ( ex_dmg > 0 ) then
+			ex_dmg = ex_dmg * mul
+
 			table.insert( dmg, {
-				'config_explosion', 'damage', ex_dmg * mul
+				'config_explosion', 'damage', ex_dmg
 			} )
+
+			is_has_dmg, data.explosion = true, ex_dmg
 		end
 
 		for i, _ in ipairs( all_proj_dmg ) do
@@ -1746,9 +1855,13 @@ function damage_mul( proj, mul )
 			}, nil )
 
 			if ( d > 0 ) then
+				d = d * mul
+
 				table.insert( dmg, {
-					'damage_by_type', _, d * mul
+					'damage_by_type', _, d
 				} )
+
+				is_has_dmg, data[ _ ] = true, d
 			end
 		end
 
@@ -1756,6 +1869,8 @@ function damage_mul( proj, mul )
 			set_comp_obj_value( proj, 'ProjectileComponent', nil, dmg, nil, nil )
 		end
 	end
+
+	return is_has_dmg, data
 end
 
 function remove_cards_until_fix( wand, deck_cap, always )
@@ -1777,7 +1892,7 @@ function remove_cards_until_fix( wand, deck_cap, always )
 
 				EntityRemoveFromParent( card )
 
-				EntitySetTransform( card, x, y )
+				tp( card, x, y )
 
 				table.insert( act_cards, card )
 			end
@@ -1835,7 +1950,7 @@ function shoot_proj( from, xml, x, y, vel_x, vel_y, tag, func_pre, func_aft )
 			end
 		end
 
-		if ( shooter == nil or shooter == 0 ) then
+		if ( not is_not_0_num( shooter ) ) then
 			shooter = from
 		end
 	end

@@ -1,15 +1,10 @@
-dofile_once( 'data/scripts/lib/utilities.lua' )
+dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity_id	= GetUpdatedEntityID( )
-local owner_id = 0
+local proj = get_root_entity( )
+local shooter = get_shooter( proj, 0 )
 
-local comp = EntityGetFirstComponent( entity_id, 'ProjectileComponent' )
-if ( comp ) then
-	owner_id = ComponentGetValue2( comp, 'mWhoShot' )
-end
+if ( is_not_0_num( shooter ) and is_alive( shooter ) ) then
+	local x, y = EntityGetTransform( shooter )
 
-if ( owner_id ) and ( owner_id ~= NULL_ENTITY ) then
-	local tx, ty = EntityGetFirstHitboxCenter( owner_id )
-
-	EntitySetTransform( entity_id, tx, ty )
+	tp( proj, x, y )
 end

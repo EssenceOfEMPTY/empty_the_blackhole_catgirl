@@ -43,13 +43,8 @@ if ( is_not_0_num( wand ) ) then
 	local dev_rad = math.rad( max_dev_deg * ( max_adjust - frames ) / max_adjust )
 	local ox, oy = wx + math.cos( wdir ), wy - math.sin( wdir )
 
-	for i, _ in ipairs( aim1 ) do
-		EntitySetTransform( _, ox, oy, wdir + dev_rad )
-	end
-
-	for i, _ in ipairs( aim2 ) do
-		EntitySetTransform( _, ox, oy, wdir - dev_rad )
-	end
+	tp( aim1, ox, oy, wdir + dev_rad )
+	tp( aim2, ox, oy, wdir - dev_rad )
 else
 	set_comp_value( aims, 'LaserEmitterComponent', nil, {
 		is_emitting = false,

@@ -22,15 +22,11 @@
 
 	</Base>
 
-	<TeleportProjectileComponent
-		min_distance_from_wall="2"
-	></TeleportProjectileComponent>
-
 	<ProjectileComponent
 		lob_min="0.5"
 		lob_max="0.7"
-		speed_min="12000"
-		speed_max="12000"
+		speed_min="24000"
+		speed_max="24000"
 		direction_random_rad="0.00"
 		on_death_explode="1"
 		on_death_gfx_leave_sprite="0"
@@ -184,6 +180,12 @@
 		randomize_velocity.min_x="-2"
 		randomize_velocity.max_x="2"
 	></SpriteParticleEmitterComponent>
+
+	<LuaComponent
+		_tags="empty_teleport"
+		script_source_file="mods/empty_the_blackhole_catgirl/files/scripts/projectiles/empty_teleport.lua"
+		execute_on_removed="1"
+	></LuaComponent>
 
 	<VariableStorageComponent
 		name="projectile_file"

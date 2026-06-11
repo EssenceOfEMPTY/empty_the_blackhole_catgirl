@@ -1,22 +1,21 @@
 dofile_once( 'data/scripts/lib/utilities.lua' )
 
-local entity_id	= GetUpdatedEntityID()
-local pos_x, pos_y = EntityGetTransform( entity_id )
+local proj	= GetUpdatedEntityID()
+local pos_x, pos_y = EntityGetTransform( proj )
 
 local targets = EntityGetInRadiusWithTag( pos_x, pos_y, 96, 'homing_target' )
 
-SetRandomSeed( pos_x + pos_y, GameGetFrameNum() )
+SetRandomSeed( pos_x + pos_y, GameGetFrameNum( ) )
 
 if ( #targets > 0 ) then
 	local rnd = Random( 1, #targets )
-	local target_id = targets[ rnd ]
+	local tar = targets[ rnd ]
 
-	-- 检查目标是否有 teleportable_NOT 标签（传送免疫）
-	if ( EntityHasTag( target_id, 'teleportable_NOT' ) ) then
+	if ( EntityHasTag( tar, 'teleportable_NOT' ) ) then
 		return
 	end
 
-	local tx, ty = EntityGetFirstHitboxCenter( target_id )
+	local tx, ty = EntityGetTransform( tar )
 
-	EntitySetTransform( entity_id, tx, ty )
+	tp( proj, tx, ty )
 end

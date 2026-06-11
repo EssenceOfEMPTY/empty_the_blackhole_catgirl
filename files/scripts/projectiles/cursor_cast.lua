@@ -1,18 +1,17 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity = get_root_entity( )
+local proj = get_root_entity( )
+local shooter = get_shooter( proj, 0 )
 
-local shooter = get_comp_info( entity, 'ProjectileComponent', nil, {
-	{ 'mWhoShot', 0 }
-}, nil )
+if ( is_not_0_num( shooter ) and is_alive( shooter ) ) then
+	local cur = get_comp_info( shooter, 'ControlsComponent', nil, {
+		{ 'mMousePosition', {
+			v_1 = 'nil',
+			v_2 = 'nil',
+		} },
+	}, nil )
 
-if ( is_alive( shooter ) ) then
-	local c_comp = EntityGetFirstComponentIncludingDisabled( shooter, 'ControlsComponent' )
-
-	if ( c_comp ) then
-		local cursor_x, cursor_y = ComponentGetValue2( c_comp, 'mMousePosition' )
-		local x, y = EntityGetTransform( entity )
-
-		EntitySetTransform( entity, cursor_x or x, cursor_y or y )
+	if ( is_not_nan_num( cur.v_1 ) and is_not_nan_num( cur.v_2 ) ) then
+		tp( proj, cur.v_1, cur.v_2 )
 	end
 end

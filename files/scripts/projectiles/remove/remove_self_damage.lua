@@ -8,9 +8,7 @@ if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
 		collide_with_shooter_frames = -1,
 	}, nil, nil )
 
-	local shooter = get_comp_info( proj, 'ProjectileComponent', nil, {
-		{ 'mWhoShot', nil },
-	}, nil )
+	local shooter = get_shooter( proj, 0 )
 
 	if ( is_not_0_num( shooter ) ) then
 		set_comp_obj_value( proj, 'ProjectileComponent', nil, {

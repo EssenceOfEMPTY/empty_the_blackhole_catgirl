@@ -2106,7 +2106,7 @@ local new_actions =
 						data = discarded[ _ - #deck - #hand ]
 					end
 
-					if ( data.max_uses and data.uses_remaining > -1 and data.uses_remaining < data.max_uses ) and ( data.id ~= 'EMPTY_SPELL_RECHARGE' ) then
+					if ( data.max_uses and data.uses_remaining > -1 and data.uses_remaining < data.max_uses ) and ( data.id ~= 'EMPTY_SPELL_RELOAD' ) then
 						data.uses_remaining = data.uses_remaining + 1
 
 						ActionUsesRemainingChanged( data.inventoryitem_id, data.uses_remaining )

@@ -40,6 +40,9 @@ new_modifiers = {
 			} )
 		end
 	end,
+	remove_recoil = function ( )
+		shot_effects.recoil_knockback = 0
+	end,
 }
 
 for i, _ in pairs( new_modifiers ) do

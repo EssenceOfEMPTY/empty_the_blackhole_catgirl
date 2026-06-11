@@ -12,12 +12,39 @@
 	></MagicConvertMaterialComponent>
 
 	<MagicConvertMaterialComponent
-		from_material_tag="[meltable_to_lava_fast],[sand_ground],[rust]"
+		from_material_tag="[meltable_to_lava_fast]"
 		to_material="air"
 		steps_per_frame="128"
 		loop="1"
 		is_circle="1"
-		radius="256"
+		radius="192"
+	></MagicConvertMaterialComponent>
+
+	<MagicConvertMaterialComponent
+		from_material_tag="[meltable_to_water]"
+		to_material="air"
+		steps_per_frame="128"
+		loop="1"
+		is_circle="1"
+		radius="192"
+	></MagicConvertMaterialComponent>
+
+	<MagicConvertMaterialComponent
+		from_material_tag="[sand_ground]"
+		to_material="air"
+		steps_per_frame="128"
+		loop="1"
+		is_circle="1"
+		radius="192"
+	></MagicConvertMaterialComponent>
+
+	<MagicConvertMaterialComponent
+		from_material_tag="[rust]"
+		to_material="air"
+		steps_per_frame="128"
+		loop="1"
+		is_circle="1"
+		radius="192"
 	></MagicConvertMaterialComponent>
   
 </Entity>
