@@ -180,7 +180,7 @@ e_cmd_funcs = {
 			local v_value = 0
 
 			if ( reflect or type( v_No ) == 'number' ) then
-				v_value = tonumber( GlobalsGetValue( 'EMPTY_COMMAND_VARIABLE_' .. tostring( v_No ), '0' ) ) or 0
+				v_value = get_globals_num( 'EMPTY_COMMAND_VARIABLE_' .. tostring( v_No ), 0 )
 
 				command_print( command .. '(', '$empty_command_variable_get_success', tostring( v_No ), tostring( v_value ) )
 			end

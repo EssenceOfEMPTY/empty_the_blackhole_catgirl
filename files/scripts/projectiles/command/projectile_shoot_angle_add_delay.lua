@@ -1,28 +1,25 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity = get_root_entity( )
+local proj = get_root_entity( )
 local command = 'projectile_shoot_angle_add'
 local command_delay = command .. '_delay'
 
-if ( entity ~= NULL_ENTITY ) then
-	local varia_comps = EntityGetComponent( entity, 'VariableStorageComponent', command_delay )
+if ( proj ~= NULL_ENTITY ) then
+	local varia_comps = EntityGetComponent( proj, 'VariableStorageComponent', command_delay )
 	local count = 0
 
 	for i, varia_comp in ipairs( varia_comps or { } ) do
 		local angle = ComponentGetValue2( varia_comp, 'value_float' )
 
-		local v_comps = EntityGetComponent( entity, 'VelocityComponent' ) or { }
-		count = count + #v_comps
+		local vel_x, vel_y = get_vel( proj )
 
-		for _, v_comp in ipairs( v_comps ) do
-			local vel_x, vel_y = ComponentGetValue2( v_comp, 'mVelocity' )
+		vel_x, vel_y = rot_vel( vel_x, vel_y, angle )
 
-			vel_x, vel_y = rot_vel( vel_x, vel_y or 0, angle )
+		set_vel( proj, vel_x, vel_y )
 
-			ComponentSetValue2( v_comp, 'mVelocity', vel_x, vel_y )
-		end
+		count = count + 1
 
-		EntityRemoveComponent( entity, varia_comp )
+		EntityRemoveComponent( proj, varia_comp )
 	end
 
 	if ( count > 0 ) then

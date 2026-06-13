@@ -25,7 +25,7 @@ if ( is_alive( entity ) ) then
 				delay_frames = max,
 			}, nil, nil )
 		else
-			local count = get_comp_info( entity, 'VariableStorageComponent', curse, {
+			local count = get_comp_value( entity, 'VariableStorageComponent', curse, {
 				{ 'value_int', 0 },
 			}, nil )
 

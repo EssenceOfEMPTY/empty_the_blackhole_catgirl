@@ -1,35 +1,22 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity = get_root_entity( )
-local p_comp = EntityGetFirstComponent( entity, 'ProjectileComponent' )
-local shooter
+local proj = get_root_entity( )
+local shooter = get_shooter( proj, 0 )
 
-if ( p_comp ) then
-	shooter = ComponentGetValue2( p_comp, 'mWhoShot' )
-end
+if ( is_not_0_num( shooter ) ) then
+	local cur_x, cur_y = get_cur_xy( shooter )
 
-if ( shooter and shooter ~= NULL_ENTITY ) then
-	local p_s = EntityGetWithTag( 'projectile' ) or { }
-	if ( #p_s > 0 ) then
-		local controls = EntityGetFirstComponentIncludingDisabled( shooter, 'ControlsComponent' )
-		if ( controls ) then
-			local cur_x, cur_y = ComponentGetValue2( controls, 'mMousePosition' )
-			if ( cur_x and cur_y ) then
-				for _ = 1, #p_s do
-					local p = p_s[_]
+	if ( cur_x and cur_y ) then
+		local projs = get_all_projs( )
 
-					local v_comp = EntityGetFirstComponentIncludingDisabled( p, 'VelocityComponent' )
-					local px, py = EntityGetTransform( p )
-					if ( v_comp ) then
-						local length = 500
-						local divergence = ( ( math.random( ) - 0.5 ) * 0.174533 )
-						local angle = ( math.pi - math.atan( ( cur_y - py ), ( cur_x - px ) ) ) + divergence
-						local vel_x = - math.cos( angle ) * length
-						local vel_y = math.sin( angle ) * length
-						ComponentSetValue2( v_comp, 'mVelocity', vel_x, vel_y )
-					end
-				end
-			end
+		for i, _ in ipairs( projs ) do
+			local x, y = EntityGetTransform( _ )
+
+			local angle, length = math.pi - math.atan( cur_y - y, cur_x - x ), 500
+
+			local vel_x, vel_y = -math.cos( angle ), math.sin( angle )
+
+			set_vel( p, vel_x * length, vel_y * length )
 		end
 	end
 end

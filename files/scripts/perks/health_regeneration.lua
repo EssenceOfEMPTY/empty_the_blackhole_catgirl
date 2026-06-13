@@ -2,7 +2,7 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_command
 
 local entity = get_root_entity( )
 
-local cur_hp, max_hp = get_comp_info( entity, 'DamageModelComponent', nil, {
+local cur_hp, max_hp = get_comp_value( entity, 'DamageModelComponent', nil, {
 	{ 'hp', 1 / get_scale( ) },
 	{ 'max_hp', 1 / get_scale( ) },
 }, nil )

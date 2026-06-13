@@ -3,7 +3,7 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility
 local entity = get_root_entity( )
 local x, y = EntityGetTransform( entity )
 
-local speed = get_comp_info( entity, 'VariableStorageComponent', 'orbit_projectile', {
+local speed = get_comp_value( entity, 'VariableStorageComponent', 'orbit_projectile', {
 	{ 'value_int', 1 },
 }, nil )
 

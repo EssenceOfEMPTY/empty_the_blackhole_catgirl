@@ -10,7 +10,7 @@ if ( paras ) then
 	if ( is_not_0_num( paras.frames ) and is_not_0_num( paras.level ) ) then
 		remove_speed_limit( proj )
 
-		local sp_min, sp_max = get_comp_info( proj, 'ProjectileComponent', nil, {
+		local sp_min, sp_max = get_comp_value( proj, 'ProjectileComponent', nil, {
 			{ 'speed_min', 1000 },
 			{ 'speed_max', 1000 },
 		}, nil )

@@ -16,7 +16,7 @@ function init_potion( entity_id, potion_material )
 		end
 	end
 
-	local total_capacity = tonumber( GlobalsGetValue( 'EXTRA_POTION_CAPACITY_LEVEL', '2000' ) ) or 2000
+	local total_capacity = get_globals_num( 'EXTRA_POTION_CAPACITY_LEVEL', 2000 )
 	if ( total_capacity > 2000 ) then
 		local comp = EntityGetFirstComponentIncludingDisabled( entity_id, 'MaterialSuckerComponent' )
 

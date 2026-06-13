@@ -4,7 +4,7 @@ local death = tonumber( StatsGlobalGetValue( 'death_count' ) ) or 0
 
 local niko = get_root_entity( )
 
-local cur_hp, max_hp = get_comp_info( niko, 'DamageModelComponent', nil, {
+local cur_hp, max_hp = get_comp_value( niko, 'DamageModelComponent', nil, {
 	{ 'hp', 1 / get_scale( ) },
 	{ 'max_hp', 1 / get_scale( ) },
 }, nil )

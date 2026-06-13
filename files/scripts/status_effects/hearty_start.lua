@@ -6,7 +6,7 @@ if ( is_alive( entity ) ) then
 	local d_comp = EntityGetFirstComponent( entity, 'DamageModelComponent' )
 
 	if ( d_comp ) then
-		local hp, max_hp = get_comp_info( entity, 'DamageModelComponent', nil, {
+		local hp, max_hp = get_comp_value( entity, 'DamageModelComponent', nil, {
 			{ 'hp', 1 },
 			{ 'max_hp', 1 },
 		}, nil )

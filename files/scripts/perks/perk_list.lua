@@ -72,12 +72,12 @@ local new_perks =
 		one_off_effect = true,
 		usable_by_enemies = false,
 		func = function( perk_item, who, item_name )
-			local reroll_count = tonumber( GlobalsGetValue( 'TEMPLE_PERK_REROLL_COUNT', '0' ) ) or 0
+			local reroll_count = get_globals_num( 'TEMPLE_PERK_REROLL_COUNT', 0 )
 
 			GlobalsSetValue( 'TEMPLE_PERK_REROLL_COUNT', tostring( reroll_count - 3 ) )
 		end,
 		func_remove = function ( who )
-			local reroll_count = tonumber( GlobalsGetValue( 'TEMPLE_PERK_REROLL_COUNT', '0' ) ) or 0
+			local reroll_count = get_globals_num( 'TEMPLE_PERK_REROLL_COUNT', 0 )
 
 			GlobalsSetValue( 'TEMPLE_PERK_REROLL_COUNT', tostring( reroll_count - 9 ) )
 		end,
@@ -90,7 +90,7 @@ local new_perks =
 		one_off_effect = true,
 		usable_by_enemies = false,
 		func = function( perk_item, who, item_name )
-			local shift_count = tonumber( GlobalsGetValue( 'fungal_shift_iteration', '0' ) ) or 0
+			local shift_count = get_globals_num( 'fungal_shift_iteration', 0 )
 
 			GlobalsSetValue( 'fungal_shift_iteration', tostring( shift_count - 5 ) )
 		end,
@@ -106,7 +106,7 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_berserk_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_berserk_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
@@ -118,7 +118,7 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood / 3 )
 			end, nil )
@@ -135,12 +135,12 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_teleport_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_teleport_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( tonumber( GlobalsGetValue( 'PERK_PICKED_EMPTY_PROTECTION_TELEPORT_PICKUP_COUNT', '0' ) ) == 0 ) then
+			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_TELEPORT_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_TELEPORT', false, false, true )
 			end
 		end,
@@ -151,7 +151,7 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood / 3 )
 			end, nil )
@@ -168,12 +168,12 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_freeze_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_freeze_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( tonumber( GlobalsGetValue( 'PERK_PICKED_EMPTY_PROTECTION_FREEZE_PICKUP_COUNT', '0' ) ) == 0 ) then
+			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_FREEZE_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_FREEZE', false, false, true )
 			end
 		end,
@@ -184,7 +184,7 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood / 3 )
 			end, nil )
@@ -201,12 +201,12 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_lava_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_lava_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( tonumber( GlobalsGetValue( 'PERK_PICKED_EMPTY_PROTECTION_LAVA_PICKUP_COUNT', '0' ) ) == 0 ) then
+			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_LAVA_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_LAVA', false, false, true )
 			end
 		end,
@@ -217,7 +217,7 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood / 3 )
 			end, nil )
@@ -234,12 +234,12 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_acid_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_acid_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( tonumber( GlobalsGetValue( 'PERK_PICKED_EMPTY_PROTECTION_ACID_PICKUP_COUNT', '0' ) ) == 0 ) then
+			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_ACID_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_ACID', false, false, true )
 			end
 		end,
@@ -250,7 +250,7 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood / 3 )
 			end, nil )
@@ -267,12 +267,12 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_polymorph_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_polymorph_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( tonumber( GlobalsGetValue( 'PERK_PICKED_EMPTY_PROTECTION_POLYMORPH_PICKUP_COUNT', '0' ) ) == 0 ) then
+			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_POLYMORPH_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_POLYMORPH', false, false, true )
 			end
 		end,
@@ -283,7 +283,7 @@ local new_perks =
 				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
 				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
 			}, function ( comp )
-				local blood = tonumber( ComponentGetValue2( comp, 'blood_multiplier' ) ) or 0
+				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood / 3 )
 			end, nil )
@@ -343,7 +343,7 @@ local new_perks =
 		func = function( perk_item, who, item_name )
 			EntityAddTag( who, 'curse_NOT' )
 
-			local mul = get_comp_obj_info( who, 'DamageModelComponent', nil, {
+			local mul = get_comp_obj_value( who, 'DamageModelComponent', nil, {
 				{ 'damage_multipliers', 'curse', 1 },
 			}, nil )
 
@@ -354,7 +354,7 @@ local new_perks =
 		func_remove = function( who )
 			EntityRemoveTag( who, 'curse_NOT' )
 
-			local mul = get_comp_obj_info( who, 'DamageModelComponent', nil, {
+			local mul = get_comp_obj_value( who, 'DamageModelComponent', nil, {
 				{ 'damage_multipliers', 'curse', 0.5 },
 			}, nil )
 
@@ -618,7 +618,6 @@ local new_perks =
 		func = function( perk_item, who, item_name )
 			EntityAddTag( who, 'drillable' )
 
-			local damagemodels = EntityGetComponent( who, 'DamageModelComponent' )
 			local d_muls = {
 				melee = 0.5,
 				projectile = 0.5,
@@ -635,17 +634,11 @@ local new_perks =
 				holy = 3.25,
 			}
 
-			for _, damagemodel in ipairs( damagemodels or { } ) do
-				for damageType, multiplier in pairs( d_muls ) do
-					local currentMultiplier = tonumber( ComponentObjectGetValue2( damagemodel, 'damage_multipliers', damageType ) ) or 1.0
-					ComponentObjectSetValue2( damagemodel, 'damage_multipliers', damageType, currentMultiplier * multiplier )
-				end
-			end
+			d_comps_mul( who, '*', d_muls )
 		end,
 		func_remove = function( who )
 			EntityRemoveTag( who, 'drillable' )
 
-			local damagemodels = EntityGetComponent( who, 'DamageModelComponent' )
 			local d_muls = {
 				melee = 0.5,
 				projectile = 0.5,
@@ -662,12 +655,7 @@ local new_perks =
 				holy = 3.25,
 			}
 
-			for _, damagemodel in ipairs( damagemodels or { } ) do
-				for damageType, multiplier in pairs( d_muls ) do
-					local currentMultiplier = tonumber( ComponentObjectGetValue2( damagemodel, 'damage_multipliers', damageType ) ) or 1.0
-					ComponentObjectSetValue2( damagemodel, 'damage_multipliers', damageType, currentMultiplier / multiplier )
-				end
-			end
+			d_comps_mul( who, '/', d_muls )
 		end,
 	},
 	{
@@ -703,7 +691,7 @@ local new_perks =
 		func = function( perk_item, who, item_name )
 			local inv = { }
 
-			local inv_y = get_comp_info( who, 'Inventory2Component', nil, {
+			local inv_y = get_comp_value( who, 'Inventory2Component', nil, {
 				{ 'full_inventory_slots_y' , 1 },
 			}, nil )
 
@@ -829,7 +817,7 @@ local new_perks =
 
 				EntityAddTag( who, tag )
 			else
-				local count, delta = get_comp_info( who, 'VariableStorageComponent', tag, {
+				local count, delta = get_comp_value( who, 'VariableStorageComponent', tag, {
 					{ 'value_int', 0 },
 					{ 'value_float', 1 },
 				}, nil )
@@ -843,7 +831,7 @@ local new_perks =
 		func_remove = function( who )
 			local tag = 'adjust'
 
-			local frames, level = get_comp_info( who, 'VariableStorageComponent', tag, {
+			local frames, level = get_comp_value( who, 'VariableStorageComponent', tag, {
 				{ 'value_int', 0 },
 				{ 'value_float', 1 },
 			}, nil )
@@ -1006,14 +994,7 @@ local new_perks =
 					script_source_file = empty_path .. 'scripts/perks/curse/curse_monk.lua',
 				} )
 
-				set_comp_obj_value( who, 'DamageModelComponent', nil, nil, function ( comp )
-					for d_type, mul in pairs( d_muls ) do
-						local cur = ComponentObjectGetValue2( comp, 'damage_multipliers', d_type ) or 1
-						ComponentObjectSetValue2( comp, 'damage_multipliers', d_type, cur * mul )
-					end
-				end, nil )
-
-				if ( tonumber( GlobalsGetValue( 'PERK_PICKED_GOLD_IS_FOREVER_PICKUP_COUNT', '0' ) ) == 0 ) then
+				if ( get_globals_num( 'PERK_PICKED_GOLD_IS_FOREVER_PICKUP_COUNT', 0 ) == 0 ) then
 					perk_pickup( nil, who, 'GOLD_IS_FOREVER', false, false, true )
 				end
 
@@ -1021,19 +1002,12 @@ local new_perks =
 					perk_pickup( nil, who, 'ATTRACT_ITEMS', false, false, true )
 				end
 
-				if ( tonumber( GlobalsGetValue( 'PERK_PICKED_EMPTY_PERCENTAGE_OFF_PICKUP_COUNT', '0' ) ) == 0 ) then
+				if ( get_globals_num( 'PERK_PICKED_EMPTY_PERCENTAGE_OFF_PICKUP_COUNT', 0 ) == 0 ) then
 					perk_pickup( nil, who, 'EMPTY_PERCENTAGE_OFF', false, false, true )
 				end
-			else
-				local damagemodels = EntityGetComponent( who, 'DamageModelComponent' )
-
-				for _, damagemodel in ipairs( damagemodels or { } ) do
-					for damageType, multiplier in pairs( d_muls ) do
-						local currentMultiplier = tonumber( ComponentObjectGetValue2( damagemodel, 'damage_multipliers', damageType ) ) or 1.0
-						ComponentObjectSetValue2( damagemodel, 'damage_multipliers', damageType, currentMultiplier * multiplier )
-					end
-				end
 			end
+
+			d_comps_mul( who, '*', d_muls )
 		end,
 		func_remove = function( who )
 			local d_muls = {
@@ -1062,21 +1036,9 @@ local new_perks =
 
 				remove_all_comp( who, 'LuaComponent', 'empty_curse_monk' )
 				remove_all_comp( who, 'VariableStorageComponent', 'empty_curse_monk' )
-
-				set_comp_obj_value( who, 'DamageModelComponent', nil, nil, function ( comp )
-					for d_type, mul in pairs( d_muls ) do
-						local cur = ComponentObjectGetValue2( comp, 'damage_multipliers', d_type ) or 1
-						ComponentObjectSetValue2( comp, 'damage_multipliers', d_type, cur / mul )
-					end
-				end, nil )
-			else
-				set_comp_obj_value( who, 'DamageModelComponent', nil, nil, function ( comp )
-					for d_type, mul in pairs( d_muls ) do
-						local cur = ComponentObjectGetValue2( comp, 'damage_multipliers', d_type ) or 1
-						ComponentObjectSetValue2( comp, 'damage_multipliers', d_type, cur / mul )
-					end
-				end, nil )
 			end
+
+			d_comps_mul( who, '/', d_muls )
 		end,
 	},
 	{
@@ -1090,7 +1052,7 @@ local new_perks =
 			local wands = EntityGetWithTag( 'wand' )
 
 			for _, wand in ipairs( wands ) do
-				local fire_rate, relaod = get_comp_obj_info( wand, 'AbilityComponent', nil, {
+				local fire_rate, relaod = get_comp_obj_value( wand, 'AbilityComponent', nil, {
 					{ 'gunaction_config', 'fire_rate_wait', 0 },
 					{ 'gun_config', 'reload_time', 0 },
 				} )
@@ -1128,7 +1090,7 @@ local new_perks =
 			local wands = EntityGetWithTag( 'wand' )
 
 			for _, wand in ipairs( wands ) do
-				local mana_charge, mana_max = get_comp_info( wand, 'AbilityComponent', nil, {
+				local mana_charge, mana_max = get_comp_value( wand, 'AbilityComponent', nil, {
 					{ 'mana_charge_speed', 0 },
 					{ 'mana_max', 0 },
 				}, nil )
@@ -1138,7 +1100,7 @@ local new_perks =
 					mana_max = 1.2 * mana_max,
 				}, nil, nil )
 
-				local deck_cap = get_comp_obj_info( wand, 'AbilityComponent', nil, {
+				local deck_cap = get_comp_obj_value( wand, 'AbilityComponent', nil, {
 					{ 'gun_config', 'deck_capacity', 0 },
 				}, nil )
 
@@ -1276,39 +1238,16 @@ local new_perks =
 					d_muls.curse = 0.5 * d_muls.curse
 				end
 
-				set_comp_obj_value( who, 'DamageModelComponent', nil, nil, function ( comp )
-					for d_type, d_mul in pairs( d_muls ) do
-						local cur_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', d_type )
-
-						ComponentObjectSetValue2( comp, 'damage_multipliers', d_type, cur_mul * d_mul )
-					end
-				end, nil )
-
-				local hp_max = get_comp_info( who, 'DamageModelComponent', nil, {
-					{ 'max_hp', -1 },
-				}, nil )
-
-				if ( hp_max > 1 / get_scale( ) ) then
-					set_comp_value( who, 'DamageModelComponent', nil, {
-						hp = 2 * hp_max,
-						max_hp = 2 * hp_max,
-					}, nil, nil )
-				end
+				max_hp_mul( who, '*', 2, true )
 
 				local x, y = EntityGetTransform( who )
 
 				for _ = 1, 4, 1 do
 					EntityLoad( empty_path .. 'entities/items/potions/potion_healthium_many_hp.xml', x + loc_center_fix( 4, 4, _ ), y )
 				end
-			else
-				set_comp_obj_value( who, 'DamageModelComponent', nil, nil, function ( comp )
-					for d_type, d_mul in pairs( d_muls ) do
-						local cur_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', d_type )
-
-						ComponentObjectSetValue2( comp, 'damage_multipliers', d_type, cur_mul * d_mul )
-					end
-				end, nil )
 			end
+
+			d_comps_mul( who, '*', d_muls )
 		end,
 		func_remove = function( who )
 			local d_muls = {
@@ -1336,13 +1275,7 @@ local new_perks =
 				end
 			end
 
-			set_comp_obj_value( who, 'DamageModelComponent', nil, nil, function ( comp )
-				for d_type, d_mul in pairs( d_muls ) do
-					local cur_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', d_type )
-
-					ComponentObjectSetValue2( comp, 'damage_multipliers', d_type, cur_mul / d_mul )
-				end
-			end, nil )
+			d_comps_mul( who, '/', d_muls )
 		end,
 	},
 	{
@@ -1641,7 +1574,7 @@ end
 
 function undo_perk_pickup( style )
 	local flag = string.upper( style ) .. '_PERK_TOTAL_COUNT'
-	local count = tonumber( GlobalsGetValue( flag, '0' ) )
+	local count = get_globals_num( flag, 0 )
 
 	GlobalsSetValue( flag, tostring( count - 1 ) )
 end

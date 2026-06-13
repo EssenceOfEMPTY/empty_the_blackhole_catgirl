@@ -7,19 +7,14 @@ function shot( proj )
 		return
 	end
 
-	local projfile = get_comp_info( proj, 'VariableStorageComponent', nil, {
+	local projfile = get_comp_value( proj, 'VariableStorageComponent', nil, {
 		{ 'value_string', nil }
 	}, 'projectile_file' )
 
 	if ( is_not_nil_str( projfile ) and ModDoesFileExist( projfile ) ) then
 		local x, y = EntityGetTransform( proj )
-		local v_comp = EntityGetFirstComponent( proj, 'VelocityComponent' ) or 0
-		local vel_x, vel_y = nil, nil
+		local vel_x, vel_y = get_vel( proj )
 		local p_comp = EntityGetFirstComponent( proj, 'ProjectileComponent' ) or 0
-
-		if ( is_not_0_num( v_comp ) ) then
-			vel_x, vel_y = ComponentGetValue2( v_comp, 'mVelocity' )
-		end
 
 		vel_x, vel_y = vel_x or 0, vel_y or 0
 

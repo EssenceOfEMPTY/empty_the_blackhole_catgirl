@@ -180,7 +180,15 @@ function OnPlayerSpawned( player )
 		GlobalsSetValue( 'EMPTY_STARTING_CHANGE', '1' )
 
 		local plat = {
-			run_velocity = 57,
+			run_velocity = 57, -- 诅咒
+			jump_velocity_y = -95,
+			jump_velocity_x = 57, -- 诅咒
+			fly_speed_max_up = 95,
+			fly_speed_max_down = 95,
+			fly_velocity_x = 57, -- 诅咒
+			pixel_gravity = 350,
+			accel_x = 0.15,
+			accel_x_air = 0.15,
 
 			velocity_min_x = -int_huge,
 			velocity_max_x = int_huge,
@@ -188,13 +196,20 @@ function OnPlayerSpawned( player )
 			velocity_max_y = int_huge,
 		}
 
+		set_comp_value( player, 'CharacterPlatformingComponent', nil, plat, nil, nil )
+
 		local kick = {
 			kick_radius = 4,
 		}
 
-		set_comp_value( player, 'CharacterPlatformingComponent', nil, plat, nil, nil )
-
 		set_comp_value( player, 'KickComponent', nil, kick, nil, nil )
+
+		local p_sh = {
+			camera_max_distance_from_character = 64,
+			eating_cells_per_frame = 3,
+		}
+
+		set_comp_value( player, 'PlatformShooterPlayerComponent', nil, p_sh, nil, nil )
 
 		for _, curse in ipairs( all_curses ) do
 			if ( ModSettingGet( 'empty_the_blackhole_catgirl.' .. curse ) ) then
@@ -206,11 +221,11 @@ end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 世界更新前 >>>>>>>>>>>>>>>>>>>>>>>>---
 
---function OnWorldPreUpdate( )
---	local a, b, c = time_for_vec3( )
---	SetRandomSeed( a + c, b + c )
+function OnWorldPreUpdate( )
+	local a, b, c = time_for_vec3( )
+	SetRandomSeed( a + c, b + c )
 
 	--if ( GlobalsGetValue( 'EMPTY_PERK_REMOVE_COUNT', '0' ) ~= '0' ) then
 	--	dofile( empty_path .. '' )
 	--end
---end
+end

@@ -3,7 +3,7 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility
 function item_pickup( heart, who, name )
 	local x, y = EntityGetTransform( heart )
 
-	local max_hp, max_hp_cap = get_comp_info( who, 'DamageModelComponent', nil, {
+	local max_hp, max_hp_cap = get_comp_value( who, 'DamageModelComponent', nil, {
 		{ 'max_hp', 1 / get_scale( ) },
 		{ 'max_hp_cap', 0 },
 	}, nil )
@@ -11,8 +11,8 @@ function item_pickup( heart, who, name )
 	local delta = max_hp
 
 	local add_num = 25 / get_scale( )
-	local mul = tonumber( GlobalsGetValue( 'HEARTS_MORE_EXTRA_HP_MULTIPLIER', '1' ) ) or 1
-	local also_heal = tonumber( GlobalsGetValue( 'EMPTY_HEARTS_ALSO_HEAL', '0' ) ) or 0
+	local mul = get_globals_num( 'HEARTS_MORE_EXTRA_HP_MULTIPLIER', 1 )
+	local also_heal = get_globals_num( 'EMPTY_HEARTS_ALSO_HEAL', 0 )
 
 	add_num = add_num * mul
 

@@ -3,7 +3,7 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility
 local entity, tag = get_root_entity( ), 'hearty_max_hp'
 
 if ( is_alive( entity ) and not EntityHasTag( entity, 'empty_hearty_immunity' ) ) then
-	local max_hp, hp = get_comp_info( entity, 'DamageModelComponent', nil, {
+	local max_hp, hp = get_comp_value( entity, 'DamageModelComponent', nil, {
 		{ 'max_hp', 1 / get_scale( ) },
 		{ 'hp', 1 / get_scale( ) },
 	}, nil )

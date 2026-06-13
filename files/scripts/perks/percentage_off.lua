@@ -28,7 +28,7 @@ if ( #targets > 0 ) then
 					end
 				end
 
-				if ( ( tonumber( GlobalsGetValue( 'EMPTY_CURSE_MONK', '0' ) ) or 0 ) > 0 ) then
+				if ( get_globals_num( 'EMPTY_CURSE_MONK', 0 ) > 0 ) then
 					p = p + 50;
 				end
 
@@ -47,15 +47,19 @@ if ( #targets > 0 ) then
 				local offsetx = 6
 				local text = tostring( cost )
 				local textwidth = 0
+
 				for _=1, #text do
 					local l = string.sub( text, _, _ )
+
 					if ( l ~= '1' ) then
 						textwidth = textwidth + 6
 					else
 						textwidth = textwidth + 3
 					end
 				end
+
 				offsetx = textwidth * 0.5 - 0.5
+
 				ComponentSetValue2( cost_text, 'offset_x', offsetx )
 				ComponentSetValue2( itemcost, 'cost', cost )
 			end

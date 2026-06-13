@@ -3,7 +3,7 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility
 local entity, tag = get_root_entity( ), 'hearty_max_hp'
 
 if ( is_alive( entity ) and not EntityHasTag( entity, 'empty_hearty_immunity' ) ) then
-	local max_hp = get_comp_info( entity, 'VariableStorageComponent', tag, {
+	local max_hp = get_comp_value( entity, 'VariableStorageComponent', tag, {
 		{ 'value_float', nil },
 	}, nil )
 

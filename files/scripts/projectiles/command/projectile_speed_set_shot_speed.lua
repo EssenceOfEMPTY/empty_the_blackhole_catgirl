@@ -10,13 +10,13 @@ function shot( proj )
 		for _, varia_comp in ipairs( varia_comps or { } ) do
 			local speed = ComponentGetValue2( varia_comp, 'value_float' )
 
-			set_comp_value( proj, 'VelocityComponent', nil, nil, function ( comp )
-				local vel_x, vel_y = ComponentGetValue2( comp, 'mVelocity' )
+			local vel_x, vel_y = get_vel( proj )
 
-				vel_x, vel_y = change_vel( vel_x, vel_y or 0, speed )
+			vel_x, vel_y = change_vel( vel_x, vel_y, speed )
 
-				ComponentSetValue2( comp, 'mVelocity', vel_x, vel_y )
-			end, nil )
+			set_vel( proj, vel_x, vel_y )
+
+			count = count + 1
 
 			EntityRemoveComponent( proj, varia_comp )
 		end

@@ -12,34 +12,4 @@
 		frames="-1"
 	></GameEffectComponent>
 
-	<GameEffectComponent
-		effect="EXTRA_MONEY"
-		frames="-1"
-	></GameEffectComponent>
-
-	<GameEffectComponent
-		effect="EXTRA_MONEY"
-		frames="-1"
-	></GameEffectComponent>
-
-	<GameEffectComponent
-		effect="EXTRA_MONEY"
-		frames="-1"
-	></GameEffectComponent>
-
-	<GameEffectComponent
-		effect="EXTRA_MONEY"
-		frames="-1"
-	></GameEffectComponent>
-
-	<GameEffectComponent
-		effect="EXTRA_MONEY"
-		frames="-1"
-	></GameEffectComponent>
-
-	<GameEffectComponent
-		effect="EXTRA_MONEY"
-		frames="-1"
-	></GameEffectComponent>
-
 </Entity>

@@ -3,14 +3,7 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility
 local proj = get_root_entity( )
 local px, py = EntityGetTransform( proj )
 
-local vel = get_comp_info( proj, 'VelocityComponent', nil, {
-	{ 'mVelocity', {
-		v_1 = 0,
-		v_2 = 0,
-	} },
-}, nil )
-
-local vel_x, vel_y = vel.v_1, vel.v_2
+local vel_x, vel_y = get_vel( proj )
 
 local angle = -math.atan( vel_y, vel_x )
 

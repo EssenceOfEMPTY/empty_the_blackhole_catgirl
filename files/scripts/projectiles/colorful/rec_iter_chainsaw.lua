@@ -9,7 +9,7 @@ if ( is_not_0_num( proj ) ) then
 	if ( paras and paras.count ) then
 		local count = paras.count
 
-		local dmg = get_comp_obj_info( proj, 'ProjectileComponent', nil, {
+		local dmg = get_comp_obj_value( proj, 'ProjectileComponent', nil, {
 			{ 'damage_by_type', 'slice', 1 / get_scale( ) },
 		}, nil )
 

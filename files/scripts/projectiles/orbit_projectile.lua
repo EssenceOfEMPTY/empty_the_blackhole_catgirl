@@ -7,7 +7,7 @@ local a, b, c = time_for_vec3( )
 
 SetRandomSeed( x - a + c, y - b + c )
 
-local projfile = get_comp_info( entity, 'VariableStorageComponent', 'orbit_projectile', {
+local projfile = get_comp_value( entity, 'VariableStorageComponent', 'orbit_projectile', {
 	{ 'value_string', nil },
 }, nil )
 

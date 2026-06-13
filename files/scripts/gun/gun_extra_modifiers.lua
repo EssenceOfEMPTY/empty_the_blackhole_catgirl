@@ -6,7 +6,7 @@ new_modifiers = {
 		local tagging = tag .. 'ing'
 
 		local shooter = get_root_entity( )
-		local frames, level = get_comp_info( shooter, 'VariableStorageComponent', tag, {
+		local frames, level = get_comp_value( shooter, 'VariableStorageComponent', tag, {
 			{ 'value_int', 0 },
 			{ 'value_float', 1 },
 		}, nil )

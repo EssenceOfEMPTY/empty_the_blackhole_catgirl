@@ -11,9 +11,7 @@ function shot( proj )
 			local vel_x = ComponentGetValue2( varia_comp, 'value_float' )
 			local vel_y = tonumber( ComponentGetValue2( varia_comp, 'value_string' ) ) or 0
 
-			set_comp_value( proj, 'VelocityComponent', nil, {
-				mVelocity = { vel_x, vel_y },
-			}, nil, nil )
+			set_vel( proj, vel_x, vel_y )
 
 			EntityRemoveComponent( proj, varia_comp )
 		end

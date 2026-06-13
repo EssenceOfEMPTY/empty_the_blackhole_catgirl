@@ -14,15 +14,7 @@ for _, proj in ipairs( projs ) do
 
 	if ( not tags ) or ( string.find( tags, 'black_hole' ) == nil ) then
 		local x, y = EntityGetTransform( proj )
-		local vel_x, vel_y = nil, nil
-
-		local v_comp = EntityGetFirstComponent( proj, 'VelocityComponent' )
-
-		if ( v_comp ) then
-			vel_x, vel_y = ComponentGetValue2( v_comp, 'mVelocity' )
-		else
-			vel_x, vel_y = 0, 0
-		end
+		local vel_x, vel_y = get_vel( proj )
 
 		shoot_proj( proj, 'data/entities/projectiles/deck/black_hole_giga.xml', x, y, vel_x, vel_y, nil, nil, nil )
 

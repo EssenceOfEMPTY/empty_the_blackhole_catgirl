@@ -11,16 +11,13 @@ function shot( proj )
 		for i, varia_comp in ipairs( varia_comps or { } ) do
 			local angle = ComponentGetValue2( varia_comp, 'value_float' )
 
-			local v_comps = EntityGetComponent( proj, 'VelocityComponent' ) or { }
-			count = count + #v_comps
+			local vel_x, vel_y = get_vel( proj )
 
-			for _, v_comp in ipairs( v_comps ) do
-				local vel_x, vel_y = ComponentGetValue2( v_comp, 'mVelocity' )
+			vel_x, vel_y = abs_rot_vel( vel_x, vel_y, angle )
 
-				vel_x, vel_y = abs_rot_vel( vel_x, vel_y or 0, angle )
+			set_vel( proj, vel_x, vel_y )
 
-				ComponentSetValue2( v_comp, 'mVelocity', vel_x, vel_y )
-			end
+			count = count + 1
 
 			EntityRemoveComponent( proj, varia_comp )
 		end

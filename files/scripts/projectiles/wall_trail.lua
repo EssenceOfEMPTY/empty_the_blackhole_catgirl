@@ -7,7 +7,7 @@ local ng_num = get_ng_count( )
 
 shoot_proj( proj, empty_path .. 'entities/projectiles/wall_piece.xml', proj_x, proj_y, 0, 0, nil, nil, function ( from, e, x, y, vel_x, vel_y, tag )
 	if ( ng_num > 0 ) then
-		local lifetime = get_comp_info( e, 'ProjectileComponent', nil, {
+		local lifetime = get_comp_value( e, 'ProjectileComponent', nil, {
 			{ 'lifetime', 0 },
 		}, nil )
 
@@ -17,7 +17,7 @@ shoot_proj( proj, empty_path .. 'entities/projectiles/wall_piece.xml', proj_x, p
 			}, nil, nil )
 		end
 
-		local dmg = get_comp_obj_info( e, 'ProjectileComponent', nil, {
+		local dmg = get_comp_obj_value( e, 'ProjectileComponent', nil, {
 			{ 'damage_by_type', 'slice', 0 },
 		}, nil )
 

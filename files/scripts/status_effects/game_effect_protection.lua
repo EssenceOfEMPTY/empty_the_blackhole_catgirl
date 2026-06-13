@@ -2,7 +2,7 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility
 
 local entity = get_up_entity_table( )
 
-local eff = get_comp_info( entity.update, 'VariableStorageComponent', 'effect_name', {
+local eff = get_comp_value( entity.update, 'VariableStorageComponent', 'effect_name', {
 	{ 'value_string', nil },
 }, nil )
 

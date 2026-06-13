@@ -2,7 +2,7 @@ dofile_once( 'data/scripts/gun/procedural/gun_action_utils.lua' )
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
 local shooter, tag = get_root_entity( ), 'adjust'
-local frames, level = get_comp_info( shooter, 'VariableStorageComponent', tag, {
+local frames, level = get_comp_value( shooter, 'VariableStorageComponent', tag, {
 	{ 'value_int', 0 },
 	{ 'value_float', 1 },
 } )

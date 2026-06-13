@@ -110,6 +110,51 @@ all_pos_protect_perk = {
 	'EMPTY_PROTECTION_TOUCH_MAGIC',
 }
 
+all_stains = {
+	'1',
+	'wet',
+	'oiled',
+	'blooded',
+	'5',
+	'6',
+	'7',
+	'8',
+	'9',
+	'10',
+	'11',
+	'12',
+	'13',
+	'14',
+	'15',
+	'16',
+	'17',
+	'18',
+	'19',
+	'20',
+	'21',
+	'22',
+	'23',
+	'24',
+	'25',
+	'urine',
+	'27',
+	'28',
+	'29',
+	'30',
+	'31',
+	'32',
+	'33',
+	'34',
+	'35',
+	'36',
+	'37',
+	'38',
+	'39',
+	'40',
+	'41',
+	'42',
+}
+
 all_tag = {
 	hit = 'hittable',
 	player = 'player_unit',
@@ -129,8 +174,8 @@ max_adjust = 180
 ---打印一切信息, 此函数仅用于调试;
 ---正式版本中不应该看见任何地方调用这个函数
 ---@param info any
----@param key string|nil?
----@param tab_count number|nil?
+---@param key string?
+---@param tab_count number?
 function info_print( info, key, tab_count )
 	if ( key == nil ) then
 		key = ''
@@ -166,9 +211,109 @@ function info_print( info, key, tab_count )
 	end
 end
 
+---检测 num 是否是正常数值
+---@param num any
+---@return boolean is_not_0_num
+function is_not_nan_num( num )
+	return type( num ) == 'number' and num == num
+end
+
+---检测 num 是否是正常数值且不为 0
+---@param num any
+---@return boolean is_not_0_num
+function is_not_0_num( num )
+	return is_not_nan_num( num ) and num ~= 0
+end
+
+---检测 str 是否是字符串且不为空字符串
+---@param str any
+---@return boolean is_not_nil_str
+function is_not_nil_str( str )
+	return type( str ) == 'string' and str ~= ''
+end
+
+---检测 v_table 是否是表且不为空表
+---@param v_table any
+---@return boolean is_not_nil_table
+function is_not_nil_table( v_table )
+	return type( v_table ) == 'table' and next( v_table ) ~= nil
+end
+
+---检测 num 是否为整数
+---@param num any
+---@return boolean is_int
+function is_int( num )
+	return type( num ) == 'number' and num == math.floor( num )
+end
+
+---判断实体是否存活
+---@param entity number
+---@return boolean is_alive
+function is_alive( entity )
+	return ( is_not_0_num( entity ) and EntityGetIsAlive( entity ) )
+end
+
+---检查 search 内是否包含 value
+---@param value any
+---@param search table|nil
+---@return boolean is_in
+function is_in( value, search )
+	if ( type( search ) ~= 'table' ) then
+		return false
+	end
+
+	for _, v in ipairs( search ) do
+		if ( v == value ) then
+			return true
+		end
+	end
+
+	return false
+end
+
+---判断实体是否为玩家, 含变形
+---@param entity number
+---@return boolean is_player
+function is_player( entity )
+	return ( is_not_0_num( entity )
+		and ( EntityHasTag( entity, 'player_unit' ) or EntityHasTag( entity, 'polymorphed_player' ) ) )
+end
+
+---判断实体是否为敌怪
+---@param entity number
+---@return boolean is_enemy
+function is_enemy( entity )
+	return ( is_not_0_num( entity )
+		and ( EntityHasTag( entity, 'enemy' ) ) )
+end
+
+---手动 math.atan( y, x )
+---@param y number
+---@param x number
+---@return number atan_yx
+function atan( y, x )
+	if ( x > 0 ) then
+		return math.atan( y / x )
+	elseif ( x < 0 ) then
+		if ( y >= 0 ) then
+			return math.atan( y / x ) + math.pi
+		else
+			return math.atan( y / x ) - math.pi
+		end
+	else
+		if ( y > 0 ) then
+			return math.pi * 0.5
+		elseif ( y < 0 ) then
+			return -math.pi * 0.5
+		else
+			return 0
+		end
+	end
+end
+
 ---显示重要信息
 ---@param title string
----@param desc string|nil?
+---@param desc string?
 function imp_print( title, desc )
 	if ( type( title ) == 'string' and type( desc ) == 'string' ) then
 		GamePrintImportant( title, desc )
@@ -216,7 +361,7 @@ end
 function set_r_seed( entity )
 	local a, b, c = time_for_vec3( )
 
-	if ( entity and entity ~= NULL_ENTITY ) then
+	if ( is_not_0_num( entity ) and type( entity ) == 'number' ) then
 		local x, y = EntityGetTransform( entity )
 
 		SetRandomSeed( x - a + c, y - b + c )
@@ -323,82 +468,6 @@ function fact( z )
 	end
 end
 
----检测 num 是否是正常数值
----@param num any
----@return boolean is_not_0_num
-function is_not_nan_num( num )
-	return type( num ) == 'number' and num == num
-end
-
----检测 num 是否是正常数值且不为 0
----@param num any
----@return boolean is_not_0_num
-function is_not_0_num( num )
-	return is_not_nan_num( num ) and num ~= 0
-end
-
----检测 str 是否是字符串且不为空字符串
----@param str any
----@return boolean is_not_nil_str
-function is_not_nil_str( str )
-	return type( str ) == 'string' and str ~= ''
-end
-
----检测 v_table 是否是表且不为空表
----@param v_table any
----@return boolean is_not_nil_table
-function is_not_nil_table( v_table )
-	return type( v_table ) == 'table' and next( v_table ) ~= nil
-end
-
----检测 num 是否为整数
----@param num any
----@return boolean is_int
-function is_int( num )
-	return type( num ) == 'number' and num == math.floor( num )
-end
-
----判断实体是否存活
----@param entity number
----@return boolean is_alive
-function is_alive( entity )
-	return ( is_not_0_num( entity ) and EntityGetIsAlive( entity ) )
-end
-
----判断实体是否为玩家, 含变形
----@param entity number
----@return boolean is_player
-function is_player( entity )
-	return ( is_not_0_num( entity )
-		and ( EntityHasTag( entity, 'player_unit' ) or EntityHasTag( entity, 'polymorphed_player' ) ) )
-end
-
----判断实体是否为敌怪
----@param entity number
----@return boolean is_enemy
-function is_enemy( entity )
-	return ( is_not_0_num( entity )
-		and ( EntityHasTag( entity, 'enemy' ) ) )
-end
-
----检查 search 内是否包含 value
----@param value any
----@param search table|nil
----@return boolean is_in
-function is_in( value, search )
-	if ( type( search ) ~= 'table' ) then
-		return false
-	end
-
-	for _, v in ipairs( search ) do
-		if ( v == value ) then
-			return true
-		end
-	end
-
-	return false
-end
-
 ---深度拷贝表, 支持嵌套表和循环引用保护
 ---@param t table
 ---@return table t
@@ -458,8 +527,8 @@ end
 ---可在加入前清空 main 或在加入后清空 merge
 ---@param main table
 ---@param merge table
----@param is_clean_main boolean|nil? --默认为 false
----@param is_clean_merge boolean|nil? --默认为 true
+---@param is_clean_main boolean? --默认为 false
+---@param is_clean_merge boolean? --默认为 true
 function add_table( main, merge, is_clean_main, is_clean_merge )
 	if ( is_clean_main == nil ) then
 		is_clean_main = false
@@ -492,7 +561,7 @@ end
 ---可在替换后清空 replace
 ---@param main table
 ---@param replace table
----@param is_clean_replace boolean|nil? --默认为 true
+---@param is_clean_replace boolean? --默认为 true
 function update_table_by_id( main, replace, is_clean_replace )
 	if ( is_clean_replace == nil ) then
 		is_clean_replace = true
@@ -532,8 +601,8 @@ end
 ---将 main 逆序并返回;
 ---可修改 main
 ---@param main table
----@param is_change_main boolean|nil? --默认为 true
----@return table reversed_table
+---@param is_change_main boolean? --默认为 true
+---@return table reversed
 function reverse_table( main, is_change_main )
 	if ( is_change_main == nil ) then
 		is_change_main = true
@@ -568,8 +637,8 @@ end
 ---将 from 中第 pos_from 项移动至 to 中 pos_to 位置
 ---@param from table
 ---@param to table
----@param pos_from integer|nil? --默认为 1
----@param pos_to integer|nil? --默认为 #to + 1
+---@param pos_from integer? --默认为 1
+---@param pos_to integer? --默认为 #to + 1
 function add_table_1( from, to, pos_from, pos_to )
 	if ( pos_from == nil ) then
 		pos_from = 1
@@ -586,9 +655,9 @@ end
 ---@param from table
 ---@param to table
 ---@param count integer
----@param from_front boolean|nil? --默认为 true
----@param to_front boolean|nil? --默认为 false
----@param is_reverse_order boolean|nil? --默认为 false
+---@param from_front boolean? --默认为 true
+---@param to_front boolean? --默认为 false
+---@param is_reverse_order boolean? --默认为 false
 function add_table_count( from, to, count, from_front, to_front, is_reverse_order )
 	if ( count < 1 ) then
 		return
@@ -679,7 +748,7 @@ end
 ---为仅包含 number / string 类型的 table 去重, 返回去重后的 table
 ---@param num_str_table any
 ---@return table remove_dupli
-function remove_duplicates( num_str_table )
+function remove_dupes( num_str_table )
 	local seen, res = { }, { }
 
 	for _, each in ipairs( num_str_table ) do
@@ -729,6 +798,172 @@ function loc_shuffle( loc )
 	return loc
 end
 
+---获取全局变量的数值
+---@param key string
+---@param value number
+---@return number res
+function get_globals_num( key, value )
+	local res = tonumber( GlobalsGetValue( key ) )
+
+	if ( type( res ) == 'number' and res == res ) then
+		return res
+	else
+		return value
+	end
+end
+
+---设置全局变量的数值
+---@param key string
+---@param value number
+function set_globals_num( key, value )
+	if ( type( value ) == 'number' and value == value ) then
+		GlobalsSetValue( key, tostring( value ) )
+	end
+end
+
+---获取模组设置的值
+---@param key string
+---@param value any
+---@return any res
+function get_settings_num( key, value )
+	local res = ModSettingGet( key )
+
+	if ( res ~= nil ) then
+		return res
+	else
+		return value
+	end
+end
+
+---设置模组设置的值
+---@param key string
+---@param value any
+function set_settings_num( key, value )
+	if ( value ~= nil ) then
+		ModSettingSet( key, value )
+	end
+end
+
+---倍乘实体的生命上限
+---@param entity number
+---@param calc_type string
+---@param mul number
+---@param is_full_hp boolean? -- 默认为 true
+function max_hp_mul( entity, calc_type, mul, is_full_hp )
+	if ( is_has_comp( entity, 'DamageModelComponent', nil, nil ) ) then
+		is_full_hp = is_full_hp or true
+
+		local max_hp = get_comp_value( entity, 'DamageModelComponent', nil, {
+			{ 'max_hp', 1 / get_scale( ) },
+		}, nil )
+
+		if ( calc_type == '*' ) then
+			max_hp = max_hp * mul
+		elseif ( calc_type == '/' ) then
+			max_hp = max_hp / mul
+		end
+
+		if ( max_hp > 0 ) then
+			if ( is_full_hp ) then
+				set_comp_value( entity, 'DamageModelComponent', nil, {
+					max_hp = max_hp,
+					hp = max_hp,
+				}, nil, nil )
+			else
+				set_comp_value( entity, 'DamageModelComponent', nil, {
+					max_hp = max_hp,
+				}, nil, nil )
+			end
+		end
+	end
+end
+
+---倍乘实体的承伤系数
+---@param entity number
+---@param calc_type string
+---@param mul number|table<string, number>
+function d_comps_mul( entity, calc_type, mul )
+	if ( is_has_comp( entity, 'DamageModelComponent', nil, nil ) ) then
+		if ( is_not_nil_table( mul ) and type( mul ) == 'table' ) then
+			if ( calc_type == '*' ) then
+				set_comp_obj_value( entity, 'DamageModelComponent', nil, nil, nil, function ( comp )
+					for _, v in pairs( mul ) do
+						local cur_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', _ ) or 1
+
+						ComponentObjectSetValue2( comp, 'damage_multipliers', _, cur_mul * v )
+					end
+				end )
+			elseif ( calc_type == '/' ) then
+				set_comp_obj_value( entity, 'DamageModelComponent', nil, nil, nil, function ( comp )
+					for _, v in pairs( mul ) do
+						local cur_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', _ ) or 1
+
+						ComponentObjectSetValue2( comp, 'damage_multipliers', _, cur_mul / v )
+					end
+				end )
+			end
+		elseif ( type( mul ) == 'number' ) then
+			if ( calc_type == '*' ) then
+				set_comp_obj_value( entity, 'DamageModelComponent', nil, nil, nil, function ( comp )
+					for i, _ in ipairs( all_d_muls ) do
+						local cur_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', _ ) or 1
+
+						ComponentObjectSetValue2( comp, 'damage_multipliers', _, cur_mul * mul )
+					end
+				end )
+			elseif ( calc_type == '/' ) then
+				set_comp_obj_value( entity, 'DamageModelComponent', nil, nil, nil, function ( comp )
+					for i, _ in ipairs( all_d_muls ) do
+						local cur_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', _ ) or 1
+
+						ComponentObjectSetValue2( comp, 'damage_multipliers', _, cur_mul / mul )
+					end
+				end )
+			end
+		end
+	end
+end
+
+---获取实体的速度
+---@param entity number
+---@return number vel_x
+---@return number vel_y
+function get_vel( entity )
+	local vel = get_comp_value( entity, 'VelocityComponent', nil, {
+		{ 'mVelocity', { 0, 0 } }
+	}, nil )
+
+	return vel[ 1 ], vel[ 2 ]
+end
+
+---设置实体的速度
+---@param entity number|number[]
+function set_vel( entity, vel_x, vel_y )
+	set_comp_value( entity, 'VelocityComponent', nil, {
+		{ 'mVelocity', { vel_x, vel_y } }
+	}, nil, nil )
+end
+
+---获取实体的速度
+---@param entity number
+---@return number vel_x
+---@return number vel_y
+function get_char_vel( entity )
+	local vel = get_comp_value( entity, 'CharacterDataComponent', nil, {
+		{ 'mVelocity', { 0, 0 } }
+	}, nil )
+
+	return vel[ 1 ], vel[ 2 ]
+end
+
+---设置实体的速度
+---@param entity number|number[]
+function set_char_vel( entity, vel_x, vel_y )
+	set_comp_value( entity, 'CharacterDataComponent', nil, {
+		{ 'mVelocity', { vel_x, vel_y } }
+	}, nil, nil )
+end
+
 ---获取速度的模
 ---@param vel_x number
 ---@param vel_y number
@@ -760,10 +995,19 @@ function get_log_mul( num, paras )
 		return paras.max_log
 	end
 
+	local curve = paras.log_e or 1
+
+	if ( curve <= 0 ) then
+		curve = 1
+	end
+
 	local num_range = paras.max_num - paras.min_num
 	local log_range = paras.max_log - paras.min_log
 
-	local log_mul = math.log( num - paras.min_num + 1 ) / math.log( num_range + 1 )
+	local diff = ( num - paras.min_num ) * curve
+	local range = num_range * curve
+
+	local log_mul = math.log( diff + 1 ) / math.log( range + 1 )
 
 	return paras.min_log + log_range * log_mul
 end
@@ -814,7 +1058,7 @@ end
 ---@param y1 number
 ---@param x2 number
 ---@param y2 number
----@param dis number|nil?
+---@param dis number?
 ---@return number
 ---@return number
 function move_toward( x1, y1, x2, y2, dis )
@@ -827,28 +1071,28 @@ function move_toward( x1, y1, x2, y2, dis )
 	end
 end
 
----计算两点之间的引力, 返回应当产生的动量
----@param x1 number
----@param y1 number
----@param x2 number
----@param y2 number
+---计算 attract 与 mover 之间的引力, 返回 mover 应当产生的动量
+---@param mover_x number
+---@param mover_y number
+---@param attract_x number
+---@param attract_y number
 ---@param dist_full number
----@param coeff number|nil?
+---@param coeff number?
 ---@return number vel_x
 ---@return number vel_y
-function force_by_loc( x1, y1, x2, y2, dist_full, coeff )
+function force_by_loc( mover_x, mover_y, attract_x, attract_y, dist_full, coeff )
 	coeff = coeff or 72
 
-	local dist = math.sqrt( ( x1 - x2 ) ^ 2 + ( y1 - y2 ) ^ 2 )
+	local dist = math.sqrt( ( attract_x - mover_x ) ^ 2 + ( attract_y - mover_y ) ^ 2 )
 
 	if ( dist >= dist_full ) then
 		return 0, 0
 	end
 
-	local dirc = -math.atan2( ( y1 - y2 ), ( x1 - x2 ) )
+	local dir = -atan( attract_y - mover_y, attract_x - mover_x )
 	local per = ( dist_full - dist ) / dist_full
 
-	return math.cos( dirc ) * per * coeff, -math.sin( dirc ) * per * coeff
+	return math.cos( dir ) * per * coeff, -math.sin( dir ) * per * coeff
 end
 
 ---将角度 deg 转换为弧度 rad
@@ -986,7 +1230,7 @@ end
 ---@param def_shooter number
 ---@return number shooter
 function get_shooter( proj, def_shooter )
-	local shooter = get_comp_info( proj, 'ProjectileComponent', nil, {
+	local shooter = get_comp_value( proj, 'ProjectileComponent', nil, {
 		{ 'mWhoShot', nil },
 	}, nil )
 
@@ -1001,6 +1245,28 @@ function get_all_players( )
 	add_table( players, EntityGetWithTag( 'polymorphed_player' ) or { } )
 
 	return players
+end
+
+---获取所有投射物
+---@return number[] projs
+function get_all_projs( )
+	local projs = EntityGetWithTag( 'projectile' ) or { }
+
+	add_table( projs, EntityGetWithTag( 'projectile_player' ) or { } )
+
+	return remove_dupes( projs )
+end
+
+---获取实体光标位置
+---@param entity number
+---@return number cur_x
+---@return number cur_y
+function get_cur_xy( entity )
+	local cur = get_comp_value( entity, 'ControlsComponent', nil, {
+		{ 'mMousePosition', { 0, 0 } }
+	}, nil )
+
+	return cur[ 1 ], cur[ 2 ]
 end
 
 ---获取最近的玩家
@@ -1045,6 +1311,48 @@ function get_closest_player( tar_id, tar_x, tar_y )
 	return closest
 end
 
+---为实体复制组件 - 未完成, 请勿使用此函数
+---@param entity number|number[]
+---@param comp number|number[]
+function copy_comp( entity, comp )
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+	if ( type( comp ) == 'number' ) then
+		comp = { comp }
+	end
+
+	for i, _ in ipairs( comp ) do
+		local comp_mem = ComponentGetMembers( _ )
+		local real_comp = { }
+
+		for k, v in pairs( comp_mem or { } ) do
+			--TODO
+		end
+
+		for j, e in ipairs( entity ) do
+			add_comp( entity, '', real_comp )
+		end
+	end
+end
+
+---复制投射物 - 未完成, 请勿使用此函数
+---@param proj number|number[]
+---@param source number
+function copy_proj( proj, source )
+	if ( type( proj ) == 'number' ) then
+		proj = { proj }
+	end
+
+	local comps = get_all_comp( source )
+
+	for i, _ in ipairs( proj ) do
+		remove_all_comp( _, nil, nil, nil )
+	end
+
+	copy_comp( proj, comps )
+end
+
 ---移除投射物速度组件的速度上限
 ---@param projs number|number[]
 function remove_speed_limit( projs )
@@ -1059,7 +1367,7 @@ end
 ---@param entity number|number[]
 ---@param x number
 ---@param y number
----@param rot number|nil?
+---@param rot number?
 ---@return number tp_count
 function tp( entity, x, y, rot )
 	if ( type( entity ) == 'number' ) then
@@ -1105,9 +1413,9 @@ end
 
 ---获取每个 entity 实体中类型为 comp_type 的组件
 ---@param entity number|number[]
----@param comp_type string|nil?
----@param tag string|nil?
----@param name string|nil?
+---@param comp_type string?
+---@param tag string?
+---@param name string?
 ---@return number[] comps
 function get_all_comp( entity, comp_type, tag, name )
 	local comps = { }
@@ -1118,8 +1426,8 @@ function get_all_comp( entity, comp_type, tag, name )
 		return { }
 	end
 
-	if ( is_not_nil_str( comp_type ) ) then
-		if ( is_not_nil_str( tag ) ) then
+	if ( is_not_nil_str( comp_type ) and type( comp_type ) == 'string' ) then
+		if ( is_not_nil_str( tag ) and type( tag ) == 'string' ) then
 			for i, _ in ipairs( entity ) do
 				add_table( comps, EntityGetComponentIncludingDisabled( _, comp_type, tag ) or { } )
 			end
@@ -1148,8 +1456,8 @@ end
 ---返回 entity 实体中是否有类型为 comp_type 的组件
 ---@param entity number
 ---@param comp_type string
----@param tag string|nil?
----@param name string|nil?
+---@param tag string?
+---@param name string?
 ---@return boolean is_has_comp
 function is_has_comp( entity, comp_type, tag, name )
 	local comps = get_all_comp( entity, comp_type, tag, name )
@@ -1163,9 +1471,9 @@ end
 ---@param comp_type string
 ---@param tag string|nil
 ---@param field_table table<string, any>[]|nil
----@param name string|nil?
+---@param name string?
 ---@return any ...
-function get_comp_info( entity, comp_type, tag, field_table, name )
+function get_comp_value( entity, comp_type, tag, field_table, name )
 	local values, comp = { }, nil
 
 	if ( type( tag ) == 'string' ) then
@@ -1204,22 +1512,14 @@ function get_comp_info( entity, comp_type, tag, field_table, name )
 
 	if ( comp ) then
 		for _, t in ipairs( field_table or { } ) do
-			local a, b, c, d, e = ComponentGetValue2( comp, t[ 1 ] )
+			local value = { ComponentGetValue2( comp, t[ 1 ] ) }
 
-			if ( a == nil ) then
+			if ( #value == 0 ) then
 				table.insert( values, t[ 2 ] )
+			elseif ( #value == 1 ) then
+				table.insert( values, value[ 1 ] )
 			else
-				if ( b == nil ) then
-					table.insert( values, a )
-				else
-					table.insert( values, {
-						v_1 = a,
-						v_2 = b,
-						v_3 = c,
-						v_4 = d,
-						v_5 = e
-					} )
-				end
+				table.insert( values, value )
 			end
 		end
 	else
@@ -1237,9 +1537,9 @@ end
 ---@param comp_type string
 ---@param tag string|nil
 ---@param field_table table<string, string, any>[]|nil
----@param name string|nil?
+---@param name string?
 ---@return any ...
-function get_comp_obj_info( entity, comp_type, tag, field_table, name )
+function get_comp_obj_value( entity, comp_type, tag, field_table, name )
 	local values, comp = { }, nil
 
 	if ( type( tag ) == 'string' ) then
@@ -1327,7 +1627,7 @@ end
 ---@param comp_type string
 ---@param tag string|nil
 ---@param comp_table table
----@param prolong_table (string|{[1]:string,[2]:number})[]|nil?
+---@param prolong_table (string|{[1]:string,[2]:number})[]?
 ---@param name string|nil
 ---@return number comps_count
 ---@return string method
@@ -1391,7 +1691,7 @@ end
 ---@param comp_type string
 ---@param tag string|nil
 ---@param comp_table table
----@param name string|nil?
+---@param name string?
 ---@return number comps_count
 ---@return string method
 ---@return number[] affect_comps
@@ -1449,8 +1749,8 @@ end
 ---@param comp_type string|nil
 ---@param tag string|nil
 ---@param v_table table|nil
----@param pre_func function|nil?
----@param aft_func function|nil?
+---@param pre_func function?
+---@param aft_func function?
 ---@return number comps_count
 ---@return number[] affect_comps
 function set_comp_value( entity, comp_type, tag, v_table, pre_func, aft_func )
@@ -1550,8 +1850,8 @@ end
 ---@param comp_type string
 ---@param tag string|nil
 ---@param v_table table<string, string, any>[]|nil
----@param pre_func function|nil?
----@param aft_func function|nil?
+---@param pre_func function?
+---@param aft_func function?
 ---@return number comps_count
 ---@return number[] affect_comps
 function set_comp_obj_value( entity, comp_type, tag, v_table, pre_func, aft_func )
@@ -1648,8 +1948,8 @@ end
 ---返回影响组件的总数
 ---@param entity number|number[]
 ---@param comp_type string?
----@param tag string|nil?
----@param name string|nil?
+---@param tag string?
+---@param name string?
 ---@return number comps_count
 function remove_all_comp( entity, comp_type, tag, name )
 	if ( type( entity ) == 'number' ) then
@@ -1669,8 +1969,8 @@ end
 
 ---返回每个 entity 实体上的所有子实体
 ---@param entity number|number[]
----@param tag string|nil?
----@param name string|nil?
+---@param tag string?
+---@param name string?
 ---@return number[] childs
 function get_all_child( entity, tag, name )
 	local childs = { }
@@ -1704,7 +2004,7 @@ end
 ---@param child number|number[]
 ---@param x number
 ---@param y number
----@param rot number|nil?
+---@param rot number?
 function rem_child( child, x, y, rot )
 	if ( type( child ) == 'number' ) then
 		child = { child }
@@ -1736,8 +2036,8 @@ end
 ---@param entity number|number[]
 ---@param x number
 ---@param y number
----@param rot number|nil?
----@param tag string|nil?
+---@param rot number?
+---@param tag string?
 ---@return number child_count
 function rem_all_child( entity, x, y, rot, tag, name )
 	local child = get_all_child( entity, tag, name )
@@ -1750,7 +2050,7 @@ end
 ---移除每个 entity 实体上的所有子实体;
 ---返回影响子实体的总数
 ---@param entity number|number[]
----@param tag string|nil?
+---@param tag string?
 ---@return number child_count
 function rem_del_all_child( entity, tag, name )
 	local child = get_all_child( entity, tag, name )
@@ -1763,8 +2063,8 @@ end
 ---为投射物进行伤害变换
 ---@param proj number
 ---@param dmg_type string
----@param mul number|nil? --伤害倍率, 默认 50%
----@param base_dmg number|nil? --基础伤害, 默认 1
+---@param mul number? --伤害倍率, 默认 50%
+---@param base_dmg number? --基础伤害, 默认 1
 function damage_to( proj, dmg_type, mul, base_dmg )
 	if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
 		mul, base_dmg = mul or 0.5, base_dmg or ( 1 / get_scale( ) )
@@ -1810,16 +2110,16 @@ end
 
 ---为投射物全伤害乘以伤害倍率
 ---@param proj number
----@param mul number|nil? --伤害倍率, 默认 200%
+---@param mul number? --伤害倍率, 默认 200%
 ---@return boolean is_has_dmg
----@return table<string, number> data
+---@return table<string, number> dmg_data
 function damage_mul( proj, mul )
-	local is_has_dmg, data = false, { }
+	local is_has_dmg, dmg_data = false, { }
 
 	if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
 		mul = mul or 2
 
-		local p_dmg = get_comp_info( proj, 'ProjectileComponent', nil, {
+		local p_dmg = get_comp_value( proj, 'ProjectileComponent', nil, {
 			{ 'damage', 0 },
 		}, nil )
 
@@ -1830,12 +2130,12 @@ function damage_mul( proj, mul )
 				damage = p_dmg,
 			}, nil, nil )
 
-			is_has_dmg, data.projectile = true, p_dmg
+			is_has_dmg, dmg_data.projectile = true, p_dmg
 		end
 
 		local dmg = { }
 
-		local ex_dmg = get_comp_obj_info( proj, 'ProjectileComponent', nil, {
+		local ex_dmg = get_comp_obj_value( proj, 'ProjectileComponent', nil, {
 			{ 'config_explosion', 'damage', 0 },
 		}, nil )
 
@@ -1846,11 +2146,11 @@ function damage_mul( proj, mul )
 				'config_explosion', 'damage', ex_dmg
 			} )
 
-			is_has_dmg, data.explosion = true, ex_dmg
+			is_has_dmg, dmg_data.explosion = true, ex_dmg
 		end
 
 		for i, _ in ipairs( all_proj_dmg ) do
-			local d = get_comp_obj_info( proj, 'ProjectileComponent', nil, {
+			local d = get_comp_obj_value( proj, 'ProjectileComponent', nil, {
 				{ 'damage_by_type', _, 0 },
 			}, nil )
 
@@ -1861,7 +2161,7 @@ function damage_mul( proj, mul )
 					'damage_by_type', _, d
 				} )
 
-				is_has_dmg, data[ _ ] = true, d
+				is_has_dmg, dmg_data[ _ ] = true, d
 			end
 		end
 
@@ -1870,7 +2170,7 @@ function damage_mul( proj, mul )
 		end
 	end
 
-	return is_has_dmg, data
+	return is_has_dmg, dmg_data
 end
 
 function remove_cards_until_fix( wand, deck_cap, always )
@@ -1909,13 +2209,13 @@ end
 ---发射投射物
 ---@param from number|nil
 ---@param xml string
----@param x number|nil?
----@param y number|nil?
----@param vel_x number|nil?
----@param vel_y number|nil?
----@param tag string|nil?
----@param func_pre function|nil?
----@param func_aft function|nil?
+---@param x number?
+---@param y number?
+---@param vel_x number?
+---@param vel_y number?
+---@param tag string?
+---@param func_pre function?
+---@param func_aft function?
 ---@return number shoot_entity
 function shoot_proj( from, xml, x, y, vel_x, vel_y, tag, func_pre, func_aft )
 	from, x, y, vel_x, vel_y = from or 0, x or 0, y or 0, vel_x or 0, vel_y or 0
@@ -1924,7 +2224,7 @@ function shoot_proj( from, xml, x, y, vel_x, vel_y, tag, func_pre, func_aft )
 
 	if ( from ~= NULL_ENTITY ) then
 		if ( is_has_comp( from, 'ProjectileComponent', nil ) ) then
-			shooter, herd = get_comp_info( from, 'ProjectileComponent', nil, {
+			shooter, herd = get_comp_value( from, 'ProjectileComponent', nil, {
 				{ 'mWhoShot', 0 },
 				{ 'mShooterHerdId', 0 },
 			}, nil )
@@ -1965,9 +2265,7 @@ function shoot_proj( from, xml, x, y, vel_x, vel_y, tag, func_pre, func_aft )
 
 	GameShootProjectile( shooter or 0, x, y, x + vel_x, y + vel_y, e, true, from or 0 )
 
-	set_comp_value( e, 'VelocityComponent', nil, {
-		mVelocity = { vel_x, vel_y },
-	}, nil, nil )
+	set_vel( e, vel_x, vel_y )
 
 	if ( func_aft ~= nil ) then
 		func_aft( from, e, x, y, vel_x, vel_y, tag )
@@ -2700,31 +2998,31 @@ function add_desc_by_info( c, options, args, extra_entities, pattern )
 end
 
 ---解析 command 的参数并求值
----@param action_id string
----@param entity_id number
+---@param action string
+---@param entity number
 ---@param param_names string[]
----@param pattern string|nil?
+---@param pattern string?
 ---@return table|nil result_table
-function parse_and_evaluate_command_paras( action_id, entity_id, param_names, pattern )
-	local p_comp = EntityGetFirstComponent( entity_id, 'ProjectileComponent' )
+function parse_and_evaluate_command_paras( action, entity, param_names, pattern )
+	local p_comp = EntityGetFirstComponent( entity, 'ProjectileComponent' )
 
 	if ( not p_comp ) then
 		return nil
 	end
 
 	local desc = ComponentObjectGetValue2( p_comp, 'config', 'action_description' )
-	local values = search_table_from_format( desc, action_id, pattern or '$' )
+	local values = search_table_from_format( desc, action, pattern or '$' )
 
 	if ( not values ) then
 		return nil
 	end
 
 	local shooter = tonumber( values.shooter ) or 0
-	local x, y = EntityGetTransform( entity_id )
+	local x, y = EntityGetTransform( entity )
 
-	local result_table = {
-		shooter = shooter,
-	}
+	local res = { }
+
+	res.shooter = shooter
 
 	for _, param_name in ipairs( param_names ) do
 		local raw_value = values[ param_name ]
@@ -2734,17 +3032,17 @@ function parse_and_evaluate_command_paras( action_id, entity_id, param_names, pa
 				local result, is_correct = evaluate_delayed_expression( raw_value, '#', shooter, x, y )
 
 				if ( is_correct and result ~= nil ) then
-					result_table[ param_name ] = result
+					res[ param_name ] = result
 				end
 			else
 				local num = tonumber( raw_value )
 
 				if ( num ~= nil ) then
-					result_table[ param_name ] = num
+					res[ param_name ] = num
 				end
 			end
 		end
 	end
 
-	return result_table
+	return res
 end

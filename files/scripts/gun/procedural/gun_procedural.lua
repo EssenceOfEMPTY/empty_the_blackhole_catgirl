@@ -87,14 +87,14 @@ function wand_add_random_cards( gun, entity_id, level )
 
 	local rnd = nil
 
-	if ( ( tonumber( GlobalsGetValue( 'EMPTY_CURSE_GUARANTEED_LOSE', '0' ) ) or 0 ) > 0
-		and ( tonumber( GlobalsGetValue( 'EMPTY_CURSE_MONK', '0' ) ) or 0 ) < 1
+	if ( get_globals_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0
+		and get_globals_num( 'EMPTY_CURSE_MONK', 0 ) < 1
 		and Random( 1, 2 ) < 2 ) then
 
 		AddGunActionPermanent( entity_id, 'REGENERATION_FIELD' )
 	end
 
-	if ( ( tonumber( GlobalsGetValue( 'EMPTY_CURSE_GUARANTEED_LOSE', '0' ) ) or 0 ) > 0 ) then
+	if ( get_globals_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0 ) then
 		rnd = Random( 1, 4 )
 
 		if ( rnd < 2 ) then
@@ -107,6 +107,7 @@ function wand_add_random_cards( gun, entity_id, level )
 	-- always cast
 	for _ = 1, 5, 1 do
 		SetRandomSeed( x + _ * _ - a + c, y - _ * _ - b + c )
+
 		if ( Random( 1, 100 ) < 4 ) then
 			rnd = Random( 0, 10 )
 
@@ -131,6 +132,7 @@ function wand_add_random_cards( gun, entity_id, level )
 	-- cards
 	for _ = 1, card_count, 1 do
 		SetRandomSeed( x - _ * _ + a - c, y + _ * _ + b - c )
+
 		rnd = Random( 0, 125 )
 
 		if ( rnd < 49 ) then

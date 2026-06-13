@@ -202,7 +202,7 @@ function init( entity_id )
 		end
 	end
 
-	local total_cap = tonumber( GlobalsGetValue( 'EXTRA_POTION_CAPACITY_LEVEL', '2000' ) ) or 2000
+	local total_cap = get_globals_num( 'EXTRA_POTION_CAPACITY_LEVEL', 2000 )
 	if ( total_cap > 2000 ) then
 		local comp = EntityGetFirstComponentIncludingDisabled( entity_id, 'MaterialSuckerComponent' )
 		if ( comp ) then

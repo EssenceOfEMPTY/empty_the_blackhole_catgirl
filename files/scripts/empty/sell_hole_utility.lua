@@ -14,56 +14,16 @@ function str( var )
 end
 
 function dump( o )
-	 if type( o ) == 'table' then
+	if type( o ) == 'table' then
 		local s = '{ '
 		for k, v in pairs( o ) do
 			 if type( k ) ~= 'number' then k = '"'..k..'"' end
 			 s = s .. '['..k..'] = ' .. dump( v ) .. ', '
 		end
 		return s .. '} '
-	 else
+	else
 		return tostring( o )
-	 end
-end
-
-function get_entity_velocity( e )
-	local comp = EntityGetFirstComponent( e, 'VelocityComponent' )
-	if not comp then return nil end
-	local x, y = ComponentGetValue2( comp, 'mVelocity' )
-	return x, y
-end
-
-function set_entity_velocity( e, x, y )
-	local comp = EntityGetFirstComponent( e, 'VelocityComponent' )
-	if not comp then return nil end
-	ComponentSetValue2( comp, 'mVelocity', x, y )
-end
-
-function mod_entity_velocity( e, x, y )
-	local comp = EntityGetFirstComponent( e, 'VelocityComponent' )
-	if not comp then return nil end
-	local curr_x, curr_y = ComponentGetValue2( comp, 'mVelocity' )
-	ComponentSetValue2( comp, 'mVelocity', x + curr_x, y + curr_y )
-end
-
-function get_char_velocity( e )
-	local comp = EntityGetFirstComponent( e, 'CharacterDataComponent' )
-	if not comp then return nil end
-	local x, y = ComponentGetValue2( comp, 'mVelocity' )
-	return x, y
-end
-
-function set_char_velocity( e, x, y )
-	local comp = EntityGetFirstComponent( e, 'CharacterDataComponent' )
-	if not comp then return nil end
-	ComponentSetValue2( comp, 'mVelocity', x, y )
-end
-
-function mod_char_velocity( e, x, y )
-	local comp = EntityGetFirstComponent( e, 'CharacterDataComponent' )
-	if not comp then return nil end
-	local curr_x, curr_y = ComponentGetValue2( comp, 'mVelocity' )
-	ComponentSetValue2( comp, 'mVelocity', x + curr_x, y + curr_y )
+	end
 end
 
 function get_player( )
@@ -137,9 +97,7 @@ function drop_sell_gold( x, y, money, velo_x, velo_y )
 		table.insert( entity_list, {eid, 6} )
 	end
 
-	for _, nugget in ipairs( entity_list ) do
-		set_entity_velocity( nugget, velo_x, velo_y )
-	end
+	set_vel( entity_list, velo_x, velo_y )
 end
 
 function table_concat( t1, t2 )

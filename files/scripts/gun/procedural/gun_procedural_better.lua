@@ -242,14 +242,14 @@ function generate_gun( cost, level, force_unshuffle )
 
 	local rnd = nil
 
-	if ( ( tonumber( GlobalsGetValue( 'EMPTY_CURSE_GUARANTEED_LOSE', '0' ) ) or 0 ) > 0
-		and ( tonumber( GlobalsGetValue( 'EMPTY_CURSE_MONK', '0' ) ) or 0 ) < 1
+	if ( get_globals_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0
+		and get_globals_num( 'EMPTY_CURSE_MONK', 0 ) < 1
 		and Random( 1, 2 ) < 2 ) then
 
 		AddGunActionPermanent( entity_id, 'REGENERATION_FIELD' )
 	end
 
-	if ( ( tonumber( GlobalsGetValue( 'EMPTY_CURSE_GUARANTEED_LOSE', '0' ) ) or 0 ) > 0 ) then
+	if ( get_globals_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0 ) then
 		rnd = Random( 1, 4 )
 
 		if ( rnd < 2 ) then

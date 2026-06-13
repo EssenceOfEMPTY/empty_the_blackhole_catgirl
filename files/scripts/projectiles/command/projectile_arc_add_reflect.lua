@@ -1,11 +1,11 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity = get_root_entity( )
+local proj = get_root_entity( )
 local command = 'projectile_arc_add'
 local command_reflect = command .. '_reflect'
 
-if ( entity ~= NULL_ENTITY ) then
-	local v_comp = EntityGetFirstComponent( entity, 'VariableStorageComponent', command_reflect )
+if ( proj ~= NULL_ENTITY ) then
+	local v_comp = EntityGetFirstComponent( proj, 'VariableStorageComponent', command_reflect )
 
 	if ( v_comp ) then
 		local paras = {
@@ -16,15 +16,11 @@ if ( entity ~= NULL_ENTITY ) then
 
 		paras.frame = paras.frame + 1
 
-		local v_comps = EntityGetComponent( entity, 'VelocityComponent' )
+		local vel_x, vel_y = get_vel( proj )
 
-		for i, _ in ipairs( v_comps or { } ) do
-			local vel_x, vel_y = ComponentGetValue2( _, 'mVelocity' )
+		vel_x, vel_y = rot_vel( vel_x, vel_y, paras.angle + paras.frame * paras.inc )
 
-			vel_x, vel_y = rot_vel( vel_x, vel_y or 0, paras.angle + paras.frame * paras.inc )
-
-			ComponentSetValue2( _, 'mVelocity', vel_x, vel_y )
-		end
+		set_vel( proj, vel_x, vel_y )
 
 		ComponentSetValue2( v_comp, 'value_int', paras.frame )
 	end

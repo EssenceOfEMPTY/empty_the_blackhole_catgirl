@@ -1,3 +1,4 @@
+dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/sell_hole_utility.lua' )
 dofile_once( 'data/scripts/gun/gun_actions.lua' )
 
@@ -18,13 +19,14 @@ if ( dist < 1024 ) then
 	for _, item in ipairs( items ) do
 		local cost_component = EntityGetFirstComponent( item, 'ItemCostComponent' )
 		if not ( cost_component ) then
-			local a, b = get_entity_velocity( item )
+			local a, b = get_vel( item )
 			if a then
 				self_x, self_y = EntityGetTransform( entity )
 				local x, y = EntityGetTransform( item )
 				local distance = math.sqrt( ( self_x - x ) ^ 2 + ( self_y - y ) ^ 2 )
 				local angle = math.atan( self_y - y, self_x - x )
-				mod_entity_velocity( item, math.cos( angle ) * ( 50 - distance ) / 2, math.sin( angle ) * ( 50 - distance ) / 2)
+				local vel_x, vel_y = get_vel( item )
+				set_vel( item, vel_x + math.cos( angle ) * ( 50 - distance ) / 2, vel_y + math.sin( angle ) * ( 50 - distance ) / 2 )
 				if math.sqrt( ( self_x - x ) ^ 2 + ( self_y - y ) ^ 2 ) < 8 + math.sqrt( a ^ 2 + b ^ 2 ) / 50 then
 					local coin = 0
 					local sell_num = math.floor( math.abs( self_y / 2000 ) )

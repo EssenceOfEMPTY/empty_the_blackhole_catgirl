@@ -170,8 +170,8 @@ local sta_effs = {
 ---为每个 entity 实体增加持续时间为 duration 帧的 eff 效果
 ---@param entity number|number[]
 ---@param eff string
----@param duration number|nil?
----@param path string|nil?
+---@param duration number?
+---@param path string?
 ---@return number[] eff_entities
 function add_effect_new( entity, eff, duration, path )
 	local eff_entites = { }
@@ -219,8 +219,8 @@ end
 ---@param entity number|number[]
 ---@param eff string
 ---@param prolong number
----@param duration number|nil?
----@param path string|nil?
+---@param duration number?
+---@param path string?
 ---@return number[] eff_entities
 function prolong_effect( entity, eff, prolong, duration, path )
 	local eff_entites = { }
@@ -296,7 +296,7 @@ end
 ---@param prolong number
 ---@param duration number
 ---@param title string?
----@param path string|nil?
+---@param path string?
 function add_effect( entity, eff, prolong, duration, title, path )
 	prolong, duration = math.floor( prolong ), math.floor( duration )
 
@@ -317,7 +317,7 @@ end
 ---@param prolong number
 ---@param duration number
 ---@param title string?
----@param path string|nil?
+---@param path string?
 function add_effect_random( entity, prolong, duration, title, path )
 	set_r_seed( entity )
 

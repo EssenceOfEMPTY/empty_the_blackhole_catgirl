@@ -31,7 +31,7 @@ function get_act_perks( player )
 			local perk = { }
 
 			perk.ui_name, perk.ui_description, perk.icon_sprite_file =
-			get_comp_info( child, 'UIIconComponent', nil, {
+			get_comp_value( child, 'UIIconComponent', nil, {
 				{ 'name', '' },
 				{ 'description', '' },
 				{ 'icon_sprite_file', '' },

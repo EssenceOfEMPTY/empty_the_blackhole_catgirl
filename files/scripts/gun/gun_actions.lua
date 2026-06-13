@@ -976,7 +976,7 @@ local new_actions =
 				c.damage_fire_add = c.damage_fire_add + 1 / get_scale( )
 			else
 				local entity = get_root_entity( )
-				local hp, max_hp = get_comp_info( entity, 'DamageModelComponent', nil, {
+				local hp, max_hp = get_comp_value( entity, 'DamageModelComponent', nil, {
 					{ 'hp', 0 },
 					{ 'max_hp', 0 },
 				}, nil )
@@ -4090,72 +4090,43 @@ local new_actions =
 		spawn_probability				= '0.1,0.3,1', -- EMPTY_THETA-
 		price = 500,
 		mana = 30,
-		action = function ( recursion_level, iteration, copy_series, copy_specific )
+		action = function ( rec, iter, series, specific )
 			c.fire_rate_wait = c.fire_rate_wait - 180
 			current_reload_time = current_reload_time - 360
 
 			local firerate, reload, mana_before = c.fire_rate_wait, current_reload_time, mana
 
-			local copy_list = { }
+			local copy_list, tmp = { }, { }
 			local count = 0
 
-			if ( #discarded > 0 ) then
-				add_table( copy_list, discarded, true, false )
-				for _ = #copy_list, 1 -1 do
-					local data = copy_list[ _ ]
-					local rec = check_recursion( data, recursion_level )
-					if ( data ) and ( data.type == ACTION_TYPE_MATERIAL ) and ( rec > -1 ) then
-						dont_draw_actions = true
+			add_table( tmp, discarded, true, false )
+			reverse_table( tmp, true )
+			add_table( copy_list, tmp, true, true )
 
-						data.action( rec, nil, {
-							greek_letter = true,
-							[ '-' ] = true,
-							[ 'greek_letter-' ] = true,
-						}, 'theta' )
+			add_table( tmp, deck, true, false )
+			reverse_table( tmp, true )
+			add_table( copy_list, tmp, true, true )
 
-						count = count + 1
-					end
+			add_table( tmp, hand, true, false )
+			reverse_table( tmp, true )
+			add_table( copy_list, tmp, true, true )
+
+			for i, _ in ipairs( copy_list ) do
+				local new_rec = check_recursion( _, rec )
+
+				if ( _ and _.type == ACTION_TYPE_MATERIAL and rec > -1 ) then
+					dont_draw_actions = true
+
+					_.action( rec, nil, {
+						greek_letter = true,
+						[ '-' ] = true,
+						[ 'greek_letter-' ] = true,
+					}, 'theta' )
+
+					count = count + 1
 				end
 			end
-
-			if ( #deck > 0 ) then
-				add_table( copy_list, deck, true, false )
-				for _ = #copy_list, 1 -1 do
-					local data = copy_list[ _ ]
-					local rec = check_recursion( data, recursion_level )
-					if ( data ) and ( data.type == ACTION_TYPE_MATERIAL ) and ( rec > -1 ) then
-						dont_draw_actions = true
-
-						data.action( rec, nil, {
-							greek_letter = true,
-							[ '-' ] = true,
-							[ 'greek_letter-' ] = true,
-						}, 'theta' )
-
-						count = count + 1
-					end
-				end
-			end
-
-			if ( #hand > 0 ) then
-				add_table( copy_list, hand, true, false )
-				for _ = #copy_list, 1 -1 do
-					local data = copy_list[ _ ]
-					local rec = check_recursion( data, recursion_level )
-					if ( data ) and ( data.type == ACTION_TYPE_MATERIAL ) and ( rec > -1 ) then
-						dont_draw_actions = true
-
-						data.action( rec, nil, {
-							greek_letter = true,
-							[ '-' ] = true,
-							[ 'greek_letter-' ] = true,
-						}, 'theta' )
-
-						count = count + 1
-					end
-				end
-			end
-
+			
 			dont_draw_actions = false
 
 			c.fire_rate_wait, current_reload_time, mana = firerate, reload, mana_before
