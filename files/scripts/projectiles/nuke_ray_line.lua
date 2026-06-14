@@ -6,7 +6,7 @@ if ( is_has_comp( proj, 'VelocityComponent' ) ) then
 	local x, y = EntityGetTransform( proj )
 	local vel_x, vel_y = get_vel( proj )
 
-	local angle, length = -math.atan( vel_y, vel_x ), 1600
+	local angle, length = -atan( vel_y, vel_x ), 1600
 
 	local angle_fix = angle + math.pi * 0.5
 	vel_x, vel_y = math.cos( angle_fix ) * length, -math.sin( angle_fix ) * length

@@ -11,7 +11,7 @@ function damage_about_to_be_received( dmg, x, y, res, cri_chance )
 		}, nil )
 
 		if ( dmg > 0 and def_mul ~= 1 ) then
-			return dmg / ( def_mul * 1.25 * cap( 1, death, 8 ) ), 0
+			return dmg / ( def_mul * cap( 1, death * 1.25, 10 ) ), 0
 		end
 	end
 

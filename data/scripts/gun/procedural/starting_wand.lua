@@ -53,7 +53,7 @@ local mana_mul = get_log_mul( mana_max, {
 	max_num = 900,
 	min_log = 1.5,
 	max_log = 0.3,
-	log_e = 1,
+	log_e = 0.75,
 } )
 
 gun.mana_max = math.ceil( mana_max * mana_mul )

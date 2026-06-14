@@ -12,7 +12,7 @@ if ( is_not_0_num( shooter ) ) then
 		for i, _ in ipairs( projs ) do
 			local x, y = EntityGetTransform( _ )
 
-			local angle, length = math.pi - math.atan( cur_y - y, cur_x - x ), 500
+			local angle, length = math.pi - atan( cur_y - y, cur_x - x ), 500
 
 			local vel_x, vel_y = -math.cos( angle ), math.sin( angle )
 

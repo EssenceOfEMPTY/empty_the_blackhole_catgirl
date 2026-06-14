@@ -4126,7 +4126,7 @@ local new_actions =
 					count = count + 1
 				end
 			end
-			
+		
 			dont_draw_actions = false
 
 			c.fire_rate_wait, current_reload_time, mana = firerate, reload, mana_before

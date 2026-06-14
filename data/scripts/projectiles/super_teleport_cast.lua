@@ -5,7 +5,7 @@ local px, py = EntityGetTransform( proj )
 
 local vel_x, vel_y = get_vel( proj )
 
-local angle = -math.atan( vel_y, vel_x )
+local angle = -atan( vel_y, vel_x )
 
 local end_x = px + math.cos( angle ) * 120
 local end_y = py - math.sin( angle ) * 120

@@ -1243,7 +1243,7 @@ local new_perks =
 				local x, y = EntityGetTransform( who )
 
 				for _ = 1, 4, 1 do
-					EntityLoad( empty_path .. 'entities/items/potions/potion_healthium_many_hp.xml', x + loc_center_fix( 4, 4, _ ), y )
+					EntityLoad( empty_path .. 'entities/items/pickup/potion_healthium_many_hp.xml', x + loc_center_fix( 4, 4, _ ), y )
 				end
 			end
 

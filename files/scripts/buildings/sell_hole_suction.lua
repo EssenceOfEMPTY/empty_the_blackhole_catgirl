@@ -1,84 +1,97 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
-dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/sell_hole_utility.lua' )
 dofile_once( 'data/scripts/gun/gun_actions.lua' )
 
-local entity = GetUpdatedEntityID( )
-local player = get_player( ) or 0
+local sell_hole, coin = get_root_entity( ), 0
+local x, y = EntityGetTransform( sell_hole )
 
-local self_x, self_y = EntityGetTransform( entity )
-local dist = 2048.0
-local player_x, player_y = EntityGetTransform( player )
-if ( player_x and player_y ) then
-	dist = math.sqrt( ( self_x - player_x ) ^ 2 + ( self_y - player_y ) ^ 2 )
-end
+local suck_wand = EntityGetInRadiusWithTag( x, y, 128, 'wand' )
+local suck_card = EntityGetInRadiusWithTag( x, y, 128, 'card_action' )
 
-if ( dist < 1024 ) then
-	local items = EntityGetInRadiusWithTag( self_x, self_y, 128, 'wand' )
-	local spells = EntityGetInRadiusWithTag( self_x, self_y, 128, 'card_action' )
-	add_table( items, spells, false, true )
-	for _, item in ipairs( items ) do
-		local cost_component = EntityGetFirstComponent( item, 'ItemCostComponent' )
-		if not ( cost_component ) then
-			local a, b = get_vel( item )
-			if a then
-				self_x, self_y = EntityGetTransform( entity )
-				local x, y = EntityGetTransform( item )
-				local distance = math.sqrt( ( self_x - x ) ^ 2 + ( self_y - y ) ^ 2 )
-				local angle = math.atan( self_y - y, self_x - x )
-				local vel_x, vel_y = get_vel( item )
-				set_vel( item, vel_x + math.cos( angle ) * ( 50 - distance ) / 2, vel_y + math.sin( angle ) * ( 50 - distance ) / 2 )
-				if math.sqrt( ( self_x - x ) ^ 2 + ( self_y - y ) ^ 2 ) < 8 + math.sqrt( a ^ 2 + b ^ 2 ) / 50 then
-					local coin = 0
-					local sell_num = math.floor( math.abs( self_y / 2000 ) )
-					local sell_factor = math.max( sell_num, 1 ) ^ 2
-					if EntityHasTag( item, 'wand' ) then
-						local wand_level = math.max( sell_num ^ 2 - 1, 0 )
-						coin = 50 + wand_level * 120
-						local children = EntityGetAllChildren( item )
-						for _, child in ipairs( children or { } ) do
-							local comps = EntityGetAllComponents( child )
-							for _, comp in ipairs( comps ) do
-								if ( ComponentGetTypeName( comp ) == 'ItemActionComponent' ) then
-									action_id = ComponentGetValue2( comp, 'action_id' )
-									for _, action in ipairs( actions ) do
-										if action.id == action_id then
-											local price = math.max( math.floor( ( ( action.price * 0.50 ) + ( 70 * sell_factor ) ) / 10 ) * 10, 10 )
-											coin = coin + math.max( price / 5, 10 )
-										end
-									end
-								end
-							end
-						end
-					elseif EntityHasTag( item, 'card_action' ) then
-						local comps = EntityGetAllComponents( item )
-						for _, comp in ipairs( comps ) do
-							if ComponentGetTypeName( comp ) == 'ItemActionComponent' then
-								action_id = ComponentGetValue2( comp, 'action_id' )
-								for _, action in ipairs( actions ) do
-									if action.id == action_id then
-										local price = math.max(math.floor( ( ( action.price * 0.50 ) + ( 70 * sell_factor ) ) / 10 ) * 10, 10 )
-										coin = coin + math.max( price / 5, 10 )
-									end
-								end
-							end
+for i, _ in ipairs( suck_wand ) do
+	if ( not ( is_child( _ ) or is_has_comp( _, 'ItemCostComponent' ) ) ) then
+		local ix, iy = EntityGetTransform( _ )
+		local vel_x, vel_y = get_vel( _ )
+
+		if ( sqrt_p2_add( x - ix, y - iy ) < 8 + sqrt_p2_add( vel_x, vel_y ) / 50 ) then
+			local sell_num = math.floor( math.abs( y / 1000 ) )
+			local sell_fact = math.max( sell_num, 1.5 ) ^ 2
+
+			local wand_lvl = math.max( sell_num ^ 2 - 1, 0 )
+
+			coin = 50 + wand_lvl * 120
+
+			local childs = get_all_child( _, nil, nil )
+
+			for j, child in ipairs( childs ) do
+				set_comp_value( child, 'ItemActionComponent', nil, nil, nil, function ( comp )
+					local action = ComponentGetValue2( comp, 'action_id' )
+
+					for k, act in ipairs( actions ) do
+						if ( act.id == action ) then
+							coin = coin + math.max( ( act.price * 0.5 + sell_fact * 70 ), 10 )
+
+							break
 						end
 					end
-					drop_sell_gold( self_x, self_y, coin, a, b )
-					if ( coin > 500 ) then
-						shoot_projectile( entity, 'data/entities/particles/gold_pickup_huge.xml', self_x, self_y, 0, 0 )
-					elseif ( coin > 40 ) then
-						shoot_projectile( entity, 'data/entities/particles/gold_pickup_large.xml', self_x, self_y, 0, 0 )
-					else
-						shoot_projectile( entity, 'data/entities/particles/gold_pickup.xml', self_x, self_y, 0, 0 )
-					end
-					EntityKill( item )
-					sprite = EntityGetFirstComponent( entity, 'SpriteComponent' )
-					if ( sprite ) then
-						ComponentSetValue2( sprite, 'rect_animation', 'flash' )
-						ComponentSetValue2( sprite, 'next_rect_animation', 'loop' )
-					end
-				end
+				end )
 			end
+
+			EntityKill( _ )
+		else
+			local dist = sqrt_p2_add( x - ix, y - iy )
+			local angle = atan( y - iy, x - ix )
+
+			set_vel( _, vel_x + math.cos( angle ) * ( 50 - dist ) / 2, vel_y + math.sin( angle ) * ( 50 - dist ) / 2 )
 		end
 	end
+end
+
+for i, _ in ipairs( suck_card ) do
+	if ( not ( is_child( _ ) or is_has_comp( _, 'ItemCostComponent' ) ) ) then
+		local ix, iy = EntityGetTransform( _ )
+		local vel_x, vel_y = get_vel( _ )
+
+		if ( sqrt_p2_add( x - ix, y - iy ) < 8 + sqrt_p2_add( vel_x, vel_y ) / 50 ) then
+			local sell_num = math.floor( math.abs( y / 1000 ) )
+			local sell_fact = math.max( sell_num, 1.5 ) ^ 2
+
+			if ( EntityHasTag( _, 'card_action' ) ) then
+				set_comp_value( _, 'ItemActionComponent', nil, nil, nil, function ( comp )
+					local action = ComponentGetValue2( comp, 'action_id' )
+
+					for k, act in ipairs( actions ) do
+						if ( act.id == action ) then
+							coin = coin + math.max( ( act.price * 0.5 + sell_fact * 70 ), 10 )
+
+							EntityKill( _ )
+
+							break
+						end
+					end
+				end )
+			end
+		else
+			local dist = sqrt_p2_add( x - ix, y - iy )
+			local angle = atan( y - iy, x - ix )
+
+			set_vel( _, vel_x + math.cos( angle ) * ( 50 - dist ) / 2, vel_y + math.sin( angle ) * ( 50 - dist ) / 2 )
+		end
+	end
+end
+
+if ( coin > 0 ) then
+	create_gold( x, y, coin, false )
+
+	if ( coin > 750 ) then
+		shoot_proj( sell_hole, 'data/entities/particles/gold_pickup_huge.xml', x, y, 0, 0, nil, nil, nil )
+	elseif ( coin > 125 ) then
+		shoot_proj( sell_hole, 'data/entities/particles/gold_pickup_large.xml', x, y, 0, 0, nil, nil, nil )
+	else
+		shoot_proj( sell_hole, 'data/entities/particles/gold_pickup.xml', x, y, 0, 0, nil, nil, nil )
+	end
+
+	set_comp_value( sell_hole, 'SpriteComponent', nil, {
+		rect_animation = 'flash',
+		next_rect_animation = 'loop',
+	}, nil )
 end

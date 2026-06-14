@@ -287,6 +287,13 @@ function is_enemy( entity )
 		and ( EntityHasTag( entity, 'enemy' ) ) )
 end
 
+---检测是否是子实体
+---@param entity number
+---@return boolean is_child
+function is_child( entity )
+	return not ( entity == EntityGetRootEntity( entity ) )
+end
+
 ---手动 math.atan( y, x )
 ---@param y number
 ---@param x number
@@ -1185,6 +1192,14 @@ function cap( min, num, max )
 	return math.max( min, math.min( num, max ) )
 end
 
+---返回 math.sqrt(  a ^ 2 + b ^ 2 )
+---@param a number
+---@param b number
+---@return number sqrt_p2_add
+function sqrt_p2_add( a, b )
+	return math.sqrt( a ^ 2 + b ^ 2 )
+end
+
 ---将 int rgba 打包为 uint32
 ---@param r number
 ---@param g number
@@ -1270,10 +1285,11 @@ function get_cur_xy( entity )
 end
 
 ---获取最近的玩家
----@param tar_id number
----@param tar_x number
----@param tar_y number
----@return number|nil closest
+---@param tar_id number?
+---@param tar_x number?
+---@param tar_y number?
+---@return number? closest
+---@return number? dist
 function get_closest_player( tar_id, tar_x, tar_y )
 	local x, y = nil, nil
 
@@ -1283,7 +1299,7 @@ function get_closest_player( tar_id, tar_x, tar_y )
 		x, y = tar_x, tar_y
 	end
 
-	local closest = nil
+	local closest, final_x, final_y = nil, nil, nil
 
 	if ( x ) and ( y ) then
 		local players = get_all_players( )
@@ -1295,20 +1311,58 @@ function get_closest_player( tar_id, tar_x, tar_y )
 				local px, py = EntityGetTransform( player )
 
 				if ( px and py ) then
-					local distance_pow_2 = ( x - px ) ^ 2 + ( y - py ) ^ 2
+					local dist_pow_2 = ( x - px ) ^ 2 + ( y - py ) ^ 2
 
-					if ( distance_pow_2 < min_distance ) then
-						min_distance = distance_pow_2
+					if ( dist_pow_2 < min_distance ) then
+						min_distance = dist_pow_2
+
 						closest = player
+
+						final_x, final_y = px, py
 					end
 				end
 			end
 		elseif ( #players == 1 ) then
 			closest = players[ 1 ]
+
+			final_x, final_y = EntityGetTransform( closest )
 		end
 	end
 
-	return closest
+	if ( closest ) then
+		return closest, math.sqrt( ( x - final_x ) ^ 2 + ( y - final_y ) ^ 2 )
+	else
+		return 0, nil
+	end
+end
+
+---创建自定义价值的黄金块
+---@param x number
+---@param y number
+---@param value number
+---@param unlimit_time boolean?
+function create_gold( x, y, value, unlimit_time )
+	local gold = EntityLoad( empty_path .. 'entities/items/pickup/goldnugget.xml', x, y )
+
+	if ( unlimit_time ) then
+		remove_all_comp( gold, 'VariableStorageComponent', 'empty_gold_timer', nil )
+	end
+
+	if ( is_not_0_num( value ) ) then
+		set_comp_value( gold, 'VariableStorageComponent', 'empty_gold_value', {
+			value_int = value,
+		}, nil, nil )
+
+		if ( value > 30000 ) then
+			set_comp_value( gold, 'PhysicsImageShapeComponent', nil, {
+				image_file = 'data/items_gfx/easter/golden_idol_big.png',
+			}, nil, nil )
+		end
+	end
+
+	set_comp_value( gold, 'VelocityComponent', nil, {
+		mVelocity = { Random( -10, 10 ), Random( -10, 10 ) },
+	}, nil, nil )
 end
 
 ---为实体复制组件 - 未完成, 请勿使用此函数

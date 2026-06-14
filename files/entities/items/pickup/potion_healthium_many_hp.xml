@@ -1,4 +1,5 @@
 <Entity>
+
 	<Base file="data/entities/items/pickup/potion.xml" >
 
 		<DamageModelComponent
