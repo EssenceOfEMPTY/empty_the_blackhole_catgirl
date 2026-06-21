@@ -40,7 +40,7 @@ if ( is_not_0_num( wand ) ) then
 
 	local max_dev_deg = max_adjust / 2
 
-	local dev_rad = math.rad( max_dev_deg * ( max_adjust - frames ) / max_adjust )
+	local dev_rad = deg_to_rad( max_dev_deg * ( max_adjust - frames ) / max_adjust )
 	local ox, oy = wx + math.cos( wdir ), wy - math.sin( wdir )
 
 	tp( aim1, ox, oy, wdir + dev_rad )

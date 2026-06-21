@@ -23,6 +23,7 @@ function shot( proj )
 			air_friction = 0,
 			gravity_y = 0,
 			gravity_x = 0,
+			penetrate_world_velocity_coeff = 1,
 		}, nil, nil )
 	end
 

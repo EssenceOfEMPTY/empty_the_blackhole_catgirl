@@ -31,6 +31,10 @@
 		explosion_dont_damage_shooter="1"
 	>
 
+		<damage_by_type
+			slice="1"
+		></damage_by_type>
+
 		<config_explosion
 			never_cache="1"
 			camera_shake="0"
@@ -59,10 +63,6 @@
 			stains_image="data/temp/explosion_stain.png"
 			audio_event_name="explosions/magic_small"
 		></config_explosion>
-
-		<damage_by_type
-			slice="1"
-		></damage_by_type>
 
 	</ProjectileComponent>
 
@@ -107,19 +107,7 @@
 		offset_x="0"
 		offset_y="0"
 		rect_animation="spawn"
-		update_transform_rotation="0"
-	></SpriteComponent>
-
-	<SpriteComponent
-		alpha="1"
-		image_file="mods/empty_the_blackhole_catgirl/files/projectiles_gfx/orb_blue_big.xml"
-		next_rect_animation=""
-		offset_x="0"
-		offset_y="0"
-		rect_animation="spawn"
-		emissive="1"
-		additive="1"
-		update_transform_rotation="0"
+		update_transform_rotation="1"
 	></SpriteComponent>
 
 	<LightComponent
@@ -144,7 +132,7 @@
 		y_vel_max="100"
 		friction="5"
 		count_min="10"
-		count_max="30"
+		count_max="20"
 		area_circle_radius.max="7"
 		area_circle_radius.min="1"
 		velocity_always_away_from_center="100"

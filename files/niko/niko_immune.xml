@@ -36,13 +36,18 @@
 	></GameEffectComponent>
 
 	<GameEffectComponent
-		effect="PROTECTION_FOOD_POISONING"
+		effect="KNOCKBACK_IMMUNITY"
 		frames="-1"
 	></GameEffectComponent>
 
 	<GameEffectComponent
 		effect="NO_SLIME_SLOWDOWN"
 		frames="-1"
-	></GameEffectComponent >
+	></GameEffectComponent>
+
+	<GameEffectComponent
+		effect="PROTECTION_FOOD_POISONING"
+		frames="-1"
+	></GameEffectComponent>
 
 </Entity>

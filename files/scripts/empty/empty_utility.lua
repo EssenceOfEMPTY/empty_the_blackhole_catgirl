@@ -362,9 +362,9 @@ function time_for_vec3( )
 end
 
 ---设置随机数种子, 返回 entity 的位置
----@param entity number|nil
----@return number|nil x
----@return number|nil y
+---@param entity number?
+---@return number? x
+---@return number? y
 function set_r_seed( entity )
 	local a, b, c = time_for_vec3( )
 
@@ -404,7 +404,13 @@ end
 ---@param any any
 ---@return string upper_type
 function upper_type( any )
-	return string.upper( type( any ) )
+	local any_type = string.upper( type( any ) )
+
+	if ( any_type == 'TABLE' ) then
+		return 'NUMBER[ ]'
+	else
+		return any_type
+	end
 end
 
 ---根据 k_table 模板表创建键值全为 v 的表
@@ -986,7 +992,7 @@ function get_len( vel_x, vel_y )
 		if ( vel_y == 0 ) then
 			return vel_x
 		else
-			return math.sqrt( vel_x ^ 2 + vel_y ^ 2 )
+			return sqrt_p2_add( vel_x, vel_y )
 		end
 	end
 end
@@ -1090,7 +1096,7 @@ end
 function force_by_loc( mover_x, mover_y, attract_x, attract_y, dist_full, coeff )
 	coeff = coeff or 72
 
-	local dist = math.sqrt( ( attract_x - mover_x ) ^ 2 + ( attract_y - mover_y ) ^ 2 )
+	local dist = sqrt_p2_add( attract_x - mover_x, attract_y - mover_y )
 
 	if ( dist >= dist_full ) then
 		return 0, 0
@@ -1144,7 +1150,7 @@ function abs_rot_vel( vel_x, vel_y, angle )
 	if ( vel_x == 0 and vel_y == 0 ) then
 		return 0, 0
 	else
-		local rad, speed = deg_to_rad( -angle ), math.sqrt( vel_x * vel_x + vel_y * vel_y )
+		local rad, speed = deg_to_rad( -angle ), sqrt_p2_add( vel_x, vel_y )
 		local sin, cos = math.sin( rad ), math.cos( rad )
 
 		return cos * speed, sin * speed
@@ -1192,7 +1198,39 @@ function cap( min, num, max )
 	return math.max( min, math.min( num, max ) )
 end
 
----返回 math.sqrt(  a ^ 2 + b ^ 2 )
+---将 num 的值循环调整至 min, max 之间
+---@param num number
+---@param min number
+---@param max number
+---@return number mul_cap
+function mod_cap( num, min, max )
+	if ( min == max ) then
+		return max
+	end
+
+	if ( min > max ) then
+		min, max = max, min
+	end
+
+	if ( min <= num and num <= max ) then
+		return num
+	end
+
+	local range = max - min
+	local mod = ( num - min ) % range
+
+	if ( mod == 0 ) then
+		if ( num < min ) then
+			return min
+		else
+			return max
+		end
+	else
+		return min + mod
+	end
+end
+
+---返回 math.sqrt( a ^ 2 + b ^ 2 )
 ---@param a number
 ---@param b number
 ---@return number sqrt_p2_add
@@ -1330,7 +1368,7 @@ function get_closest_player( tar_id, tar_x, tar_y )
 	end
 
 	if ( closest ) then
-		return closest, math.sqrt( ( x - final_x ) ^ 2 + ( y - final_y ) ^ 2 )
+		return closest, sqrt_p2_add( x - final_x, y - final_y )
 	else
 		return 0, nil
 	end
@@ -1428,13 +1466,11 @@ function tp( entity, x, y, rot )
 		entity = { entity }
 	end
 
-	rot = rot or 0
-
 	local count = 0
 
 	for i, _ in ipairs( entity or { } ) do
-		if ( is_not_0_num( _ ) and is_alive( _ ) ) then
-			EntityApplyTransform( _, x, y, rot )
+		if ( is_not_0_num( _ ) ) then
+			EntitySetTransform( _, x, y, rot )
 
 			count = count + 1
 		end
@@ -2118,10 +2154,10 @@ end
 ---@param proj number
 ---@param dmg_type string
 ---@param mul number? --伤害倍率, 默认 50%
----@param base_dmg number? --基础伤害, 默认 1
+---@param base_dmg number? --基础伤害, 默认 0
 function damage_to( proj, dmg_type, mul, base_dmg )
 	if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
-		mul, base_dmg = mul or 0.5, base_dmg or ( 1 / get_scale( ) )
+		mul, base_dmg = mul or 0.5, base_dmg or 0
 
 		local sum = 0
 
@@ -2227,36 +2263,156 @@ function damage_mul( proj, mul )
 	return is_has_dmg, dmg_data
 end
 
-function remove_cards_until_fix( wand, deck_cap, always )
-	local cards = get_all_child( wand )
+---获取一个法杖的始终释放法术信息
+---@param wand number
+---@return number always_count
+---@return number[] always_spells
+function get_always( wand )
+	local spell, always = get_all_child( wand, 'card_action' ), { }
 
-	for _ = #cards, 1, -1 do
-		if ( not is_has_comp( cards[ _ ], 'ItemActionComponent' ) ) then
-			table.remove( cards, _ )
+	for i, _ in ipairs( spell ) do
+		local is_always = get_comp_value( _, 'ItemComponent', nil, {
+			{ 'permanently_attached', false },
+		}, nil )
+
+		if ( is_always ) then
+			table.insert( always, _ )
 		end
 	end
 
-	if ( #cards > deck_cap ) then
-		local x, y = EntityGetTransform( wand )
-		local act_cards = { }
+	return #always, always
+end
 
-		for _ = #cards, always + 1, -1 do
-			if ( #cards - _ + 1 > deck_cap ) then
-				local card = cards[ _ ]
+---获取法杖的真实容量
+---@param wand number
+---@return number real_cap
+function get_real_cap( wand )
+	return math.floor( EntityGetWandCapacity( wand ) )
+end
 
-				EntityRemoveFromParent( card )
+---转换始终法术数量，并移除超出的普通法术
+---增加始终时：从前到后将非始终转为始终
+---减少始终时：从后到前将始终转为非始终
+---移除超出普通容量时：从末尾掉落非始终法术
+---@param wand number
+---@param tgt_real_cap number 目标普通容量
+---@param tgt_always number 目标始终法术数量
+---@return number actual_always 实际调整后的始终法术数量（可能因实体不足而小于目标）
+function adjusts_spells( wand, tgt_real_cap, tgt_always )
+	local spells, always, non_always = get_all_child( wand ), { }, { }
+	local cur_always = get_always( wand )
 
-				tp( card, x, y )
+	for _, card in ipairs( spells ) do
+		local is_always = get_comp_value( card, 'ItemComponent', nil, {
+			{ 'permanently_attached', false },
+		}, nil )
 
-				table.insert( act_cards, card )
-			end
+		if ( is_always ) then
+			table.insert( always, card )
+		else
+			table.insert( non_always, card )
+		end
+	end
+
+	local new_always = cur_always
+
+	if ( tgt_always > cur_always ) then
+		local to_convert = math.min( tgt_always - cur_always, #non_always )
+
+		for _ = 1, to_convert do
+			local card = non_always[ _ ]
+
+			set_comp_value( card, 'ItemComponent', nil, {
+				permanently_attached = true,
+			}, nil, nil )
 		end
 
-		local comps = get_all_comp( act_cards )
+		new_always = cur_always + to_convert
+	elseif ( tgt_always < cur_always ) then
+		local to_convert = math.min( cur_always - tgt_always, #always )
 
-		set_comp_value( act_cards, nil, nil, {
+		for _ = 1, to_convert do
+			local card = always[ #always - _ + 1 ]
+
+			set_comp_value( card, 'ItemComponent', nil, {
+				permanently_attached = false,
+			}, nil, nil )
+		end
+
+		new_always = cur_always - to_convert
+	end
+
+	---@type number[]
+	local cur_non_always = { }
+
+	for _, card in ipairs( get_all_child( wand ) ) do
+		local is_always = get_comp_value( card, 'ItemComponent', nil, {
+			{ 'permanently_attached', false },
+		}, nil )
+
+		if ( not is_always ) then
+			table.insert( cur_non_always, card )
+		end
+	end
+
+	local excess = #cur_non_always - tgt_real_cap
+
+	if ( excess > 0 ) then
+		local x, y = EntityGetTransform( wand )
+
+		---@type number[]
+		local real_spell = { }
+
+		for _ = 1, excess, 1 do
+			table.insert( real_spell, cur_non_always[ #cur_non_always - _ + 1 ] )
+		end
+info_print( real_spell, 'adjusts spells - real_spell' )
+		rem_child( real_spell, x, y )
+
+		set_comp_value( real_spell, nil, 'enabled_in_world', {
 			_enabled = true,
 		}, nil, nil )
+	end
+
+	return new_always
+end
+
+---调整法杖容量
+---@param wand number|number[]
+---@param cap_change table<string, number?> --属性: always_set, always_delta, real_set, real_delta
+function adjust_wand_deck( wand, cap_change )
+	if ( type( wand ) == 'number' ) then
+		wand = { wand }
+	end
+
+	for _, entity in ipairs( wand ) do
+		if EntityHasTag( entity, 'wand' ) then
+			local always, real_cap = get_always( entity ), get_real_cap( entity )
+
+			local tar_always, tar_real_cap = always, real_cap
+
+			if ( is_not_nan_num( cap_change.always_set ) ) then
+				tar_always = cap_change.always_set
+			elseif ( is_not_0_num( cap_change.always_delta ) ) then
+				tar_always = always + cap_change.always_delta
+			end
+
+			if ( is_not_nan_num( cap_change.real_set ) ) then
+				tar_real_cap = cap_change.real_set
+			elseif ( is_not_0_num( cap_change.real_delta ) ) then
+				tar_real_cap = real_cap + cap_change.real_delta
+			end
+
+			tar_always, tar_real_cap = math.max( tar_always, 0 ), math.max( tar_real_cap, 0 )
+
+			local actual_always = adjusts_spells( entity, tar_real_cap, tar_always )
+
+			local deck_cap = tar_real_cap + actual_always
+
+			set_comp_obj_value( entity, 'AbilityComponent', nil, {
+				{ 'gun_config', 'deck_capacity', deck_cap },
+			} )
+		end
 	end
 end
 

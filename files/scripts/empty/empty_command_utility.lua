@@ -2751,7 +2751,7 @@ function from_table_get_paras( c, command_name, deck_table, pattern, shooter, ta
 						local para_count_key = 'para_' .. #func_paras
 						local para_names = nil
 						if ( e_cmd_funcs[ function_value ].para_names and
-						     e_cmd_funcs[ function_value ].para_names[ para_count_key ] ) then
+							 e_cmd_funcs[ function_value ].para_names[ para_count_key ] ) then
 							para_names = e_cmd_funcs[ function_value ].para_names[ para_count_key ]
 						end
 
@@ -3315,7 +3315,7 @@ function evaluate_delayed_expression( expr_string, pattern, shooter, tar_x, tar_
 			local para_count_key = 'para_' .. param_count
 			local para_names = nil
 			if ( e_cmd_funcs[ func_name ].para_names and
-			     e_cmd_funcs[ func_name ].para_names[ para_count_key ] ) then
+				 e_cmd_funcs[ func_name ].para_names[ para_count_key ] ) then
 				para_names = e_cmd_funcs[ func_name ].para_names[ para_count_key ]
 			end
 			if ( not para_names ) then

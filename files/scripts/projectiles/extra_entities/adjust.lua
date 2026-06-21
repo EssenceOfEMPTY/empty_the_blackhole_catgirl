@@ -17,10 +17,12 @@ if ( paras ) then
 
 		local mul = ( 8 * paras.level - 4 ) * ( paras.frames / max_adjust )
 
-		local attri = {
+		local speed_data = {
 			speed_min = sp_min * mul,
 			speed_max = sp_max * mul,
 		}
+
+		set_comp_value( proj, 'ProjectileComponent', nil, speed_data, nil, nil )
 
 		mul = ( 6 + 7 * paras.level ) * ( paras.frames / max_adjust )
 

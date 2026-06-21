@@ -1,19 +1,18 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity = get_root_entity( )
+local tar, tag = get_root_entity( ), 'CURSE_MALICE_WASHES_OVER'
 
-if ( entity ~= NULL_ENTITY ) then
-	local v_comps = EntityGetComponent( entity, 'VariableStorageComponent', 'CURSE_MALICE_WASHES_OVER' )
+if ( is_not_0_num( tar ) ) then
+	local x, y = get_comp_value( tar, 'VariableStorageComponent', tag, {
+		{ 'value_float', 0 },
+		{ 'value_string', '0' },
+	}, nil )
 
-	if ( v_comps ) then
-		local comp = v_comps[ 1 ]
-		local x, y = ComponentGetValue2( comp, 'value_float' ), tonumber( ComponentGetValue2( comp, 'value_string' ) ) or 0
+	y = tonumber( y ) or 0
 
-		local child_e = EntityLoad( empty_path .. 'entities/misc/curse/curse_malice_washes_over.xml', x, y )
-		EntityAddChild( entity, child_e )
+	local e = EntityLoad( empty_path .. 'entities/misc/curse/curse_malice_washes_over.xml', x, y )
 
-		for _, v_comp in ipairs( v_comps ) do
-			EntityRemoveComponent( entity, v_comp )
-		end
-	end
+	EntityAddChild( tar, e )
+
+	remove_all_comp( tar, 'VariableStorageComponent', tag, nil )
 end

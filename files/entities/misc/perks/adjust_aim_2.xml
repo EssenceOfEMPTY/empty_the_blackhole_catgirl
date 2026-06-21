@@ -11,7 +11,7 @@
 			audio_enabled="0"
 			hit_particle_chance="0"
 			beam_particle_chance="100"
-			beam_particle_type="spark_teal"
+			beam_particle_type="spark_red_bright"
 		></laser>
 
 	</LaserEmitterComponent>

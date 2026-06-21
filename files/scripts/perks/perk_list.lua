@@ -13,53 +13,18 @@ local new_perks =
 		one_off_effect = true,
 		usable_by_enemies = false,
 		func = function( perk_item, who, item_name )
-			local x, y = EntityGetTransform( who )
+			local invs = get_all_child( who, 'inventory_quick' )
 
-			local children = EntityGetAllChildren( who )
-			local inventory = EntityGetFirstComponent( who, 'Inventory2Component' )
+			for i, inv in ipairs( invs ) do
+				local wand = get_all_child( inv, 'wand', nil )
 
-			if ( inventory ) then
-				for i, child_id in ipairs( children or { } ) do
-					if ( EntityGetName( child_id ) == 'inventory_quick' ) then
-						local wands = EntityGetAllChildren( child_id )
+				for j, _ in ipairs( wand ) do
+					local always = get_always( _ )
 
-						for _, wand in ipairs( wands or { } ) do
-							local ability_comp = EntityGetFirstComponentIncludingDisabled( wand, 'AbilityComponent' )
-
-							if ( ability_comp ) then
-								local deck_capacity_all = ComponentObjectGetValue2( ability_comp, 'gun_config', 'deck_capacity' )
-								local deck_capacity_real = EntityGetWandCapacity( wand )
-
-								local always_count = math.max( 0, deck_capacity_all - deck_capacity_real )
-
-								if ( always_count > 0 ) then
-									local spells = EntityGetAllChildren( wand )
-
-									for j, spell in ipairs( spells or { } ) do
-										if ( spell ) then
-											local spell_comp = EntityGetFirstComponentIncludingDisabled( spell, 'ItemActionComponent' )
-
-											if ( spell_comp ) then
-												local action_id = ComponentGetValue2( spell_comp, 'action_id' )
-
-												rem_all_child( spell, x, y )
-
-												local spell_comps = EntityGetAllComponents( spell )
-
-												for k, comp in ipairs( spell_comps or { } ) do
-													EntitySetComponentIsEnabled( spell, comp, true )
-												end
-
-												CreateItemActionEntity( action_id, x, y )
-											end
-										end
-									end
-
-									ComponentObjectSetValue2( ability_comp, 'gun_config', 'deck_capacity', deck_capacity_real )
-								end
-							end
-						end
-					end
+					adjust_wand_deck( wand, {
+						always_set = 0,
+						real_delta = always,
+					} )
 				end
 			end
 		end,
@@ -1100,28 +1065,13 @@ local new_perks =
 					mana_max = 1.2 * mana_max,
 				}, nil, nil )
 
-				local deck_cap = get_comp_obj_value( wand, 'AbilityComponent', nil, {
-					{ 'gun_config', 'deck_capacity', 0 },
-				}, nil )
+				local real_cap = EntityGetWandCapacity( wand )
 
-				local deck_cap_real = EntityGetWandCapacity( wand )
-				local always_count = deck_cap - deck_cap_real
+				real_cap = mod_cap( real_cap, 1, 7 )
 
-				if ( deck_cap_real > 0 ) then
-					if ( deck_cap_real < 15 ) then
-						deck_cap_real = deck_cap_real / 2
-					elseif ( deck_cap_real < 29 ) then
-						deck_cap_real = deck_cap_real / 4
-					else
-						deck_cap_real = 1
-					end
-				end
-
-				set_comp_obj_value( wand, 'AbilityComponent', nil, {
-					{ 'gun_config', 'deck_capacity', math.floor( deck_cap_real ) + always_count },
-				}, nil, nil )
-
-				remove_cards_until_fix( wand, deck_cap, always_count )
+				adjust_wand_deck( wand, {
+					real_set = math.max( math.floor( real_cap ), 1 ),
+				} )
 			end
 		end,
 		func_remove = function( who )

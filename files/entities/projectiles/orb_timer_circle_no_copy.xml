@@ -31,7 +31,7 @@
 		explosion_dont_damage_shooter="1"
 	>
 		<damage_by_type
-			slice="1"
+			holy="1"
 		></damage_by_type>
 
 		<config_explosion
@@ -78,8 +78,8 @@
 		y_vel_min="0"
 		y_vel_max="0"
 		friction="4"
-		count_min="30"
-		count_max="50"
+		count_min="20"
+		count_max="20"
 		area_circle_radius.max="4"
 		area_circle_radius.min="4"
 		velocity_always_away_from_center="80"
@@ -105,61 +105,15 @@
 		offset_x="0"
 		offset_y="0"
 		rect_animation="spawn"
-		update_transform_rotation="0"
-	></SpriteComponent>
-
-	<SpriteComponent
-		alpha="1"
-		image_file="mods/empty_the_blackhole_catgirl/files/projectiles_gfx/orb_green_big.xml"
-		next_rect_animation=""
-		offset_x="0"
-		offset_y="0"
-		rect_animation="spawn"
-		emissive="1"
-		additive="1"
-		update_transform_rotation="0"
+		update_transform_rotation="1"
 	></SpriteComponent>
 
 	<LightComponent
 		radius="150"
 		r="30"
 		g="90"
-		b="30">
-	</LightComponent>
-
-	<ParticleEmitterComponent
-		emitted_material_name="spark_green"
-		gravity.y="0"
-		offset.x="0"
-		offset.y="0"
-		x_pos_offset_min="0"
-		y_pos_offset_min="0"
-		x_pos_offset_max="0"
-		y_pos_offset_max="0"
-		x_vel_min="-100"
-		x_vel_max="100"
-		y_vel_min="-100"
-		y_vel_max="100"
-		friction="5"
-		count_min="10"
-		count_max="30"
-		area_circle_radius.max="7"
-		area_circle_radius.min="1"
-		velocity_always_away_from_center="100"
-		lifetime_min="1.9"
-		lifetime_max="4.2"
-		render_on_grid="1"
-		airflow_force="0.85"
-		airflow_time="0.101"
-		airflow_scale="2.01"
-		fade_based_on_lifetime="1"
-		create_real_particles="0"
-		emit_cosmetic_particles="1"
-		emission_interval_min_frames="41"
-		emission_interval_max_frames="41"
-		delay_frames="0"
-		is_emitting="1"
-	></ParticleEmitterComponent>
+		b="30"
+	></LightComponent>
 
 	<AudioComponent
 		file="data/audio/Desktop/projectiles.bank"

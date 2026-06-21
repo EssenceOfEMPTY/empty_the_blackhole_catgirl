@@ -3,6 +3,9 @@ triphase_reincarnation_check = false
 
 extra_iter = 0
 
+is_mana_form = false
+is_pure_form = false
+
 inherit_attr = {
 	'extra_entities',
 	'game_effect_entities',
@@ -74,7 +77,86 @@ function set_current_action( ... )
 	end
 end
 
+local old_draw_action = draw_action
+
+function draw_action( instant_reload_if_empty )
+	local action = nil
+	state_cards_drawn = state_cards_drawn + 1
+
+	if ( reflecting ) then
+		return
+	end
+
+	if ( #deck <= 0 ) then
+		if ( instant_reload_if_empty and ( force_stop_draws == false ) ) then
+			move_discarded_to_deck( )
+			order_deck( )
+
+			start_reload = true
+		else
+			reloading = true
+
+			return true
+		end
+	end
+
+	if #deck > 0 then
+		action = table.remove( deck, 1 )
+
+		local mana_req = action.mana
+
+		if ( not action.mana ) then
+			mana_req = ACTION_MANA_DRAIN_DEFAULT
+		end
+
+		if ( is_mana_form ) then
+			mana_req = math.floor( mana_req / 3 ) - 5
+		end
+
+		if ( mana_req > mana ) then
+			OnNotEnoughManaForAction( )
+			table.insert( discarded, action )
+
+			return false
+		end
+
+		if ( action.uses_remaining == 0 ) then
+			table.insert( discarded, action )
+
+			return false
+		end
+
+		mana = mana - mana_req
+	end
+
+	if ( action ) then
+		play_action( action )
+	end
+
+	return true
+end
+
+local old__play_permanent_card = _play_permanent_card
+
+function _play_permanent_card( ... )
+	if ( not is_pure_form ) then
+		old__play_permanent_card( ... )
+	end
+end
+
 ---<<<<<<<<<<<<<<<<<<<<<<<< 新增函数 >>>>>>>>>>>>>>>>>>>>>>>>---
+
+---法力形态, 降低施法所需的法力
+---@param act boolean
+function mana_form( act )
+	is_mana_form = act
+end
+
+---纯粹形态, 不再释放始终释放
+---@param act boolean
+function pure_form( act )
+	is_pure_form = act
+end
 
 ---递归形态, 递归上限 +2
 ---@param act boolean

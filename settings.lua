@@ -4,7 +4,7 @@ local mod_id = 'empty_the_blackhole_catgirl'
 local language = GameTextGet( '$current_language' )
 mod_settings_version = 1
 
-local b1 = '        '
+local b1 = '		'
 local b2 = b1 .. b1
 local b3 = b2 .. b1
 

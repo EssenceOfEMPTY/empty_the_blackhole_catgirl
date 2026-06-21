@@ -222,8 +222,7 @@ end
 ---<<<<<<<<<<<<<<<<<<<<<<<< 世界更新前 >>>>>>>>>>>>>>>>>>>>>>>>---
 
 function OnWorldPreUpdate( )
-	local a, b, c = time_for_vec3( )
-	SetRandomSeed( a + c, b + c )
+	set_r_seed( )
 
 	--if ( GlobalsGetValue( 'EMPTY_PERK_REMOVE_COUNT', '0' ) ~= '0' ) then
 	--	dofile( empty_path .. '' )

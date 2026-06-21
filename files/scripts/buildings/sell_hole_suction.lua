@@ -7,12 +7,13 @@ local x, y = EntityGetTransform( sell_hole )
 local suck_wand = EntityGetInRadiusWithTag( x, y, 128, 'wand' )
 local suck_card = EntityGetInRadiusWithTag( x, y, 128, 'card_action' )
 
+local move = { }
+
 for i, _ in ipairs( suck_wand ) do
 	if ( not ( is_child( _ ) or is_has_comp( _, 'ItemCostComponent' ) ) ) then
 		local ix, iy = EntityGetTransform( _ )
-		local vel_x, vel_y = get_vel( _ )
 
-		if ( sqrt_p2_add( x - ix, y - iy ) < 8 + sqrt_p2_add( vel_x, vel_y ) / 50 ) then
+		if ( sqrt_p2_add( x - ix, y - iy ) < 8 ) then
 			local sell_num = math.floor( math.abs( y / 1000 ) )
 			local sell_fact = math.max( sell_num, 1.5 ) ^ 2
 
@@ -38,6 +39,8 @@ for i, _ in ipairs( suck_wand ) do
 
 			EntityKill( _ )
 		else
+			local vel_x, vel_y = get_vel( _ )
+
 			local dist = sqrt_p2_add( x - ix, y - iy )
 			local angle = atan( y - iy, x - ix )
 
@@ -49,9 +52,8 @@ end
 for i, _ in ipairs( suck_card ) do
 	if ( not ( is_child( _ ) or is_has_comp( _, 'ItemCostComponent' ) ) ) then
 		local ix, iy = EntityGetTransform( _ )
-		local vel_x, vel_y = get_vel( _ )
 
-		if ( sqrt_p2_add( x - ix, y - iy ) < 8 + sqrt_p2_add( vel_x, vel_y ) / 50 ) then
+		if ( sqrt_p2_add( x - ix, y - iy ) < 8 ) then
 			local sell_num = math.floor( math.abs( y / 1000 ) )
 			local sell_fact = math.max( sell_num, 1.5 ) ^ 2
 
@@ -71,6 +73,8 @@ for i, _ in ipairs( suck_card ) do
 				end )
 			end
 		else
+			local vel_x, vel_y = get_vel( _ )
+
 			local dist = sqrt_p2_add( x - ix, y - iy )
 			local angle = atan( y - iy, x - ix )
 
@@ -94,4 +98,8 @@ if ( coin > 0 ) then
 		rect_animation = 'flash',
 		next_rect_animation = 'loop',
 	}, nil )
+end
+
+for i, _ in ipairs( move ) do
+	
 end
