@@ -772,8 +772,8 @@ local new_perks =
 				} )
 
 				add_comp_or_not( who, 'ShotEffectComponent', tag, {
-					_tags = tag,
-					extra_modifier = 'adjust',
+					{ '_tags', tag },
+					{ 'extra_modifier', 'adjust' },
 				} )
 
 				local x, y = EntityGetTransform( who )

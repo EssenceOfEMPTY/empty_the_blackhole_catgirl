@@ -1,6 +1,6 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_command_utility.lua' )
 
-new_modifiers = {
+local new_mod = {
 	adjust = function( )
 		local tag = 'adjust'
 		local tagging = tag .. 'ing'
@@ -43,6 +43,6 @@ new_modifiers = {
 	end,
 }
 
-for i, _ in pairs( new_modifiers ) do
-	extra_modifiers[ i ] = _
+for k, v in pairs( new_mod ) do
+	extra_modifiers[ k ] = v
 end

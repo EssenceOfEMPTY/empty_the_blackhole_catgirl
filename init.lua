@@ -49,7 +49,7 @@ for _, magic in ipairs( magics ) do
 	end
 end
 
----<<<<<<<<<<<<<<<<<<<<<<<< 通用文件覆写 >>>>>>>>>>>>>>>>>>>>>>>>---
+---<<<<<<<<<<<<<<<<<<<<<<<< 通用 lua 覆写 >>>>>>>>>>>>>>>>>>>>>>>>---
 
 local overwrites = { }
 
@@ -82,13 +82,6 @@ if ( get_setting_by_def( 'LOOT_CHANGE_FRIEND' ) ) then
 	table.insert( overwrites, {
 		source = 'scripts/animals/friend_death.lua',
 		replace = 'entities/animals/boss_friend/death.lua',
-	} )
-end
-
-if ( get_setting_by_def( 'EFFECT_CHANGE_WAND_CONTENT' ) ) then
-	add_table( overwrites, {
-		'scripts/gun/procedural/gun_procedural.lua',
-		'scripts/gun/procedural/gun_procedural_better.lua',
 	} )
 end
 
@@ -207,10 +200,15 @@ local luas = {
 	'scripts/gun/gun',
 	'scripts/gun/gun_actions',
 	'scripts/gun/gun_extra_modifiers',
-	'scripts/gun/procedural/gun_procedural',
-	'scripts/gun/procedural/gun_procedural_better',
 	'scripts/status_effects/status_list',
 }
+
+if ( get_setting_by_def( 'EFFECT_CHANGE_WAND_CONTENT' ) ) then
+	add_table( luas, {
+		'scripts/gun/procedural/gun_procedural',
+		'scripts/gun/procedural/gun_procedural_better',
+	} )
+end
 
 for i, _ in ipairs( luas ) do
 	ModLuaFileAppend( 'data/' .. _ .. '.lua', empty_path .. _ .. '.lua' )

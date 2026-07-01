@@ -49,10 +49,11 @@ function shot( proj )
 					}, nil )
 
 					if ( explo_range > 0 ) then
+						local explo_mul = math.log( 10 + atk_mul, 10 )
+
 						set_comp_obj_value( proj, 'ProjectileComponent', nil, {
-							{ 'config_explosion', 'explosion_radius', explo_range * math.log( 10 + atk_mul, 10 ) },
-							{ 'config_explosion', 'ray_energy', ray_energy * atk_mul },
-							{ 'config_explosion', 'physics_explosion_power', { 64, 64 } },
+							{ 'config_explosion', 'explosion_radius', explo_range * explo_mul },
+							{ 'config_explosion', 'ray_energy', ray_energy * explo_mul },
 						}, nil, nil )
 					end
 				end
