@@ -3,6 +3,6 @@ dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility
 local entity = get_root_entity( )
 
 set_comp_value( entity, 'VelocityComponent', nil, {
-	gravity_y = 0,
-	gravity_x = 0,
+	{ 'gravity_y', 0 },
+	{ 'gravity_x', 0 },
 }, nil, nil )

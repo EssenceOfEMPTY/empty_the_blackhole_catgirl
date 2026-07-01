@@ -180,7 +180,7 @@ e_cmd_funcs = {
 			local v_value = 0
 
 			if ( reflect or type( v_No ) == 'number' ) then
-				v_value = get_globals_num( 'EMPTY_COMMAND_VARIABLE_' .. tostring( v_No ), 0 )
+				v_value = get_global_num( 'EMPTY_COMMAND_VARIABLE_' .. tostring( v_No ), 0 )
 
 				command_print( command .. '(', '$empty_command_variable_get_success', tostring( v_No ), tostring( v_value ) )
 			end
@@ -466,14 +466,14 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				set_comp_value( entity, 'ParticleEmitterComponent', nil, {
-					color = pack_rgba( r, g, b, 255 ),
+					{ 'color', pack_rgba( r, g, b, 255 ) },
 				}, nil, nil )
 
 				set_comp_value( entity, 'SpriteParticleEmitterComponent', nil, {
-					[ 'color.r' ] = r / 255,
-					[ 'color.g' ] = g / 255,
-					[ 'color.b' ] = b / 255,
-					[ 'color.a' ] = 1,
+					{ 'color.r', r / 255 },
+					{ 'color.g', g / 255 },
+					{ 'color.b', b / 255 },
+					{ 'color.a', 1 },
 				}, nil, nil )
 			else
 				add_desc_by_info( c, {
@@ -545,14 +545,14 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				set_comp_value( entity, 'ParticleEmitterComponent', nil, {
-					color = pack_rgba( r, g, b, a ),
+					{ 'color', pack_rgba( r, g, b, a ) },
 				}, nil, nil )
 
 				set_comp_value( entity, 'SpriteParticleEmitterComponent', nil, {
-					[ 'color.r' ] = r / 255,
-					[ 'color.g' ] = g / 255,
-					[ 'color.b' ] = b / 255,
-					[ 'color.a' ] = a / 255,
+					{ 'color.r', r / 255 },
+					{ 'color.g', g / 255 },
+					{ 'color.b', b / 255 },
+					{ 'color.a', a / 255 },
 				}, nil, nil )
 			else
 				add_desc_by_info( c, {
@@ -609,7 +609,7 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				local count = set_comp_value( entity, 'LifetimeComponent', nil, {
-					lifetime = lifetime,
+					{ 'lifetime', lifetime },
 				}, nil, nil )
 
 				if ( count > 0 ) then
@@ -669,7 +669,7 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				local count = set_comp_value( entity, 'ProjectileComponent', nil, {
-					lifetime = lifetime,
+					{ 'lifetime', lifetime },
 				}, nil, nil )
 
 				if ( count > 0 ) then
@@ -739,29 +739,26 @@ e_cmd_funcs = {
 					speed = 0
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				remove_speed_limit( entity )
+				remove_speed_limit( proj )
 
-				local count = set_comp_value( entity, 'VelocityComponent', nil, {
-					speed_min = speed,
-					speed_max = speed,
+				local count = set_comp_value( proj, 'VelocityComponent', nil, {
+					{ 'speed_min', speed },
+					{ 'speed_max', speed },
 				}, nil, nil )
 
-				EntityAddTag( entity, command_shot_speed )
+				EntityAddTag( proj, command_shot_speed )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_shot_speed, {
-					_tags = command_shot_speed,
-					value_float = speed,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_shot_speed, {
+					{ '_tags', command_shot_speed },
+					{ 'value_float', speed },
+				}, nil )
 
-				if ( not is_has_comp( shooter, 'LuaComponent', command_shot_speed ) ) then
-					add_comp_remove_dupli( shooter, 'LuaComponent', command_shot_speed, {
-						_tags = command_shot_speed,
-						script_shot = empty_path .. 'scripts/projectiles/command/' .. command_shot_speed .. '.lua',
-						remove_after_executed = true,
-					} )
-				end
+				add_comp_or_not( shooter, 'LuaComponent', command_shot_speed, {
+					{ '_tags', command_shot_speed },
+					{ 'script_shot', empty_path .. 'scripts/projectiles/command/' .. command_shot_speed .. '.lua' },
+				}, nil )
 
 				if ( count > 0 ) then
 					command_print( command .. '(', '$empty_command_projectile_change_success', tostring( count ) )
@@ -810,30 +807,27 @@ e_cmd_funcs = {
 					vel_y = 0
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 				local speed = math.sqrt( vel_x ^ 2, vel_y ^ 2 )
 
-				remove_speed_limit( entity )
+				remove_speed_limit( proj )
 
-				local count = set_comp_value( entity, 'VelocityComponent', nil, {
-					speed_min = speed,
-					speed_max = speed,
+				local count = set_comp_value( proj, 'VelocityComponent', nil, {
+					{ 'speed_min', speed },
+					{ 'speed_max', speed },
 				}, nil, nil )
 
-				EntityAddTag( entity, command_shot_velxy )
+				EntityAddTag( proj, command_shot_velxy )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_shot_velxy, {
-					_tags = command_shot_velxy,
-					value_float = speed,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_shot_velxy, {
+					{ '_tags', command_shot_velxy },
+					{ 'value_float', speed },
+				}, nil )
 
-				if ( not is_has_comp( shooter, 'LuaComponent', command_shot_velxy ) ) then
-					add_comp_remove_dupli( shooter, 'LuaComponent', command_shot_velxy, {
-						_tags = command_shot_velxy,
-						script_shot = empty_path .. 'scripts/projectiles/command/' .. command_shot_velxy .. '.lua',
-						remove_after_executed = true,
-					} )
-				end
+				add_comp_or_not( shooter, 'LuaComponent', command_shot_velxy, {
+					{ '_tags', command_shot_velxy },
+					{ 'script_shot', empty_path .. 'scripts/projectiles/command/' .. command_shot_velxy .. '.lua' },
+				}, nil )
 
 				if ( count > 0 ) then
 					command_print( command .. '(', '$empty_command_projectile_change_success', tostring( count ) )
@@ -902,7 +896,7 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				local count = set_comp_value( entity, 'VelocityComponent', nil, {
-					gravity_y = gravity_y,
+					{ 'gravity_y', gravity_y },
 				}, nil, nil )
 
 				if ( count > 0 ) then
@@ -954,8 +948,8 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				local count = set_comp_value( entity, 'VelocityComponent', nil, {
-					gravity_y = gravity_y,
-					gravity_x = gravity_x,
+					{ 'gravity_y', gravity_y },
+					{ 'gravity_x', gravity_x },
 				}, nil, nil )
 
 				if ( count > 0 ) then
@@ -1016,7 +1010,7 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				local count = set_comp_value( entity, 'VelocityComponent', nil, {
-					air_friction = air_friction,
+					{ 'air_friction', air_friction },
 				}, nil, nil )
 
 				if ( count > 0 ) then
@@ -1084,22 +1078,19 @@ e_cmd_funcs = {
 					angle = 0
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				EntityAddTag( entity, command )
+				EntityAddTag( proj, command )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_shot, {
-					_tags = command_shot,
-					value_float = angle,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_shot, {
+					{ '_tags', command_shot, },
+					{ 'value_float', angle, },
+				}, nil )
 
-				if ( not is_has_comp( shooter, 'LuaComponent', command_shot ) ) then
-					add_comp_remove_dupli( shooter, 'LuaComponent', command_shot, {
-						_tags = command_shot,
-						script_shot = empty_path .. 'scripts/projectiles/command/' .. command_shot .. '.lua',
-						remove_after_executed = true,
-					} )
-				end
+				add_comp_or_not( shooter, 'LuaComponent', command_shot, {
+					{ '_tags', command_shot, },
+					{ 'script_shot', empty_path .. 'scripts/projectiles/command/' .. command_shot .. '.lua', },
+				}, nil )
 			else
 				add_desc_by_info( c, {
 					replace = true,
@@ -1144,19 +1135,18 @@ e_cmd_funcs = {
 					delay = math.floor( delay )
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_delay, {
-					_tags = command_delay,
-					value_float = angle_delay,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_delay, {
+					{ '_tags', command_delay },
+					{ 'value_float', angle_delay },
+				}, nil )
 
-				add_comp_remove_dupli( entity, 'LuaComponent', command_delay, {
-					_tags = command_delay,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_delay .. '.lua',
-					execute_every_n_frame = delay,
-					remove_after_executed = true,
-				} )
+				add_comp_or_not( proj, 'LuaComponent', command_delay, {
+					{ '_tags', command_delay },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_delay .. '.lua' },
+					{ 'execute_every_n_frame', delay },
+				}, nil )
 			else
 				add_desc_by_info( c, {
 					replace = true,
@@ -1218,22 +1208,19 @@ e_cmd_funcs = {
 					angle = 0
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				EntityAddTag( entity, command )
+				EntityAddTag( proj, command )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_shot, {
-					_tags = command_shot,
-					value_float = angle,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_shot, {
+					{ '_tags', command_shot },
+					{ 'value_float', angle },
+				}, nil )
 
-				if ( not is_has_comp( shooter, 'LuaComponent', command_shot ) ) then
-					add_comp_remove_dupli( entity, 'LuaComponent', command_shot, {
-						_tags = command_shot,
-						script_shot = empty_path .. 'scripts/projectiles/command/' .. command_shot .. '.lua',
-						remove_after_executed = true,
-					} )
-				end
+				add_comp_or_not( shooter, 'LuaComponent', command_shot, {
+					{ '_tags', command_shot },
+					{ 'script_shot', empty_path .. 'scripts/projectiles/command/' .. command_shot .. '.lua' },
+				}, nil )
 			else
 				add_desc_by_info( c, {
 					replace = true,
@@ -1278,19 +1265,19 @@ e_cmd_funcs = {
 					delay = math.floor( delay )
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_delay, {
-					_tags = command_delay,
-					value_float = angle_delay,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_delay, {
+					{ '_tags', command_delay },
+					{ 'value_float', angle_delay },
+				}, nil )
 
-				add_comp_remove_dupli( entity, 'LuaComponent', command_delay, {
-					_tags = command_delay,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_delay .. '.lua',
-					execute_every_n_frame = delay,
-					remove_after_executed = true,
-				} )
+				add_comp_or_not( proj, 'LuaComponent', command_delay, {
+					{ '_tags', command_delay },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_delay .. '.lua' },
+					{ 'execute_every_n_frame', delay },
+					{ 'remove_after_executed', true },
+				}, nil )
 			else
 				add_desc_by_info( c, {
 					replace = true,
@@ -1344,7 +1331,7 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				local count = set_comp_value( entity, 'ProjectileComponent', nil, {
-					direction_random_rad = deg_to_rad( angle ),
+					{ 'direction_random_rad', deg_to_rad( angle ) },
 				}, nil, nil )
 
 				if ( count > 0 ) then
@@ -1437,20 +1424,20 @@ e_cmd_funcs = {
 					angle = 0
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_reflect, {
-					_tags = command_reflect,
-					value_int = 0,
-					value_string = tostring( angle ),
-					value_float = 0,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_reflect, {
+					{ '_tags', command_reflect },
+					{ 'value_int', 0 },
+					{ 'value_string', tostring( angle ) },
+					{ 'value_float', 0 },
+				}, nil )
 
-				add_comp_remove_dupli( entity, 'LuaComponent', command_reflect, {
-					_tags = command_reflect,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_reflect .. '.lua',
-					execute_every_n_frame = 0,
-				} )
+				add_comp_or_not( proj, 'LuaComponent', command_reflect, {
+					{ '_tags', command_reflect },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_reflect .. '.lua' },
+					{ 'execute_every_n_frame', 0 },
+				}, nil )
 			else
 				add_desc_by_info( c, {
 					replace = true,
@@ -1492,20 +1479,20 @@ e_cmd_funcs = {
 					inc = 0
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_reflect, {
-					_tags = command_reflect,
-					value_int = 0,
-					value_string = tostring( angle ),
-					value_float = inc,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_reflect, {
+					{ '_tags', command_reflect },
+					{ 'value_int', 0 },
+					{ 'value_string', tostring( angle ) },
+					{ 'value_float', inc },
+				}, nil )
 
-				add_comp_remove_dupli( entity, 'LuaComponent', command_reflect, {
-					_tags = command_reflect,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_reflect .. '.lua',
-					execute_every_n_frame = 0,
-				} )
+				add_comp_or_not( proj, 'LuaComponent', command_reflect, {
+					{ '_tags', command_reflect },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_reflect .. '.lua' },
+					{ 'execute_every_n_frame', 0 },
+				}, nil )
 			else
 				add_desc_by_info( c, {
 					replace = true,
@@ -1560,20 +1547,20 @@ e_cmd_funcs = {
 					delay = math.floor( delay )
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_delay, {
-					_tags = command_delay,
-					value_int = 0,
-					value_string = tostring( angle_delay ),
-					value_float = inc_delay,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_delay, {
+					{ '_tags', command_delay },
+					{ 'value_int', 0 },
+					{ 'value_string', tostring( angle_delay ) },
+					{ 'value_float', inc_delay },
+				}, nil )
 
-				add_comp_remove_dupli( entity, 'LuaComponent', command_delay, {
-					_tags = command_trigger,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_trigger .. '.lua',
-					execute_every_n_frame = delay,
-				} )
+				add_comp_or_not( proj, 'LuaComponent', command_delay, {
+					{ '_tags', command_trigger },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_trigger .. '.lua' },
+					{ 'execute_every_n_frame', delay },
+				}, nil )
 			else
 				add_desc_by_info( c, {
 					replace = true,
@@ -1641,26 +1628,26 @@ e_cmd_funcs = {
 					duration = math.floor( duration )
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_delay, {
-					_tags = command_delay,
-					value_int = 0,
-					value_string = tostring( angle_delay ),
-					value_float = inc_delay,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_delay, {
+					{ '_tags', command_delay },
+					{ 'value_int', 0 },
+					{ 'value_string', tostring( angle_delay ) },
+					{ 'value_float', inc_delay },
+				}, nil )
 
-				add_comp_remove_dupli( entity, 'LuaComponent', command_trigger, {
-					_tags = command_trigger,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_trigger .. '.lua',
-					execute_every_n_frame = delay,
-				} )
+				add_comp_or_not( proj, 'LuaComponent', command_trigger, {
+					{ '_tags', command_trigger },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_trigger .. '.lua' },
+					{ 'execute_every_n_frame', delay },
+				}, nil )
 
-				add_comp_remove_dupli( entity, 'LuaComponent', command_death, {
-					_tags = command_death,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_death .. '.lua',
-					execute_every_n_frame = delay + duration,
-				} )
+				add_comp_or_not( proj, 'LuaComponent', command_death, {
+					{ '_tags', command_death },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_death .. '.lua' },
+					{ 'execute_every_n_frame', delay + duration },
+				}, nil )
 			else
 				add_desc_by_info( c, {
 					replace = true,
@@ -1749,20 +1736,20 @@ e_cmd_funcs = {
 					angle = 0
 				end
 
-				local entity = get_root_entity( )
+				local proj = get_root_entity( )
 
-				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_reflect, {
-					_tags = command_reflect,
-					value_int = 0,
-					value_string = tostring( angle ),
-					value_float = 0,
-				} )
+				add_comp_remove_dupli( proj, 'VariableStorageComponent', command_reflect, {
+					{ '_tags', command_reflect },
+					{ 'value_int', 0 },
+					{ 'value_string', tostring( angle ) },
+					{ 'value_float', 0 },
+				}, nil )
 
-				add_comp_remove_dupli( entity, 'LuaComponent', command_reflect, {
-					_tags = command_reflect,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_reflect .. '.lua',
-					execute_every_n_frame = 0,
-				} )
+				add_comp_or_not( proj, 'LuaComponent', command_reflect, {
+					{ '_tags', command_reflect },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_reflect .. '.lua' },
+					{ 'execute_every_n_frame', 0 },
+				}, nil )
 			else
 				add_desc_by_info( c, {
 					replace = true,
@@ -1808,16 +1795,16 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_reflect, {
-					_tags = command_reflect,
-					value_int = 0,
-					value_string = tostring( angle ),
-					value_float = inc,
+					{ '_tags', command_reflect },
+					{ 'value_int', 0 },
+					{ 'value_string', tostring( angle ) },
+					{ 'value_float', inc },
 				} )
 
 				add_comp_remove_dupli( entity, 'LuaComponent', command_reflect, {
-					_tags = command_reflect,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_reflect .. '.lua',
-					execute_every_n_frame = 0,
+					{ '_tags', command_reflect },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_reflect .. '.lua' },
+					{ 'execute_every_n_frame', 0 },
 				} )
 			else
 				add_desc_by_info( c, {
@@ -1876,16 +1863,16 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_delay, {
-					_tags = command_delay,
-					value_int = 0,
-					value_string = tostring( angle_delay ),
-					value_float = inc_delay,
+					{ '_tags', command_delay },
+					{ 'value_int', 0 },
+					{ 'value_string', tostring( angle_delay ) },
+					{ 'value_float', inc_delay },
 				} )
 
 				add_comp_remove_dupli( entity, 'LuaComponent', command_trigger, {
-					_tags = command_trigger,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_trigger .. '.lua',
-					execute_every_n_frame = delay,
+					{ '_tags', command_trigger },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_trigger .. '.lua' },
+					{ 'execute_every_n_frame', delay },
 				} )
 			else
 				add_desc_by_info( c, {
@@ -1957,22 +1944,22 @@ e_cmd_funcs = {
 				local entity = get_root_entity( )
 
 				add_comp_remove_dupli( entity, 'VariableStorageComponent', command_delay, {
-					_tags = command_delay,
-					value_int = 0,
-					value_string = tostring( angle_delay ),
-					value_float = inc_delay,
+					{ '_tags', command_delay },
+					{ 'value_int', 0 },
+					{ 'value_string', tostring( angle_delay ) },
+					{ 'value_float', inc_delay },
 				} )
 
 				add_comp_remove_dupli( entity, 'LuaComponent', command_trigger, {
-					_tags = command_trigger,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_trigger .. '.lua',
-					execute_every_n_frame = delay,
+					{ '_tags', command_trigger },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_trigger .. '.lua' },
+					{ 'execute_every_n_frame', delay },
 				} )
 
 				add_comp_remove_dupli( entity, 'LuaComponent', command_death, {
-					_tags = command_death,
-					script_source_file = empty_path .. 'scripts/projectiles/command/' .. command_death .. '.lua',
-					execute_every_n_frame = delay + duration,
+					{ '_tags', command_death },
+					{ 'script_source_file', empty_path .. 'scripts/projectiles/command/' .. command_death .. '.lua' },
+					{ 'execute_every_n_frame', delay + duration },
 				} )
 			else
 				add_desc_by_info( c, {

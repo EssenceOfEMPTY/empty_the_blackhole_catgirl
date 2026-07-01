@@ -31,14 +31,12 @@ new_modifiers = {
 			level = level,
 		}, c.extra_entities .. empty_path .. 'entities/misc/extra_entities/adjust.xml,', '%' )
 
-		if ( not is_has_comp( shooter, 'LuaComponent', tagging ) ) then
-			add_comp( shooter, 'LuaComponent', {
-				_tags = tagging,
-				script_source_file = empty_path .. 'scripts/perks/adjust_remove_frame.lua',
-				execute_every_n_frame = 0,
-				remove_after_executed = true,
-			} )
-		end
+		add_comp_or_not( shooter, 'LuaComponent', tagging, {
+			{ '_tags', tagging },
+			{ 'script_source_file', empty_path .. 'scripts/perks/adjust_remove_frame.lua' },
+			{ 'execute_every_n_frame', 0 },
+			{ 'remove_after_executed', true },
+		}, nil )
 	end,
 	remove_recoil = function ( )
 		shot_effects.recoil_knockback = 0

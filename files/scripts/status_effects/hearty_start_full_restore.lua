@@ -11,8 +11,8 @@ if ( is_alive( entity ) and not EntityHasTag( entity, 'empty_hearty_immunity' ) 
 	if ( max_hp >= 2 / get_scale( ) and not ( EntityHasTag( entity, 'boss_centipede' ) and ( GameGetOrbCountThisRun( ) > 32 ) ) ) then
 		if ( not is_has_comp( entity, 'VariableStorageComponent', tag ) ) then
 			add_comp_remove_dupli( entity, 'VariableStorageComponent', tag, {
-				_tags = tag,
-				value_float = max_hp,
+				{ '_tags', tag },
+				{ 'value_float', max_hp },
 			}, nil )
 		end
 
@@ -20,12 +20,12 @@ if ( is_alive( entity ) and not EntityHasTag( entity, 'empty_hearty_immunity' ) 
 
 		if ( hp > max_hp ) then
 			set_comp_value( entity, 'DamageModelComponent', nil, {
-				hp = max_hp,
-				max_hp = max_hp,
+				{ 'hp', max_hp },
+				{ 'max_hp', max_hp },
 			}, nil, nil )
 		else
 			set_comp_value( entity, 'DamageModelComponent', nil, {
-				max_hp = max_hp,
+				{ 'max_hp', max_hp },
 			}, nil, nil )
 		end
 	end

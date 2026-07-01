@@ -4,7 +4,7 @@ local proj = get_root_entity( )
 local shooter = get_shooter( proj, 0 )
 
 if ( is_not_0_num( shooter ) ) then
-	local tx, ty = EntityGetTransform( shooter )
+	local x, y = EntityGetTransform( shooter )
 
-	tp( proj, tx, ty )
+	tp( proj, x, y )
 end

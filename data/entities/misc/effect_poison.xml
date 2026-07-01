@@ -12,7 +12,7 @@
 		execute_on_added="1"
 	></LuaComponent>
 
-	<GameEffectComponent 
+	<GameEffectComponent
 		effect="POISON"
 		frames="600"
 	></GameEffectComponent>

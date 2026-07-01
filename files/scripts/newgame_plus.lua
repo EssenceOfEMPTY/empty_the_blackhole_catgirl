@@ -18,17 +18,17 @@ function do_newgame_plus( )
 		drill = 2,
 		slice = 2,
 		ice = 2,
-		--physics_hit = 1,
+		-- physics_hit = 1,
 		radioactive = 2,
 		poison = 3,
-		--curse = 1,
-		--holy = 1,
-		--healing = 1,
+		-- curse = 1,
+		-- holy = 1,
+		-- healing = 1,
 	}
 
 	SessionNumbersSetValue( 'NEW_GAME_PLUS_COUNT', tostring( ng_count + 1 ) )
 
-	if ( ModSettingGet( 'empty_the_blackhole_catgirl.EASY_NG+' ) ) then
+	if ( get_setting_by_def( 'EASY_NG_PLUS' ) ) then
 		ng_change.hp_scl_min = ng_change.hp_scl_min / 2
 		ng_change.hp_scl_max = ng_change.hp_scl_max / 4
 		ng_change.atk_speed = 0.85 ^ ( ng_count + 1 )
@@ -52,7 +52,8 @@ function do_newgame_plus( )
 		end
 	end, nil )
 
-	if ( ModSettingGet( 'empty_the_blackhole_catgirl.CHAOS_CONNECTED_WORLD' ) ) then
+	if ( get_setting_by_def( 'CHAOS_CONNECTED_WORLD' ) ) then
+		-- TODO, more chaotic ng+ world
 		BiomeMapLoad_KeepPlayer( 'data/biome_impl/biome_map_newgame_plus.lua', 'data/biome/_pixel_scenes_newgame_plus.xml' )
 	else
 		BiomeMapLoad_KeepPlayer( 'data/biome_impl/biome_map_newgame_plus.lua', 'data/biome/_pixel_scenes_newgame_plus.xml' )

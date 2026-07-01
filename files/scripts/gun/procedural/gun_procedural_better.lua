@@ -1,6 +1,7 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
 local old_GetWand = GetWand
+
 function GetWand( gun )
 	local shuffle = gun.shuffle_deck_when_empty
 	if ( shuffle == nil or shuffle == false ) then
@@ -115,42 +116,12 @@ function generate_gun( cost, level, force_unshuffle )
 		gun.shuffle_deck_when_empty = false
 	end
 
-	if ( GlobalsGetValue( 'EMPTY_CURSE_ALWAYS_SHUFFLE', '0' ) == '1' ) then
-		gun.shuffle_deck_when_empty = true
-
-		if ( gun.fire_rate_wait > 0 ) then
-			gun.fire_rate_wait = gun.fire_rate_wait / 2
-		else
-			gun.fire_rate_wait = gun.fire_rate_wait * 2
-		end
-		if ( gun.reload_time > 0 ) then
-			gun.reload_time = gun.reload_time / 2
-		else
-			gun.reload_time = gun.reload_time * 2
-		end
-	end
-
 	if ( force_unshuffle or ( GlobalsGetValue( 'PERK_NO_MORE_SHUFFLE_WANDS', '0' ) == '1' ) ) then
 		gun.shuffle_deck_when_empty = false
 	end
 
 	if ( Random( 0, 10000 ) <= 9995 ) then
 		gun.deck_capacity = clamp( gun.deck_capacity, 0, 30 )
-	end
-
-	if ( GlobalsGetValue( 'EMPTY_CURSE_SHORT_WAND', '0' ) == '1' ) then
-		if ( gun.deck_capacity <= 15 ) then
-			gun.deck_capacity = math.ceil( gun.deck_capacity / 2 )
-		else
-			if ( gun.deck_capacity <= 30 ) then
-				gun.deck_capacity = math.ceil( gun.deck_capacity / 4 )
-			else
-				gun.deck_capacity = 2
-			end
-		end
-
-		gun.mana_max = gun.mana_max * 1.2
-		gun.mana_charge_speed = gun.mana_charge_speed * 1.2
 	end
 
 	if ( gun.reload_time >= 60 ) then
@@ -187,7 +158,6 @@ function generate_gun( cost, level, force_unshuffle )
 		shuffle = false
 	end
 
-	-- SetItemSprite( entity_id, ability_comp, 'data / items_gfx / gungen_guns / submachinegun_', Random( 0, 7 ) )
 	ComponentSetValue2( ability_comp, 'ui_name', name )
 	ComponentObjectSetValue2( ability_comp, 'gun_config', 'actions_per_round', gun.actions_per_round )
 	ComponentObjectSetValue2( ability_comp, 'gun_config', 'reload_time', gun.reload_time )
@@ -242,14 +212,14 @@ function generate_gun( cost, level, force_unshuffle )
 
 	local rnd = nil
 
-	if ( get_globals_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0
-		and get_globals_num( 'EMPTY_CURSE_MONK', 0 ) < 1
+	if ( get_global_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0
+		and get_global_num( 'EMPTY_CURSE_MONK', 0 ) < 1
 		and Random( 1, 2 ) < 2 ) then
 
 		AddGunActionPermanent( entity_id, 'REGENERATION_FIELD' )
 	end
 
-	if ( get_globals_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0 ) then
+	if ( get_global_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0 ) then
 		rnd = Random( 1, 4 )
 
 		if ( rnd < 2 ) then

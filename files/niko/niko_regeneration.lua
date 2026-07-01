@@ -18,7 +18,7 @@ if ( cur_hp < max_hp ) then
 		local heal = -math.min( max_hp - cur_hp, reg_mul * cap( 1, death, 5 ) * max_hp )
 
 		if ( heal < 0 ) then
-			EntityInflictDamage( niko, heal, 'DAMAGE_HEALING', '', 'NONE', 0, 0, niko )
+			local e, x, y, force = EntityInflictDamage( niko, heal, 'DAMAGE_HEALING', '', 'NONE', 0, 0, niko )
 
 			EntityLoad( 'data/entities/particles/heal.xml', x, y )
 		end

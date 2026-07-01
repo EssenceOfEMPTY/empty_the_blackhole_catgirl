@@ -6,4 +6,4 @@ local all_stains = get_comp_value( niko, 'StatusEffectDataComponent', nil, {
 	{ 'stain_effects', { } }
 }, nil )
 
-info_print( all_stains, 'all_stains' )
+-- TODO

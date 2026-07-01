@@ -10,7 +10,7 @@ if ( is_alive( entity ) ) then
 			local log_max_hp = ComponentGetValue2( v_comp, 'value_float' )
 
 			set_comp_value( entity, 'DamageModelComponent', nil, {
-				max_hp = log_max_hp,
+				{ 'max_hp', log_max_hp },
 			}, nil, nil )
 		end
 

@@ -1,6 +1,6 @@
 <Entity>
 
-	</InheritTransformComponent/>
+	<InheritTransformComponent/>
 
 	<GameEffectComponent
 		effect="NONE"

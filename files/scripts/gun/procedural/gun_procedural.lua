@@ -1,47 +1,8 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local old_make_wand_from_gun_data = make_wand_from_gun_data
-function make_wand_from_gun_data( gun, entity_id, level )
-	if ( ( gun[ 'shuffle_deck_when_empty' ] == 1 or gun[ 'shuffle_deck_when_empty' ] == true ) and Random( 1, 100 ) < 4 ) then
-		gun[ 'shuffle_deck_when_empty' ] = 0
-	end
-
-	if ( GlobalsGetValue( 'EMPTY_CURSE_ALWAYS_SHUFFLE', '0' ) == '1' ) then
-		gun[ 'shuffle_deck_when_empty' ] = 1
-
-		if ( gun[ 'fire_rate_wait' ] > 0 ) then
-			gun[ 'fire_rate_wait' ] = gun[ 'fire_rate_wait' ] / 2
-		else
-			gun[ 'fire_rate_wait' ] = gun[ 'fire_rate_wait' ] * 2
-		end
-		if ( gun[ 'reload_time' ] > 0 ) then
-			gun[ 'reload_time' ] = gun[ 'reload_time' ] / 2
-		else
-			gun[ 'reload_time' ] = gun[ 'reload_time' ] * 2
-		end
-	end
-
-	if ( GlobalsGetValue( 'EMPTY_CURSE_SHORT_WAND', '0' ) == '1' ) then
-		if ( gun[ 'deck_capacity' ] <= 15 ) then
-			gun[ 'deck_capacity' ] = math.ceil( gun[ 'deck_capacity' ] / 2 )
-		else
-			if ( gun[ 'deck_capacity' ] <= 30 ) then
-				gun[ 'deck_capacity' ] = math.ceil( gun[ 'deck_capacity' ] / 4 )
-			else
-				gun[ 'deck_capacity' ] = 1
-			end
-		end
-
-		gun[ 'mana_max' ] = gun[ 'mana_max' ] * 1.2
-		gun[ 'mana_charge_speed' ] = gun[ 'mana_charge_speed' ] * 1.2
-	end
-
-	old_make_wand_from_gun_data( gun, entity_id, level )
-end
-
 function wand_add_random_cards( gun, entity_id, level )
 
-	local is_rare = gun[ 'is_rare' ]
+	local is_rare = gun.is_rare
 	local x, y = EntityGetTransform( entity_id )
 	local a, b, c = time_for_vec3( )
 	SetRandomSeed( x + a - c, y + b - c )
@@ -61,8 +22,8 @@ function wand_add_random_cards( gun, entity_id, level )
 
 	local orig_level = level
 	level = level - 1
-	local deck_capacity = gun[ 'deck_capacity' ]
-	local actions_per_round = gun[ 'actions_per_round' ]
+	local deck_capacity = gun.deck_capacity
+	local actions_per_round = gun.actions_per_round
 	local card_count = Random( 1, 3 )
 	local bullet_card = GetRandomActionWithType( x, y, level, ACTION_TYPE_PROJECTILE, 0 )
 	local card = ''
@@ -87,14 +48,14 @@ function wand_add_random_cards( gun, entity_id, level )
 
 	local rnd = nil
 
-	if ( get_globals_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0
-		and get_globals_num( 'EMPTY_CURSE_MONK', 0 ) < 1
+	if ( get_global_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0
+		and get_global_num( 'EMPTY_CURSE_MONK', 0 ) < 1
 		and Random( 1, 2 ) < 2 ) then
 
 		AddGunActionPermanent( entity_id, 'REGENERATION_FIELD' )
 	end
 
-	if ( get_globals_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0 ) then
+	if ( get_global_num( 'EMPTY_CURSE_GUARANTEED_LOSE', 0 ) > 0 ) then
 		rnd = Random( 1, 4 )
 
 		if ( rnd < 2 ) then

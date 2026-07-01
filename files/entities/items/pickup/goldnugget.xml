@@ -5,13 +5,13 @@
 		name="$item_goldnugget"
 	></UIInfoComponent>
 
-	<PhysicsBodyComponent 
+	<PhysicsBodyComponent
 		_tags="enabled_in_world"
-		uid="1" 
-		allow_sleep="1" 
-		angular_damping="0" 
-		fixed_rotation="0" 
-		is_bullet="0" 
+		uid="1"
+		allow_sleep="1"
+		angular_damping="0"
+		fixed_rotation="0"
+		is_bullet="0"
 		linear_damping="0"
 		auto_clean="0"
 		hax_fix_going_through_ground="1"
@@ -45,11 +45,11 @@
 		preferred_inventory="FULL"
 	></ItemComponent>
 
-	<HitboxComponent 
+	<HitboxComponent
 		_tags="enabled_in_world"
-		aabb_min_x="-3" 
-		aabb_max_x="3" 
-		aabb_min_y="-5" 
+		aabb_min_x="-3"
+		aabb_max_x="3"
+		aabb_min_y="-5"
 		aabb_max_y="0"
 	></HitboxComponent>
 
@@ -65,7 +65,7 @@
 
 	<LuaComponent
 		_tags="enabled_in_world"
-		script_source_file="data/scripts/perks/gold_explosion.lua" 
+		script_source_file="data/scripts/perks/gold_explosion.lua"
 		execute_on_added="1"
 		remove_after_executed="1"
 	></LuaComponent>
@@ -83,16 +83,16 @@
 		scale.x="1.0"
 		scale.y="1.0"
 		sprite_random_rotation="1"
-		randomize_scale.min_x="-0.1" 
-		randomize_scale.max_x="0.1" 
-		randomize_scale.min_y="-0.1" 
-		randomize_scale.max_y="0.1" 
-		randomize_position.min_y="-6" 
+		randomize_scale.min_x="-0.1"
+		randomize_scale.max_x="0.1"
+		randomize_scale.min_y="-0.1"
+		randomize_scale.max_y="0.1"
+		randomize_position.min_y="-6"
 		randomize_position.max_y="6"
 		randomize_position.min_x="-6"	
 		randomize_position.max_x="6"
 		randomize_animation_speed_coeff.min="0.667"	
-		randomize_animation_speed_coeff.max="1.0" 
+		randomize_animation_speed_coeff.max="1.0"
 	></SpriteParticleEmitterComponent>
 
 	<SpriteParticleEmitterComponent
@@ -110,16 +110,16 @@
 		scale.x="1.0"
 		scale.y="1.0"
 		sprite_random_rotation="1"
-		randomize_scale.min_x="-0.1" 
-		randomize_scale.max_x="0.1" 
-		randomize_scale.min_y="-0.1" 
-		randomize_scale.max_y="0.1" 
-		randomize_position.min_y="-5" 
+		randomize_scale.min_x="-0.1"
+		randomize_scale.max_x="0.1"
+		randomize_scale.min_y="-0.1"
+		randomize_scale.max_y="0.1"
+		randomize_position.min_y="-5"
 		randomize_position.max_y="5"
 		randomize_position.min_x="-5"	
 		randomize_position.max_x="5"
 		randomize_animation_speed_coeff.min="0.667"	
-		randomize_animation_speed_coeff.max="1.0" 
+		randomize_animation_speed_coeff.max="1.0"
 	></SpriteParticleEmitterComponent>
 
 	<SpriteParticleEmitterComponent
@@ -135,16 +135,16 @@
 		count_min="1"
 		count_max="1"
 		sprite_random_rotation="1"
-		randomize_scale.min_x="-0.1" 
-		randomize_scale.max_x="0.1" 
-		randomize_scale.min_y="-0.1" 
-		randomize_scale.max_y="0.1" 
-		randomize_position.min_y="-6" 
+		randomize_scale.min_x="-0.1"
+		randomize_scale.max_x="0.1"
+		randomize_scale.min_y="-0.1"
+		randomize_scale.max_y="0.1"
+		randomize_position.min_y="-6"
 		randomize_position.max_y="6"
 		randomize_position.min_x="-6"	
 		randomize_position.max_x="6"
 		randomize_animation_speed_coeff.min="0.667"	
-		randomize_animation_speed_coeff.max="1.0" 
+		randomize_animation_speed_coeff.max="1.0"
 	></SpriteParticleEmitterComponent>
 
 </Entity>

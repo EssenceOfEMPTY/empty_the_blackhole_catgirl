@@ -4,8 +4,8 @@ local proj = get_root_entity( )
 
 if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
 	set_comp_value( proj, 'ProjectileComponent', nil, {
-		friendly_fire = false,
-		collide_with_shooter_frames = -1,
+		{ 'friendly_fire', false },
+		{ 'collide_with_shooter_frames', -1 },
 	}, nil, nil )
 
 	local shooter = get_shooter( proj, 0 )
@@ -18,15 +18,15 @@ if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
 		if ( is_has_comp( proj, 'AreaDamageComponent', nil ) ) then
 			if ( is_player( shooter ) ) then
 				set_comp_value( proj, 'AreaDamageComponent', nil, {
-					entities_with_tag = all_tag.enemy,
+					{ 'entities_with_tag', all_tag.enemy },
 				}, nil, nil )
 			elseif ( is_enemy( shooter ) ) then
 				set_comp_value( proj, 'AreaDamageComponent', nil, {
-					entities_with_tag = all_tag.player,
+					{ 'entities_with_tag', all_tag.player },
 				}, nil, nil )
 			else
 				set_comp_value( proj, 'AreaDamageComponent', nil, {
-					entities_with_tag = all_tag.hit,
+					{ 'entities_with_tag', all_tag.hit },
 				}, nil, nil )
 			end
 		end

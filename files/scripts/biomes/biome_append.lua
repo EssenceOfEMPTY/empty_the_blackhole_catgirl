@@ -35,7 +35,7 @@ for i, each in ipairs( table_need_remove_limit ) do
 	end
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.SPAWN_MANY_ENEMIES' ) ) then
+if ( get_setting_by_def( 'SPAWN_MANY_ENEMIES' ) ) then
 	local table_need_multiple_spawn = {
 		g_small_enemies_helpless,
 		g_small_enemies, g_big_enemies, g_small_enemies_sky, g_big_enemies_sky, g_large_enemies,
@@ -69,6 +69,7 @@ if ( spawn_chest ) then
 	function spawn_chest( x, y )
 		local a, b, c = time_for_vec3( )
 		SetRandomSeed( x + a - c, y + b - c )
+
 		local rnd = Random( 1, 3 )
 		if ( rnd >= 3 ) then
 			EntityLoad( 'data/entities/items/pickup/chest_random_super.xml', x, y )

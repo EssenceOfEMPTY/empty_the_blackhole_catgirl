@@ -9,7 +9,7 @@ if ( is_alive( entity ) and not EntityHasTag( entity, 'empty_hearty_immunity' ) 
 
 	if ( is_not_0_num( max_hp ) and max_hp > 0 ) then
 		set_comp_value( entity, 'DamageModelComponent', nil, {
-			max_hp = max_hp,
+			{ 'max_hp', max_hp },
 		}, nil, nil )
 	end
 end

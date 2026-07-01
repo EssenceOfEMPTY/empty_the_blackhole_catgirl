@@ -31,7 +31,7 @@ function shot( proj )
 
 			if ( p_dmg and p_dmg > 0 ) then
 				set_comp_value( e, 'ProjectileComponent', nil, {
-					damage = p_dmg,
+					{ 'damage', p_dmg },
 				}, nil, nil )
 			end
 

@@ -15,7 +15,7 @@ if ( is_not_nil_str( projfile ) ) then
 	local speed = get_random_from( { 1, -1 } )
 
 	set_comp_value( entity, 'VariableStorageComponent', 'orbit_projectile', {
-		value_int = speed,
+		{ 'value_int', speed },
 	}, nil, nil )
 
 	local entities = { }
@@ -31,8 +31,8 @@ if ( is_not_nil_str( projfile ) ) then
 	end
 
 	set_comp_value( entities, 'ProjectileComponent', nil, {
-		lifetime = -1,
-		die_on_low_velocity = false,
+		{ 'lifetime', -1 },
+		{ 'die_on_low_velocity', false },
 	}, nil, nil )
 
 	remove_all_comp( entities, 'LifetimeComponent', nil )

@@ -5,8 +5,8 @@ local projs = EntityGetWithTag( 'projectile' )
 add_table( projs, EntityGetWithTag( 'projectile_player' ) or { } )
 
 set_comp_value( projs, 'ProjectileComponent', nil, {
-	on_death_explode = false,
-	on_lifetime_out_explode = false,
+	{ 'on_death_explode', false },
+	{ 'on_lifetime_out_explode', false },
 }, nil, nil )
 
 for _, proj in ipairs( projs ) do

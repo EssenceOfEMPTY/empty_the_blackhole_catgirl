@@ -2,7 +2,7 @@ dofile_once("data/scripts/lib/utilities.lua")
 dofile_once( "data/scripts/perks/perk_list.lua" )
 
 function give_perk_to_enemy( perk_data, entity_who_picked, entity_item )
-	-- fetch perk info ---------------------------------------------------
+	-- fetch perk info ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---
 
 	local pos_x, pos_y = EntityGetTransform( entity_who_picked )
 
@@ -24,7 +24,7 @@ function give_perk_to_enemy( perk_data, entity_who_picked, entity_item )
 	local entity_icon = EntityLoad( "data/entities/misc/perks/enemy_icon.xml", pos_x, pos_y )
 
 	set_comp_value( entity_icon, 'SpriteComponent', nil, {
-		image_file = perk_data.ui_icon,
+		{ 'image_file', perk_data.ui_icon },
 	}, nil, nil )
 
 	EntityAddChild( entity_who_picked, entity_icon )

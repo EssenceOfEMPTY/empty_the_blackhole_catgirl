@@ -1,5 +1,7 @@
 <Entity tags="curse_cloud,CURSE_MALICE_WASHES_OVER">
 
+	<StreamingKeepAliveComponent/>
+
 	<ParticleEmitterComponent
 		emitted_material_name="acid"
 		offset.x="0"

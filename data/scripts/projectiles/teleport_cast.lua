@@ -1,11 +1,11 @@
-dofile_once( 'data/scripts/lib/utilities.lua' )
+dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
 local proj	= GetUpdatedEntityID()
-local pos_x, pos_y = EntityGetTransform( proj )
+local x, y = EntityGetTransform( proj )
 
-local targets = EntityGetInRadiusWithTag( pos_x, pos_y, 96, 'homing_target' )
+local targets = EntityGetInRadiusWithTag( x, y, 96, 'homing_target' )
 
-SetRandomSeed( pos_x + pos_y, GameGetFrameNum( ) )
+set_r_seed( proj )
 
 if ( #targets > 0 ) then
 	local rnd = Random( 1, #targets )

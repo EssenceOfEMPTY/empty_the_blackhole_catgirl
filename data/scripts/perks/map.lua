@@ -1,31 +1,28 @@
-dofile_once( 'data/scripts/lib/utilities.lua' )
+dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local entity_id = GetUpdatedEntityID( )
-local player_id = EntityGetRootEntity( entity_id )
-local x, y = EntityGetTransform( entity_id )
+local entity = GetUpdatedEntityID( )
+local player = EntityGetRootEntity( entity )
+
+local x, y = EntityGetTransform( entity )
 y = y - 4
 
 local orbdata = orb_map_get( )
 local pw, mx = check_parallel_pos( x )
 
 local timer = 0
-local timercomp
-local comps = EntityGetComponent( entity_id, 'VariableStorageComponent' )
+local timercomp = get_all_comp( entity, 'VariableStorageComponent', nil, 'map_timer' )[ 1 ]
 
-for i, comp in ipairs( comps or { } ) do
-	local n = ComponentGetValue2( comp, 'name' )
-	if ( n == 'map_timer' ) then
-		timer = ComponentGetValue2( comp, 'value_int' )
-		timercomp = comp
-
-		break
-	end
-end
-
-if ( timercomp ) and ( entity_id ~= player_id ) then
+if ( timercomp ) and ( entity ~= player ) then
 	local is_moving = false
-	component_read( EntityGetFirstComponent( player_id, 'ControlsComponent' ), { mButtonDownDown = false, mButtonDownUp = false, mButtonDownLeft = false, mButtonDownRight = false, mButtonDownJump = false, mButtonDownFire = false }, function( controls_comp )
-		is_moving = controls_comp.mButtonDownDown or controls_comp.mButtonDownUp or controls_comp.mButtonDownLeft or controls_comp.mButtonDownRight or controls_comp.mButtonDownJump or controls_comp.mButtonDownFire or false
+	component_read( EntityGetFirstComponent( player, 'ControlsComponent' ), {
+		mButtonDownDown = false,
+		mButtonDownUp = false,
+		mButtonDownLeft = false,
+		mButtonDownRight = false,
+		mButtonDownJump = false,
+		mButtonDownFire = false,
+	}, function( ctrl )
+		is_moving = ctrl.mButtonDownDown or ctrl.mButtonDownUp or ctrl.mButtonDownLeft or ctrl.mButtonDownRight or ctrl.mButtonDownJump or ctrl.mButtonDownFire or false
 	end )
 
 	if ( is_moving == false ) then
@@ -56,15 +53,15 @@ if ( timercomp ) and ( entity_id ~= player_id ) then
 				map_sprite = 'spatial_map_2'
 			end
 
-			SetRandomSeed( 24, 32 )
+			set_r_seed( player )
+
 			local fspot = Random( 1, 6 )
 			local fspots = { { 249, 153 }, { 261, 201 }, { 153, 141 }, { 87, 135 }, { 81, 219 }, { 153, 237 } }
 
-			local fdata = fspots[fspot]
-			local fx, fy = fdata[1], fdata[2]
+			local fdata = fspots[ fspot ]
+			local fx, fy = fdata[ 1 ], fdata[ 2 ]
 
-			fx = fx - 420 * 0.5
-			fy = fy - 288 * 0.5
+			fx, fy = fx - 420 * 0.5, fy - 288 * 0.5
 
 			GameCreateSpriteForXFrames( 'data/particles/' .. map_sprite .. '.png', mi_x, mi_y, true, 0, 0, 1, true )
 			GameCreateSpriteForXFrames( 'data/particles/spatial_map_player.png', pi_x, pi_y, true, 0, 0, 1, true )
@@ -83,8 +80,9 @@ if ( timercomp ) and ( entity_id ~= player_id ) then
 			end
 
 			for i, v in ipairs( orbdata ) do
-				local ox = v[1] * 6 + 3
-				local oy = v[2] * 6 - 56
+				local ox = v[ 1 ] * 6 + 3
+				local oy = v[ 2 ] * 6 - 56
+
 				GameCreateSpriteForXFrames( 'mods/empty_the_blackhole_catgirl/files/ui_gfx/map_orb.png', mi_x + ox, mi_y + oy, true, 0, 0, 1, true )
 			end
 		end

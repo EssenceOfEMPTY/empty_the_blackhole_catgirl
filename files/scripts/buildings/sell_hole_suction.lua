@@ -95,8 +95,8 @@ if ( coin > 0 ) then
 	end
 
 	set_comp_value( sell_hole, 'SpriteComponent', nil, {
-		rect_animation = 'flash',
-		next_rect_animation = 'loop',
+		{ 'rect_animation', 'flash' },
+		{ 'next_rect_animation', 'loop' },
 	}, nil )
 end
 

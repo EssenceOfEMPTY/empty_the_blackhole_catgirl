@@ -49,7 +49,7 @@ if ( state == 1 ) then
 		local wid = shoot_proj( entity, 'data/entities/animals/boss_pit/wand.xml', x, y, vel_x, vel_y, nil, nil, nil )
 
 		set_comp_value( wid, 'VariableStorageComponent', nil, {
-			value_string = path,
+			{ 'value_string', path },
 		}, nil, nil )
 
 		EntityAddComponent( wid, 'HomingComponent', {

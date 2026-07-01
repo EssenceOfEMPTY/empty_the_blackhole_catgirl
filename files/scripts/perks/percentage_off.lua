@@ -28,7 +28,7 @@ if ( #targets > 0 ) then
 					end
 				end
 
-				if ( get_globals_num( 'EMPTY_CURSE_MONK', 0 ) > 0 ) then
+				if ( get_global_num( 'EMPTY_CURSE_MONK', 0 ) > 0 ) then
 					p = p + 50;
 				end
 

@@ -13,7 +13,7 @@ shoot_proj( proj, empty_path .. 'entities/projectiles/wall_piece.xml', proj_x, p
 
 		if ( lifetime > 0 ) then
 			set_comp_value( e, 'ProjectileComponent', nil, {
-				lifetime = ( 1 + 0.2 * ng_num ) * lifetime,
+				{ 'lifetime', ( 1 + 0.2 * ng_num ) * lifetime },
 			}, nil, nil )
 		end
 

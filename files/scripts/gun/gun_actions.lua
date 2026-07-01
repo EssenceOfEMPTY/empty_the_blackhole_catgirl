@@ -421,31 +421,7 @@ local new_actions =
 			if ( reflecting ) then
 				add_projectile( empty_path .. 'entities/projectiles/deck/holy_orb.xml' )
 			else
-				local is_has_mana = false
-
-				for _ = 1, #deck + #hand + #discarded, 1 do
-					if ( _ <= #deck ) then
-						if ( deck[ _ ].id == 'MANA_REDUCE' ) then
-							is_has_mana = true
-
-							break
-						end
-					elseif ( _ <= #deck + #hand ) then
-						if ( hand[ _ - #deck ].id == 'MANA_REDUCE' ) then
-							is_has_mana = true
-
-							break
-						end
-					else
-						if ( discarded[ _ - #deck - #hand ].id == 'MANA_REDUCE' ) then
-							is_has_mana = true
-
-							break
-						end
-					end
-				end
-
-				if ( is_has_mana ) then
+				if ( is_in_mul( 'MANA_REDUCE', { deck, hand, discarded } ) ) then
 					c.spread_degrees = 30
 
 					for _ = 1, 7, 1 do
@@ -455,6 +431,39 @@ local new_actions =
 					add_projectile( empty_path .. 'entities/projectiles/deck/holy_orb.xml' )
 				end
 			end
+		end,
+	},
+	{
+		info = 'heal_bullet_with_trigger',
+		related_projectiles	= { 'data/entities/projectiles/deck/heal_bullet.xml' },
+		type		= ACTION_TYPE_PROJECTILE,
+		spawn_level						= '0,1,5,6,7,8,9,10', -- EMPTY_HEAL_BULLET_WITH_TRIGGER
+		spawn_probability				= '0.1,0.5,0.5,0.4,0.3,0.2,0.1,0.05', -- EMPTY_HEAL_BULLET_WITH_TRIGGER
+		price = 80,
+		mana = 20,
+		max_uses = 30,
+		action = function ( )
+			c.fire_rate_wait = c.fire_rate_wait + 4
+			c.spread_degrees = c.spread_degrees + 2.0
+
+			add_projectile_trigger_hit_world( 'data/entities/projectiles/deck/heal_bullet.xml', 1 )
+		end,
+	},
+	{
+		info = 'teleport_at_speed_of_light',
+		series = {
+			teleport = true,
+		},
+		related_projectiles	= { empty_path .. 'entities/projectiles/deck/teleport_at_speed_of_light.xml' },
+		type		= ACTION_TYPE_PROJECTILE,
+		spawn_level						= '0,1,2,3,4,5,6,7,8,9,10', -- EMPTY_TELEPORT_AT_SPEED_OF_LIGHT
+		spawn_probability				= '0.005,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1', -- EMPTY_TELEPORT_AT_SPEED_OF_LIGHT
+		price = 320,
+		mana = 60,
+		action = function ( )
+			c.spread_degrees = -15
+
+			add_projectile( empty_path .. 'entities/projectiles/deck/teleport_at_speed_of_light.xml' )
 		end,
 	},
 	{
@@ -773,8 +782,8 @@ local new_actions =
 		},
 		related_projectiles = { 'data/entities/projectiles/deck/bouncy_orb.xml' },
 		type		= ACTION_TYPE_PROJECTILE,
-		spawn_level						= '10', --EMPTY_COLORFUL_REC_ITER_PROJECTILE_HOLE
-		spawn_probability				= '0.1', --EMPTY_COLORFUL_REC_ITER_PROJECTILE_HOLE
+		spawn_level						= '10', -- EMPTY_COLORFUL_REC_ITER_PROJECTILE_HOLE
+		spawn_probability				= '0.1', -- EMPTY_COLORFUL_REC_ITER_PROJECTILE_HOLE
 		price = 320,
 		mana = 160,
 		action = function ( rec, iter, series, specific )
@@ -2341,8 +2350,8 @@ local new_actions =
 						EntityAddTag( entity, form )
 
 						add_comp_remove_dupli( entity, 'LuaComponent', form, {
-							_tags = form,
-							script_shot = empty_path .. 'scripts/projectiles/form/' .. form .. '.lua',
+							{ '_tags', form },
+							{ 'script_shot', empty_path .. 'scripts/projectiles/form/' .. form .. '.lua' },
 						} )
 
 						GamePrint( GameTextGet( '$empty_form_on', GameTextGet( '$empty_' .. form ) ) )
@@ -2375,30 +2384,18 @@ local new_actions =
 
 						remove_all_comp( entity, 'LuaComponent', form )
 
-						set_comp_obj_value( entity, 'DamageModelComponent', nil, nil, function ( comp )
-							for i, _ in ipairs( all_d_muls ) do
-								local d_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', _ ) or 1
-
-								ComponentObjectSetValue2( comp, 'damage_multipliers', _, d_mul / mul )
-							end
-						end, nil )
+						d_comps_mul( entity, '/', mul )
 
 						GamePrint( GameTextGet( '$empty_form_off', GameTextGet( '$empty_' .. form ) ) )
 					else
 						EntityAddTag( entity, form )
 
 						add_comp_remove_dupli( entity, 'LuaComponent', form, {
-							_tags = form,
-							script_shot = empty_path .. 'scripts/projectiles/form/' .. form .. '.lua',
+							{ '_tags', form },
+							{ 'script_shot', empty_path .. 'scripts/projectiles/form/' .. form .. '.lua' },
 						} )
 
-						set_comp_obj_value( entity, 'DamageModelComponent', nil, nil, function ( comp )
-							for i, _ in ipairs( all_d_muls ) do
-								local d_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', _ ) or 1
-
-								ComponentObjectSetValue2( comp, 'damage_multipliers', _, d_mul * mul )
-							end
-						end, nil )
+						d_comps_mul( entity, '*', mul )
 
 						GamePrint( GameTextGet( '$empty_form_on', GameTextGet( '$empty_' .. form ) ) )
 					end
@@ -2433,8 +2430,8 @@ local new_actions =
 						EntityAddTag( entity, form )
 
 						add_comp_remove_dupli( entity, 'LuaComponent', form, {
-							_tags = form,
-							script_shot = empty_path .. 'scripts/projectiles/form/' .. form .. '.lua',
+							{ '_tags', form },
+							{ 'script_shot', empty_path .. 'scripts/projectiles/form/' .. form .. '.lua' },
 						} )
 
 						GamePrint( GameTextGet( '$empty_form_on', GameTextGet( '$empty_' .. form ) ) )
@@ -2466,38 +2463,26 @@ local new_actions =
 						EntityRemoveTag( entity, form )
 
 						set_comp_value( entity, 'CharacterPlatformingComponent', nil, {
-							velocity_min_x = -int_huge,
-							velocity_max_x = int_huge,
-							velocity_min_y = -int_huge,
-							velocity_max_y = int_huge,
+							{ 'velocity_min_x', -int_huge },
+							{ 'velocity_max_x', int_huge },
+							{ 'velocity_min_y', -int_huge },
+							{ 'velocity_max_y', int_huge },
 						}, nil, nil )
 
-						set_comp_obj_value( entity, 'DamageModelComponent', nil, nil, function ( comp )
-							for i, _ in ipairs( all_d_muls ) do
-								local d_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', _ ) or 1
-
-								ComponentObjectSetValue2( comp, 'damage_multipliers', _, d_mul / mul )
-							end
-						end, nil )
+						d_comps_mul( entity, '/', mul )
 
 						GamePrint( GameTextGet( '$empty_form_off', GameTextGet( '$empty_' .. form ) ) )
 					else
 						EntityAddTag( entity, form )
 
 						set_comp_value( entity, 'CharacterPlatformingComponent', nil, {
-							velocity_min_x = 0,
-							velocity_max_x = 0,
-							velocity_min_y = 0,
-							velocity_max_y = 0,
+							{ 'velocity_min_x', 0 },
+							{ 'velocity_max_x', 0 },
+							{ 'velocity_min_y', 0 },
+							{ 'velocity_max_y', 0 },
 						}, nil, nil )
 
-						set_comp_obj_value( entity, 'DamageModelComponent', nil, nil, function ( comp )
-							for i, _ in ipairs( all_d_muls ) do
-								local d_mul = ComponentObjectGetValue2( comp, 'damage_multipliers', _ ) or 1
-
-								ComponentObjectSetValue2( comp, 'damage_multipliers', _, d_mul * mul )
-							end
-						end, nil )
+						d_comps_mul( entity, '*', mul )
 
 						GamePrint( GameTextGet( '$empty_form_on', GameTextGet( '$empty_' .. form ) ) )
 					end
@@ -5953,8 +5938,8 @@ local new_actions =
 		type		= ACTION_TYPE_OTHER,
 		command_type = 'FUNCTION',
 		command_value = 'projectile_shoot_angle_add(',
-		spawn_level						= '7,8,9,10', --EMPTY_COMMAND_FUNCTION_PROJECTILE_SHOOT_ANGLE_ADD
-		spawn_probability				= '0.7,0.8,0.9,1', --EMPTY_COMMAND_FUNCTION_PROJECTILE_SHOOT_ANGLE_ADD
+		spawn_level						= '7,8,9,10', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_SHOOT_ANGLE_ADD
+		spawn_probability				= '0.7,0.8,0.9,1', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_SHOOT_ANGLE_ADD
 		price = 500,
 		mana = 15,
 		action = function ( recursion_level, iteration, copy_series, copy_specific )
@@ -5989,8 +5974,8 @@ local new_actions =
 		type		= ACTION_TYPE_OTHER,
 		command_type = 'FUNCTION',
 		command_value = 'projectile_shoot_angle_set(',
-		spawn_level						= '7,8,9,10', --EMPTY_COMMAND_FUNCTION_PROJECTILE_SHOOT_ANGLE_SET
-		spawn_probability				= '0.7,0.8,0.9,1', --EMPTY_COMMAND_FUNCTION_PROJECTILE_SHOOT_ANGLE_SET
+		spawn_level						= '7,8,9,10', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_SHOOT_ANGLE_SET
+		spawn_probability				= '0.7,0.8,0.9,1', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_SHOOT_ANGLE_SET
 		price = 500,
 		mana = 15,
 		action = function ( recursion_level, iteration, copy_series, copy_specific )
@@ -6025,8 +6010,8 @@ local new_actions =
 		type		= ACTION_TYPE_OTHER,
 		command_type = 'FUNCTION',
 		command_value = 'projectile_spread_set(',
-		spawn_level						= '0,1,2,3,4', --EMPTY_COMMAND_FUNCTION_PROJECTILE_SPREAD_SET
-		spawn_probability				= '0.1,0.2,0.3,0.4,0.5', --EMPTY_COMMAND_FUNCTION_PROJECTILE_SPREAD_SET
+		spawn_level						= '0,1,2,3,4', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_SPREAD_SET
+		spawn_probability				= '0.1,0.2,0.3,0.4,0.5', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_SPREAD_SET
 		price = 500,
 		mana = 0,
 		action = function ( recursion_level, iteration, copy_series, copy_specific )
@@ -6059,8 +6044,8 @@ local new_actions =
 		type		= ACTION_TYPE_OTHER,
 		command_type = 'FUNCTION',
 		command_value = 'projectile_arc_add(',
-		spawn_level						= '10', --EMPTY_COMMAND_FUNCTION_PROJECTILE_ARC_ADD
-		spawn_probability				= '0.3', --EMPTY_COMMAND_FUNCTION_PROJECTILE_ARC_ADD
+		spawn_level						= '10', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_ARC_ADD
+		spawn_probability				= '0.3', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_ARC_ADD
 		price = 500,
 		mana = 125,
 		action = function ( recursion_level, iteration, copy_series, copy_specific )
@@ -6099,8 +6084,8 @@ local new_actions =
 		type		= ACTION_TYPE_OTHER,
 		command_type = 'FUNCTION',
 		command_value = 'projectile_arc_set(',
-		spawn_level						= '10', --EMPTY_COMMAND_FUNCTION_PROJECTILE_ARC_SET
-		spawn_probability				= '0.3', --EMPTY_COMMAND_FUNCTION_PROJECTILE_ARC_SET
+		spawn_level						= '10', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_ARC_SET
+		spawn_probability				= '0.3', -- EMPTY_COMMAND_FUNCTION_PROJECTILE_ARC_SET
 		price = 500,
 		mana = 125,
 		action = function ( recursion_level, iteration, copy_series, copy_specific )
@@ -6285,7 +6270,6 @@ local new_actions =
 			copy_all = true,
 			colorful_copy_all = true,
 		},
-		spawn_requires_flag = 'card_unlocked_mestari',
 		type		= ACTION_TYPE_OTHER,
 		recursive	= true,
 		spawn_level						= '10', -- EMPTY_COLORFUL_X2
@@ -6334,7 +6318,6 @@ local new_actions =
 			copy_all = true,
 			colorful_copy_all = true,
 		},
-		spawn_requires_flag = 'card_unlocked_mestari',
 		type		= ACTION_TYPE_OTHER,
 		recursive	= true,
 		spawn_level						= '10', -- EMPTY_COLORFUL_ARRIVAL
@@ -6383,7 +6366,6 @@ local new_actions =
 			copy_all = true,
 			colorful_copy_all = true,
 		},
-		spawn_requires_flag = 'card_unlocked_mestari',
 		type		= ACTION_TYPE_OTHER,
 		recursive	= true,
 		spawn_level						= '10', -- EMPTY_COLORFUL_DEPARTURE
@@ -6432,7 +6414,6 @@ local new_actions =
 			copy_all = true,
 			colorful_copy_all = true,
 		},
-		spawn_requires_flag = 'card_unlocked_mestari',
 		type		= ACTION_TYPE_OTHER,
 		recursive	= true,
 		spawn_level						= '10', -- EMPTY_COLORFUL_RETURN
@@ -7878,7 +7859,46 @@ for i, _ in ipairs( new_actions ) do
 	end
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.EFFECT_CHANGE_BOMB' ) ) then
+if ( get_setting_by_def( 'LOOT_CHANGE_FRIEND' ) ) then
+	local changes = {
+		{
+			info = 'EMPTY_COLORFUL_ITER_PROJECTILE_BUCKSHOT',
+			spawn_requires_flag = 'card_unlocked_colorful',
+		},
+		{
+			info = 'EMPTY_COLORFUL_REC_ITER_PROJECTILE_CHAINSAW',
+			spawn_requires_flag = 'card_unlocked_colorful',
+		},
+		{
+			info = 'EMPTY_COLORFUL_REC_ITER_PROJECTILE_HOLE',
+			spawn_requires_flag = 'card_unlocked_colorful',
+		},
+		{
+			info = 'EMPTY_COLORFUL_REC_MODIFIER_COMPLEX',
+			spawn_requires_flag = 'card_unlocked_colorful',
+		},
+		{
+			info = 'EMPTY_COLORFUL_X2',
+			spawn_requires_flag = 'card_unlocked_colorful',
+		},
+		{
+			info = 'EMPTY_COLORFUL_ARRIVAL',
+			spawn_requires_flag = 'card_unlocked_colorful',
+		},
+		{
+			info = 'EMPTY_COLORFUL_DEPARTURE',
+			spawn_requires_flag = 'card_unlocked_colorful',
+		},
+		{
+			info = 'EMPTY_COLORFUL_RETURN',
+			spawn_requires_flag = 'card_unlocked_colorful',
+		},
+	}
+
+	add_table( changed_actions, changes )
+end
+
+if ( get_setting_by_def( 'EFFECT_CHANGE_BOMB' ) ) then
 	local changes = {
 		{
 			id			= 'BOMB',
@@ -7907,14 +7927,14 @@ else
 	} )
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.ICON_CHANGE_BLACKHOLE_DEATH_TRIGGER' ) ) then
+if ( get_setting_by_def( 'ICON_CHANGE_BLACKHOLE_DEATH_TRIGGER' ) ) then
 	table.insert( changed_actions, {
 		id			= 'BLACK_HOLE_DEATH_TRIGGER',
 		sprite		= sprite_url .. 'black_hole_death_trigger.png',
 	} )
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.EFFECT_CHANGE_BUBBLESHOT' ) ) then
+if ( get_setting_by_def( 'EFFECT_CHANGE_BUBBLESHOT' ) ) then
 	table.insert( changed_actions, {
 		id			= 'BUBBLESHOT',
 		related_projectiles	= { 'data/entities/projectiles/deck/bubbleshot.xml', 3 },
@@ -7928,7 +7948,7 @@ if ( ModSettingGet( 'empty_the_blackhole_catgirl.EFFECT_CHANGE_BUBBLESHOT' ) ) t
 	} )
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.EFFECT_CHANGE_BUBBLESHOT_TRIGGER' ) ) then
+if ( get_setting_by_def( 'EFFECT_CHANGE_BUBBLESHOT_TRIGGER' ) ) then
 	table.insert( changed_actions, {
 		id			= 'BUBBLESHOT_TRIGGER',
 		related_projectiles	= { 'data/entities/projectiles/deck/bubbleshot.xml', 3 },
@@ -7942,35 +7962,35 @@ if ( ModSettingGet( 'empty_the_blackhole_catgirl.EFFECT_CHANGE_BUBBLESHOT_TRIGGE
 	} )
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.ICON_CHANGE_MINE_DEATH_TRIGGER' ) ) then
+if ( get_setting_by_def( 'ICON_CHANGE_MINE_DEATH_TRIGGER' ) ) then
 	table.insert( changed_actions, {
 		id			= 'MINE_DEATH_TRIGGER',
 		sprite		= sprite_url .. 'mine_death_trigger.png',
 	} )
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.ICON_CHANGE_PIPE_BOMB_DEATH_TRIGGER' ) ) then
+if ( get_setting_by_def( 'ICON_CHANGE_PIPE_BOMB_DEATH_TRIGGER' ) ) then
 	table.insert( changed_actions, {
 		id			= 'PIPE_BOMB_DEATH_TRIGGER',
 		sprite		= sprite_url .. 'pipe_bomb_death_trigger.png',
 	} )
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.ICON_CHANGE_SUMMON_EGG_DEATH_TRIGGER' ) ) then
+if ( get_setting_by_def( 'ICON_CHANGE_SUMMON_EGG_DEATH_TRIGGER' ) ) then
 	table.insert( changed_actions, {
 		id			= 'SUMMON_HOLLOW_EGG',
 		sprite		= sprite_url .. 'summon_egg_death_trigger.png',
 	} )
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.BUGFIX_DUPE_MAX_HP_FROM_WORMRAIN' ) ) then
+if ( get_setting_by_def( 'BUGFIX_DUPE_MAX_HP_FROM_WORMRAIN' ) ) then
 	table.insert( changed_actions, {
 		id			= 'WORM_RAIN',
 		related_projectiles	= { 'data/entities/projectiles/deck/worm_rain.xml' },
 	} )
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.CHEESE_CHANGE_CHAINSAW' ) ) then
+if ( get_setting_by_def( 'CHEESE_CHANGE_CHAINSAW' ) ) then
 	table.insert( changed_actions, {
 		id			= 'CHAINSAW',
 		action = function( )
@@ -7989,20 +8009,20 @@ update_table_by_id( actions, changed_actions, true )
 
 local template, need_replace = { }, false
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.UNLOCK_ALL_SPELL' ) ) then
+if ( get_setting_by_def( 'UNLOCK_ALL_SPELL' ) ) then
 	template.spawn_requires_flag = '< { [ nil ] } >'
 
 	need_replace = true
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.SPELL_ALL_EQUAL' ) ) then
+if ( get_setting_by_def( 'SPELL_ALL_EQUAL' ) ) then
 	template.spawn_level = '0,1,2,3,4,5,6,7,8,9,10'
 	template.spawn_probability = '4,4,4,4,4,4,4,4,4,4,4'
 
 	need_replace = true
 end
 
-if ( ModSettingGet( 'empty_the_blackhole_catgirl.TRUE_POWER_OF_UNLIMITED_SPELLS' ) ) then
+if ( get_setting_by_def( 'TRUE_POWER_OF_UNLIMITED_SPELLS' ) ) then
 	template.never_unlimited = '< { [ nil ] } >'
 
 	need_replace = true

@@ -83,7 +83,7 @@ if ( who_shot ) and ( comp ) then
 	local par_min, par_max = math.min( math.floor( totalcount * 0.5 ), 100 ), math.min( totalcount + 1, 120 )
 
 	set_comp_value( effect_id, 'ParticleEmitterComponent', nil, {
-		count_min = par_min,
-		count_max = par_max,
+		{ 'count_min', par_min },
+		{ 'count_max', par_max },
 	}, nil, nil )
 end

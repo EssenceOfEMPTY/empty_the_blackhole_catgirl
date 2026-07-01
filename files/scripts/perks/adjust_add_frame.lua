@@ -10,7 +10,7 @@ local frames, level = get_comp_value( shooter, 'VariableStorageComponent', tag, 
 frames = math.min( frames + level, max_adjust )
 
 set_comp_value( shooter, 'VariableStorageComponent', tag, {
-	value_int = frames,
+	{ 'value_int', frames },
 } )
 
 local aims = { }
@@ -33,7 +33,7 @@ local wand = tonumber( find_the_wand_held( shooter ) )
 
 if ( is_not_0_num( wand ) ) then
 	set_comp_value( aims, 'LaserEmitterComponent', nil, {
-		is_emitting = true,
+		{ 'is_emitting', true },
 	} )
 
 	local wx, wy, wdir = EntityGetTransform( wand )
@@ -47,6 +47,6 @@ if ( is_not_0_num( wand ) ) then
 	tp( aim2, ox, oy, wdir - dev_rad )
 else
 	set_comp_value( aims, 'LaserEmitterComponent', nil, {
-		is_emitting = false,
+		{ 'is_emitting', false },
 	} )
 end

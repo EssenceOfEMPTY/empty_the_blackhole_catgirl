@@ -33,7 +33,7 @@
 	>
 
 		<config_explosion
-			never_cache="1"
+			never_cache="0"
 			camera_shake="1.5"
 			explosion_radius="3"
 			explosion_sprite="data/particles/spark_0$[1-3].xml"

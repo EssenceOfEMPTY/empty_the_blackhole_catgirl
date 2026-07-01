@@ -16,8 +16,8 @@ if ( is_alive( entity ) ) then
 
 			if ( not is_has_comp( entity, 'VariableStorageComponent', eff ) ) then
 				add_comp_remove_dupli( entity, 'VariableStorageComponent', eff, {
-					_tags = eff,
-					value_float = max_hp,
+					{ '_tags', eff },
+					{ 'value_float', max_hp },
 				} )
 			end
 
@@ -25,12 +25,12 @@ if ( is_alive( entity ) ) then
 
 			if ( hp > max_hp ) then
 				set_comp_value( entity, 'DamageModelComponent', nil, {
-					hp = max_hp,
-					max_hp = max_hp,
+					{ 'hp', max_hp },
+					{ 'max_hp', max_hp },
 				}, nil, nil )
 			else
 				set_comp_value( entity, 'DamageModelComponent', nil, {
-					max_hp = max_hp,
+					{ 'max_hp', max_hp },
 				}, nil, nil )
 			end
 		end

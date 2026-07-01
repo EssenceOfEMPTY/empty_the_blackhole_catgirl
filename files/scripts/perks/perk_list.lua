@@ -37,12 +37,12 @@ local new_perks =
 		one_off_effect = true,
 		usable_by_enemies = false,
 		func = function( perk_item, who, item_name )
-			local reroll_count = get_globals_num( 'TEMPLE_PERK_REROLL_COUNT', 0 )
+			local reroll_count = get_global_num( 'TEMPLE_PERK_REROLL_COUNT', 0 )
 
 			GlobalsSetValue( 'TEMPLE_PERK_REROLL_COUNT', tostring( reroll_count - 3 ) )
 		end,
 		func_remove = function ( who )
-			local reroll_count = get_globals_num( 'TEMPLE_PERK_REROLL_COUNT', 0 )
+			local reroll_count = get_global_num( 'TEMPLE_PERK_REROLL_COUNT', 0 )
 
 			GlobalsSetValue( 'TEMPLE_PERK_REROLL_COUNT', tostring( reroll_count - 9 ) )
 		end,
@@ -55,7 +55,7 @@ local new_perks =
 		one_off_effect = true,
 		usable_by_enemies = false,
 		func = function( perk_item, who, item_name )
-			local shift_count = get_globals_num( 'fungal_shift_iteration', 0 )
+			local shift_count = get_global_num( 'fungal_shift_iteration', 0 )
 
 			GlobalsSetValue( 'fungal_shift_iteration', tostring( shift_count - 5 ) )
 		end,
@@ -66,10 +66,10 @@ local new_perks =
 		usable_by_enemies = true,
 		func = function( perk_item, who, item_name )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'magic_liquid_berserk',
-				blood_spray_material = 'magic_liquid_berserk',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_berserk_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_berserk_$[1-3].xml',
+				{ 'blood_material', 'magic_liquid_berserk' },
+				{ 'blood_spray_material', 'magic_liquid_berserk' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_berserk_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters/bloodsplatter_berserk_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
@@ -78,10 +78,10 @@ local new_perks =
 		end,
 		func_remove = function ( who )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'blood',
-				blood_spray_material = 'blood',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
+				{ 'blood_material', 'blood' },
+				{ 'blood_spray_material', 'blood' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
@@ -95,26 +95,26 @@ local new_perks =
 		usable_by_enemies = true,
 		func = function( perk_item, who, item_name )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'magic_liquid_teleportation',
-				blood_spray_material = 'magic_liquid_teleportation',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_teleport_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_teleport_$[1-3].xml',
+				{ 'blood_material', 'magic_liquid_teleportation' },
+				{ 'blood_spray_material', 'magic_liquid_teleportation' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_teleport_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters/bloodsplatter_teleport_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_TELEPORT_PICKUP_COUNT', 0 ) == 0 ) then
+			if ( get_global_num( 'PERK_PICKED_EMPTY_PROTECTION_TELEPORT_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_TELEPORT', false, false, true )
 			end
 		end,
 		func_remove = function ( who )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'blood',
-				blood_spray_material = 'blood',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
+				{ 'blood_material', 'blood' },
+				{ 'blood_spray_material', 'blood' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
@@ -128,26 +128,26 @@ local new_perks =
 		usable_by_enemies = true,
 		func = function( perk_item, who, item_name )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'blood_cold',
-				blood_spray_material = 'blood_cold',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_freeze_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_freeze_$[1-3].xml',
+				{ 'blood_material', 'blood_cold' },
+				{ 'blood_spray_material', 'blood_cold' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_freeze_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters/bloodsplatter_freeze_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_FREEZE_PICKUP_COUNT', 0 ) == 0 ) then
+			if ( get_global_num( 'PERK_PICKED_EMPTY_PROTECTION_FREEZE_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_FREEZE', false, false, true )
 			end
 		end,
 		func_remove = function ( who )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'blood',
-				blood_spray_material = 'blood',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
+				{ 'blood_material', 'blood' },
+				{ 'blood_spray_material', 'blood' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
@@ -161,26 +161,26 @@ local new_perks =
 		usable_by_enemies = true,
 		func = function( perk_item, who, item_name )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'lava',
-				blood_spray_material = 'lava',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_lava_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_lava_$[1-3].xml',
+				{ 'blood_material', 'lava' },
+				{ 'blood_spray_material', 'lava' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_lava_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters/bloodsplatter_lava_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_LAVA_PICKUP_COUNT', 0 ) == 0 ) then
+			if ( get_global_num( 'PERK_PICKED_EMPTY_PROTECTION_LAVA_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_LAVA', false, false, true )
 			end
 		end,
 		func_remove = function ( who )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'blood',
-				blood_spray_material = 'blood',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
+				{ 'blood_material', 'blood' },
+				{ 'blood_spray_material', 'blood' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
@@ -194,26 +194,26 @@ local new_perks =
 		usable_by_enemies = true,
 		func = function( perk_item, who, item_name )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'acid',
-				blood_spray_material = 'acid',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_acid_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_acid_$[1-3].xml',
+				{ 'blood_material', 'acid' },
+				{ 'blood_spray_material', 'acid' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_acid_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters/bloodsplatter_acid_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_ACID_PICKUP_COUNT', 0 ) == 0 ) then
+			if ( get_global_num( 'PERK_PICKED_EMPTY_PROTECTION_ACID_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_ACID', false, false, true )
 			end
 		end,
 		func_remove = function ( who )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'blood',
-				blood_spray_material = 'blood',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
+				{ 'blood_material', 'blood' },
+				{ 'blood_spray_material', 'blood' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
@@ -227,26 +227,26 @@ local new_perks =
 		usable_by_enemies = true,
 		func = function( perk_item, who, item_name )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'magic_liquid_polymorph',
-				blood_spray_material = 'magic_liquid_polymorph',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_polymorph_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters/bloodsplatter_polymorph_$[1-3].xml',
+				{ 'blood_material', 'magic_liquid_polymorph' },
+				{ 'blood_spray_material', 'magic_liquid_polymorph' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_polymorph_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters/bloodsplatter_polymorph_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
 				ComponentSetValue2( comp, 'blood_multiplier', blood * 3 )
 			end, nil )
 
-			if ( get_globals_num( 'PERK_PICKED_EMPTY_PROTECTION_POLYMORPH_PICKUP_COUNT', 0 ) == 0 ) then
+			if ( get_global_num( 'PERK_PICKED_EMPTY_PROTECTION_POLYMORPH_PICKUP_COUNT', 0 ) == 0 ) then
 				perk_pickup( nil, who, 'EMPTY_PROTECTION_POLYMORPH', false, false, true )
 			end
 		end,
 		func_remove = function ( who )
 			set_comp_value( who, 'DamageModelComponent', nil, {
-				blood_material = 'blood',
-				blood_spray_material = 'blood',
-				blood_sprite_directional = empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml',
-				blood_sprite_large = empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml',
+				{ 'blood_material', 'blood' },
+				{ 'blood_spray_material', 'blood' },
+				{ 'blood_sprite_directional', empty_path .. 'particles/bloodsplatters/bloodsplatter_directional_$[1-3].xml' },
+				{ 'blood_sprite_large', empty_path .. 'particles/bloodsplatters//bloodsplatter_$[1-3].xml' },
 			}, function ( comp )
 				local blood = ComponentGetValue2( comp, 'blood_multiplier' )
 
@@ -276,7 +276,7 @@ local new_perks =
 		end,
 		func_remove = function( who )
 			set_comp_obj_value( who, 'DamageModelComponent', nil, {
-				{ 'damage_multipliers', 'physics_hit', 0 },
+				{ 'damage_multipliers', 'physics_hit', 1 },
 			}, nil, nil )
 		end,
 	},
@@ -320,7 +320,7 @@ local new_perks =
 			EntityRemoveTag( who, 'curse_NOT' )
 
 			local mul = get_comp_obj_value( who, 'DamageModelComponent', nil, {
-				{ 'damage_multipliers', 'curse', 0.5 },
+				{ 'damage_multipliers', 'curse', 1 },
 			}, nil )
 
 			set_comp_obj_value( who, 'DamageModelComponent', nil, {
@@ -376,16 +376,18 @@ local new_perks =
 			EntityRemoveTag( who, 'teleportable' )
 			EntityAddTag( who, 'teleportable_NOT' )
 			EntityAddTag( who, 'no_swap' )
+			EntityAddTag( who, 'empty_teleport_immunity' )
 
 			add_comp_remove_dupli( who, 'LuaComponent', 'empty_protection_teleport', {
-				_tags = 'protection_teleport',
-				script_shot = empty_path .. 'scripts/perks/protection_teleport.lua',
+				{ '_tags', 'protection_teleport' },
+				{ 'script_shot', empty_path .. 'scripts/perks/protection_teleport.lua' },
 			} )
 		end,
 		func_remove = function( who )
 			EntityAddTag( who, 'teleportable' )
 			EntityRemoveTag( who, 'teleportable_NOT' )
 			EntityRemoveTag( who, 'no_swap' )
+			EntityRemoveTag( who, 'empty_teleport_immunity' )
 
 			remove_all_comp( who, 'LuaComponent', 'empty_protection_teleport' )
 		end,
@@ -396,8 +398,8 @@ local new_perks =
 		usable_by_enemies = true,
 		func = function( perk_item, who, item_name )
 			add_comp_remove_dupli( who, 'LuaComponent', 'empty_protection_slice', {
-				_tags = 'protection_slice',
-				script_shot = empty_path .. 'scripts/perks/protection_slice.lua',
+				{ '_tags', 'protection_slice' },
+				{ 'script_shot', empty_path .. 'scripts/perks/protection_slice.lua' },
 			} )
 
 			set_comp_obj_value( who, 'DamageModelComponent', nil, {
@@ -452,8 +454,8 @@ local new_perks =
 			local tag = 'protection_plasma'
 
 			add_comp_remove_dupli( who, 'LuaComponent', tag, {
-				_tags = tag,
-				script_damage_about_to_be_received = empty_path .. 'scripts/perks/protection_plasma.lua',
+				{ '_tags', tag },
+				{ 'script_damage_about_to_be_received', empty_path .. 'scripts/perks/protection_plasma.lua' },
 			}, nil )
 		end,
 		func_remove = function( who )
@@ -686,8 +688,8 @@ local new_perks =
 			end
 
 			set_comp_value( who, 'Inventory2Component', nil, {
-				full_inventory_slots_y = 1,
-				full_inventory_slots_x = 16,
+				{ 'full_inventory_slots_y', 1 },
+				{ 'full_inventory_slots_x', 16 },
 			}, nil, nil )
 		end,
 	},
@@ -697,9 +699,9 @@ local new_perks =
 		usable_by_enemies = false,
 		func = function( perk_item, who, item_name )
 			add_comp_remove_dupli( who, 'LuaComponent', 'empty_percentage_off', {
-				_tags='empty_percentage_off,perk_component',
-				execute_every_n_frame='60',
-				script_source_file=empty_path .. 'scripts/perks/percentage_off.lua',
+				{ '_tags', 'empty_percentage_off,perk_component' },
+				{ 'execute_every_n_frame', '60' },
+				{ 'script_source_file', empty_path .. 'scripts/perks/percentage_off.lua' },
 			} )
  		end,
 		func_remove = function( who )
@@ -755,19 +757,21 @@ local new_perks =
 			local tag = 'adjust'
 
 			if ( not EntityHasTag( who, tag ) ) then
-				add_comp( who, 'VariableStorageComponent', {
-					_tags = tag,
-					value_int = 0,
-					value_float = 1,
+				EntityAddTag( who, tag )
+
+				add_comp_or_not( who, 'VariableStorageComponent', tag, {
+					{ '_tags', tag },
+					{ 'value_int', 0 },
+					{ 'value_float', 1 },
 				} )
 
-				add_comp( who, 'LuaComponent', {
-					_tags = tag,
-					script_source_file = empty_path .. 'scripts/perks/adjust_add_frame.lua',
-					execute_every_n_frame = 0,
+				add_comp_or_not( who, 'LuaComponent', tag, {
+					{ '_tags', tag },
+					{ 'script_source_file', empty_path .. 'scripts/perks/adjust_add_frame.lua' },
+					{ 'execute_every_n_frame', 0 },
 				} )
 
-				add_comp( who, 'ShotEffectComponent', {
+				add_comp_or_not( who, 'ShotEffectComponent', tag, {
 					_tags = tag,
 					extra_modifier = 'adjust',
 				} )
@@ -779,8 +783,6 @@ local new_perks =
 
 				EntityAddChild( who, c1 )
 				EntityAddChild( who, c2 )
-
-				EntityAddTag( who, tag )
 			else
 				local count, delta = get_comp_value( who, 'VariableStorageComponent', tag, {
 					{ 'value_int', 0 },
@@ -788,8 +790,8 @@ local new_perks =
 				}, nil )
 
 				set_comp_value( who, 'VariableStorageComponent', tag, {
-					value_int = count,
-					value_float = delta + 1,
+					{ 'value_int', count },
+					{ 'value_float', delta + 1 },
 				}, nil, nil )
 			end
 		end,
@@ -803,8 +805,8 @@ local new_perks =
 
 			if ( level > 1 ) then
 				set_comp_value( who, 'VariableStorageComponent', nil, {
-					value_int = frames,
-					value_float = level - 1,
+					{ 'value_int', frames },
+					{ 'value_float', level - 1 },
 				}, nil, nil )
 			else
 				remove_all_comp( who, nil, tag, nil )
@@ -831,9 +833,9 @@ local new_perks =
 			local tag = 'empty_health_regeneration'
 
 			add_comp_remove_dupli( who, 'LuaComponent', tag, {
-				_tags = tag,
-				execute_every_n_frame = 1800,
-				script_source_file = empty_path .. 'scripts/perks/health_regeneration.lua',
+				{ '_tags', tag },
+				{ 'execute_every_n_frame', 1800 },
+				{ 'script_source_file', empty_path .. 'scripts/perks/health_regeneration.lua' },
 			} )
 		end,
 		func_remove = function( who )
@@ -850,7 +852,7 @@ local new_perks =
 
 			tp( who, x, y )
 
-			--TODO
+			-- TODO
 		end,
 	},
 	{
@@ -954,12 +956,12 @@ local new_perks =
 				end
 
 				add_comp_remove_dupli( who, 'LuaComponent', 'empty_curse_monk', {
-					_tags = 'empty_curse_monk,perk_component',
-					execute_every_n_frame = 60,
-					script_source_file = empty_path .. 'scripts/perks/curse/curse_monk.lua',
+					{ '_tags', 'empty_curse_monk,perk_component' },
+					{ 'execute_every_n_frame', 60 },
+					{ 'script_source_file', empty_path .. 'scripts/perks/curse/curse_monk.lua' },
 				} )
 
-				if ( get_globals_num( 'PERK_PICKED_GOLD_IS_FOREVER_PICKUP_COUNT', 0 ) == 0 ) then
+				if ( get_global_num( 'PERK_PICKED_GOLD_IS_FOREVER_PICKUP_COUNT', 0 ) == 0 ) then
 					perk_pickup( nil, who, 'GOLD_IS_FOREVER', false, false, true )
 				end
 
@@ -967,7 +969,7 @@ local new_perks =
 					perk_pickup( nil, who, 'ATTRACT_ITEMS', false, false, true )
 				end
 
-				if ( get_globals_num( 'PERK_PICKED_EMPTY_PERCENTAGE_OFF_PICKUP_COUNT', 0 ) == 0 ) then
+				if ( get_global_num( 'PERK_PICKED_EMPTY_PERCENTAGE_OFF_PICKUP_COUNT', 0 ) == 0 ) then
 					perk_pickup( nil, who, 'EMPTY_PERCENTAGE_OFF', false, false, true )
 				end
 			end
@@ -1012,36 +1014,38 @@ local new_perks =
 		usable_by_enemies = false,
 		not_in_default_perk_pool = true,
 		func = function( perk_item, who, item_name )
-			GlobalsSetValue( 'EMPTY_CURSE_ALWAYS_SHUFFLE', '1' )
+			local cast_del = get_global_num( 'EMPTY_CAST_DEL_MULTIPLIER', 1 )
 
-			local wands = EntityGetWithTag( 'wand' )
+			set_global_num( 'EMPTY_CAST_DEL_MULTIPLIER', cast_del / 2 )
 
-			for _, wand in ipairs( wands ) do
-				local fire_rate, relaod = get_comp_obj_value( wand, 'AbilityComponent', nil, {
-					{ 'gunaction_config', 'fire_rate_wait', 0 },
-					{ 'gun_config', 'reload_time', 0 },
-				} )
+			add_comp_or_not( who, 'LuaComponent', 'empty_cast_del', {
+				{ '_tags', 'empty_cast_del' },
+				{ 'execute_every_n_frame', 180 },
+				{ 'script_source_file', empty_path .. 'scripts/perks/mul_cast_del.lua' },
+			}, nil )
 
-				if ( fire_rate > 0 ) then
-					fire_rate = fire_rate / 2
-				else
-					fire_rate = fire_rate * 2
-				end
-				if ( relaod > 0 ) then
-					relaod = relaod / 2
-				else
-					relaod = relaod * 2
-				end
+			local wand_shu = get_global_num( 'EMPTY_WAND_SHU', 0 )
 
-				set_comp_obj_value( wand, 'AbilityComponent', nil, {
-					{ 'gun_config', 'shuffle_deck_when_empty', true },
-					{ 'gunaction_config', 'fire_rate_wait', fire_rate },
-					{ 'gun_config', 'reload_time', relaod },
-				}, nil, nil )
+			if ( wand_shu == 0 ) then
+				set_global_num( 'EMPTY_WAND_SHU', -1 )
+
+				add_comp_or_not( who, 'LuaComponent', 'empty_wand_shu', {
+					{ '_tags', 'empty_wand_shu' },
+					{ 'execute_every_n_frame', 180 },
+					{ 'script_source_file', empty_path .. 'scripts/perks/set_wand_shu.lua' },
+				}, nil )
 			end
 		end,
 		func_remove = function( who )
-			GlobalsSetValue( 'EMPTY_CURSE_ALWAYS_SHUFFLE', '0' )
+			local cast_del = get_global_num( 'EMPTY_CAST_DEL_MULTIPLIER', 1 )
+
+			set_global_num( 'EMPTY_CAST_DEL_MULTIPLIER', cast_del * 2 )
+
+			local wand_shu = get_global_num( 'EMPTY_WAND_SHU', 0 )
+
+			if ( wand_shu < 0 ) then
+				set_global_num( 'EMPTY_WAND_SHU', 0 )
+			end
 		end,
 	},
 	{
@@ -1050,32 +1054,40 @@ local new_perks =
 		usable_by_enemies = false,
 		not_in_default_perk_pool = true,
 		func = function( perk_item, who, item_name )
-			GlobalsSetValue( 'EMPTY_CURSE_SHORT_WAND', '1' )
+			local mana_max = get_global_num( 'EMPTY_MANA_MAX_MULTIPLIER', 1 )
+			local mana_reg = get_global_num( 'EMPTY_MANA_REG_MULTIPLIER', 1 )
 
-			local wands = EntityGetWithTag( 'wand' )
+			set_global_num( 'EMPTY_MANA_CAP_MULTIPLIER', mana_max * 1.2 )
+			set_global_num( 'EMPTY_MANA_REG_MULTIPLIER', mana_reg * 1.2 )
 
-			for _, wand in ipairs( wands ) do
-				local mana_charge, mana_max = get_comp_value( wand, 'AbilityComponent', nil, {
-					{ 'mana_charge_speed', 0 },
-					{ 'mana_max', 0 },
-				}, nil )
+			add_comp_or_not( who, 'LuaComponent', 'empty_mana_max', {
+				{ '_tags', 'empty_mana_max' },
+				{ 'execute_every_n_frame', 180 },
+				{ 'script_source_file', empty_path .. 'scripts/perks/mul_mana_max.lua' },
+			}, nil )
 
-				set_comp_value( wand, 'AbilityComponent', nil, {
-					mana_charge_speed = 1.2 * mana_charge,
-					mana_max = 1.2 * mana_max,
-				}, nil, nil )
+			add_comp_or_not( who, 'LuaComponent', 'empty_mana_reg', {
+				{ '_tags', 'empty_mana_reg' },
+				{ 'execute_every_n_frame', 180 },
+				{ 'script_source_file', empty_path .. 'scripts/perks/mul_mana_reg.lua' },
+			}, nil )
 
-				local real_cap = EntityGetWandCapacity( wand )
+			set_global_num( 'EMPTY_CURSE_SHORT_WAND', 1 )
 
-				real_cap = mod_cap( real_cap, 1, 7 )
-
-				adjust_wand_deck( wand, {
-					real_set = math.max( math.floor( real_cap ), 1 ),
-				} )
-			end
+			add_comp_or_not( who, 'LuaComponent', 'empty_deck_cap', {
+				{ '_tags', 'empty_deck_cap' },
+				{ 'execute_every_n_frame', 180 },
+				{ 'script_source_file', empty_path .. 'scripts/perks/mul_deck_cap.lua' },
+			}, nil )
 		end,
 		func_remove = function( who )
-			GlobalsSetValue( 'EMPTY_CURSE_SHORT_WAND', '0' )
+			local mana_max = get_global_num( 'EMPTY_MANA_MAX_MULTIPLIER', 1 )
+			local mana_reg = get_global_num( 'EMPTY_MANA_REG_MULTIPLIER', 1 )
+
+			set_global_num( 'EMPTY_MANA_CAP_MULTIPLIER', mana_max / 1.2 )
+			set_global_num( 'EMPTY_MANA_REG_MULTIPLIER', mana_reg / 1.2 )
+
+			set_global_num( 'EMPTY_CURSE_SHORT_WAND', 0 )
 		end,
 	},
 	{
@@ -1094,16 +1106,16 @@ local new_perks =
 						local x, y = EntityGetTransform( player )
 
 						add_comp_remove_dupli( player, 'VariableStorageComponent', curse, {
-							_tags = curse,
-							value_float = x,
-							value_string = tostring( y ),
+							{ '_tags', curse },
+							{ 'value_float', x },
+							{ 'value_string', tostring( y ) },
 						} )
 
 						add_comp_remove_dupli( player, 'LuaComponent', curse, {
-							_tags = curse,
-							script_source_file = empty_path .. 'scripts/perks/curse/curse_malice_washes_over_delay.lua',
-							execute_every_n_frame = 300,
-							remove_after_executed = true,
+							{ '_tags', curse },
+							{ 'script_source_file', empty_path .. 'scripts/perks/curse/curse_malice_washes_over_delay.lua' },
+							{ 'execute_every_n_frame', 300 },
+							{ 'remove_after_executed', true },
 						} )
 					end
 				end
@@ -1111,26 +1123,40 @@ local new_perks =
 				local x, y = EntityGetTransform( who )
 
 				add_comp_remove_dupli( who, 'VariableStorageComponent', curse, {
-					_tags = curse,
-					value_float = x,
-					value_string = tostring( y ),
+					{ '_tags', curse },
+					{ 'value_float', x },
+					{ 'value_string', tostring( y ) },
 				} )
 
 				add_comp_remove_dupli( who, 'LuaComponent', curse, {
-					_tags = curse,
-					script_source_file = empty_path .. 'scripts/perks/curse/curse_malice_washes_over_delay.lua',
-					execute_every_n_frame = 180,
-					remove_after_executed = true,
+					{ '_tags', curse },
+					{ 'script_source_file', empty_path .. 'scripts/perks/curse/curse_malice_washes_over_delay.lua' },
+					{ 'execute_every_n_frame', 180 },
+					{ 'remove_after_executed', true },
 				} )
 			end
 		end,
 		func_remove = function( who )
 			local curse = 'CURSE_MALICE_WASHES_OVER'
+			local cloud_tag = curse .. '_CLOUD'
+
+			local cloud_id = get_comp_value( who, 'VariableStorageComponent', cloud_tag, {
+				{ 'value_int', 0 },
+			}, nil )
+
+			-- 处理可能的嵌套数组格式 (如 {{1, 0}})
+			while ( type( cloud_id ) == 'table' and cloud_id[ 1 ] ~= nil ) do
+				cloud_id = cloud_id[ 1 ]
+			end
+
+			if ( is_not_0_num( cloud_id ) ) then
+				EntityKill( cloud_id )
+			end
 
 			remove_all_comp( who, 'VariableStorageComponent', curse )
+			remove_all_comp( who, 'VariableStorageComponent', cloud_tag )
+			remove_all_comp( who, 'VariableStorageComponent', curse .. '_ACTIVE' )
 			remove_all_comp( who, 'LuaComponent', curse )
-
-			rem_del_all_child( who, curse )
 		end,
 	},
 	{
@@ -1239,12 +1265,12 @@ local new_perks =
 			end
 
 			set_comp_value( who, 'CharacterPlatformingComponent', nil, {
-				pixel_gravity = 0,
-				run_velocity = 0,
-				jump_velocity_x = 0,
-				fly_speed_max_up = 0,
-				fly_speed_max_down = 0,
-				fly_velocity_x = 0,
+				{ 'run_velocity', 0 },
+				{ 'jump_velocity_x', 0 },
+				{ 'fly_speed_max_up', 0 },
+				{ 'fly_speed_max_down', 0 },
+				{ 'fly_velocity_x', 0 },
+				{ 'pixel_gravity', 0 },
 			}, nil, nil )
 
 			if ( is_player( who ) ) then
@@ -1255,7 +1281,7 @@ local new_perks =
 				local e = EntityLoad( 'data/entities/buildings/workshop_tree_holiday.xml', x, y )
 
 				add_comp_remove_dupli( e, 'LifetimeComponent', nil, {
-					lifetime = 3600,
+					{ 'lifetime', 3600 },
 				} )
 			end
 		end,
@@ -1265,12 +1291,12 @@ local new_perks =
 			end
 
 			set_comp_value( who, 'CharacterPlatformingComponent', nil, {
-				pixel_gravity = 350,
-				run_velocity = 57,
-				jump_velocity_x = 56,
-				fly_speed_max_up = 95,
-				fly_speed_max_down = 85,
-				fly_velocity_x = 52,
+				{ 'run_velocity', 57 },
+				{ 'jump_velocity_x', 57 },
+				{ 'fly_speed_max_up', 95 },
+				{ 'fly_speed_max_down', 95 },
+				{ 'fly_velocity_x', 57 },
+				{ 'pixel_gravity', 350 },
 			}, nil, nil )
 		end,
 	},
@@ -1283,16 +1309,16 @@ local new_perks =
 			local curse = 'CURSE_DEATH_TRAIL'
 
 			add_comp_remove_dupli( who, 'LuaComponent', curse, {
-				_tags = curse,
-				script_source_file = empty_path .. 'scripts/perks/curse/curse_death_trail.lua',
-				execute_every_n_frame = 0,
-				remove_after_executed = true,
+				{ '_tags', curse },
+				{ 'script_source_file', empty_path .. 'scripts/perks/curse/curse_death_trail.lua' },
+				{ 'execute_every_n_frame', 0 },
+				{ 'remove_after_executed', true },
 			} )
 
 			add_comp_remove_dupli( who, 'LuaComponent', curse, {
-				_tags = curse,
-				script_source_file = empty_path .. 'scripts/perks/curse/curse_death_trail.lua',
-				execute_every_n_frame = 2,
+				{ '_tags', curse },
+				{ 'script_source_file', empty_path .. 'scripts/perks/curse/curse_death_trail.lua' },
+				{ 'execute_every_n_frame', 2 },
 			} )
 
 			local c_comp = EntityGetFirstComponent( who, 'CharacterPlatformingComponent' )
@@ -1305,9 +1331,9 @@ local new_perks =
 				}
 
 				set_comp_value( who, 'CharacterPlatformingComponent', nil, {
-					pixel_gravity = values.pixel_gravity / 1.2,
-					run_velocity = values.run_velocity * 1.2,
-					fly_velocity_x = values.fly_velocity_x * 1.2,
+					{ 'pixel_gravity', values.pixel_gravity / 1.2 },
+					{ 'run_velocity', values.run_velocity * 1.2 },
+					{ 'fly_velocity_x', values.fly_velocity_x * 1.2 },
 				}, nil, nil )
 			end
 		end,
@@ -1327,9 +1353,9 @@ local new_perks =
 				}
 
 				set_comp_value( who, 'CharacterPlatformingComponent', nil, {
-					pixel_gravity = values.pixel_gravity * 1.2,
-					run_velocity = values.run_velocity / 1.2,
-					fly_velocity_x = values.fly_velocity_x / 1.2,
+					{ 'pixel_gravity', values.pixel_gravity * 1.2 },
+					{ 'run_velocity', values.run_velocity / 1.2 },
+					{ 'fly_velocity_x', values.fly_velocity_x / 1.2 },
 				}, nil, nil )
 			end
 		end,
@@ -1341,9 +1367,9 @@ local new_perks =
 		not_in_default_perk_pool = true,
 		func = function ( perk_item, who, item_name )
 			add_comp_remove_dupli( who, 'LuaComponent', 'CURSE_FURIOUS_COCKTAIL', {
-				_tags = 'CURSE_FURIOUS_COCKTAIL',
-				script_source_file = empty_path .. 'scripts/perks/curse/curse_furious_cocktail.lua',
-				execute_every_n_frame = 540,
+				{ '_tags', 'CURSE_FURIOUS_COCKTAIL' },
+				{ 'script_source_file', empty_path .. 'scripts/perks/curse/curse_furious_cocktail.lua' },
+				{ 'execute_every_n_frame', 540 },
 			} )
 		end,
 		func_remove = function ( who )
@@ -1402,14 +1428,14 @@ local changed_perks = {--[[
 			local world = GameGetWorldStateEntity( )
 
 			set_comp_value( world, 'WorldStateComponent', nil, {
-				perk_gold_is_forever = true,
+				{ 'perk_gold_is_forever', true },
 			}, nil, nil )
 		end,
 		func_remove = function( who )
 			local world = GameGetWorldStateEntity( )
 
 			set_comp_value( world, 'WorldStateComponent', nil, {
-				perk_gold_is_forever = false,
+				{ 'perk_gold_is_forever', false },
 			}, nil, nil )
 		end,
 	},--[[
@@ -1524,7 +1550,7 @@ end
 
 function undo_perk_pickup( style )
 	local flag = string.upper( style ) .. '_PERK_TOTAL_COUNT'
-	local count = get_globals_num( flag, 0 )
+	local count = get_global_num( flag, 0 )
 
 	GlobalsSetValue( flag, tostring( count - 1 ) )
 end

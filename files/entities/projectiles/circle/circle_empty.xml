@@ -1,16 +1,19 @@
 <Entity name="$projectile_default" tags="projectile" >
 
-	<LifetimeComponent
-		lifetime="300"
-	></LifetimeComponent>
+	<MagicConvertMaterialComponent
+		kill_when_finished="1"
+		from_any_material="1"
+		steps_per_frame="3"
+		to_material="air"
+		clean_stains="1"
+		is_circle="1"
+		radius="960"
+		loop="0"
+	></MagicConvertMaterialComponent>
 
-	<LoadEntitiesComponent
-		entity_file="mods/empty_the_blackhole_catgirl/files/entities/projectiles/circle_empty_remove.xml"
-		count.min="1"
-		count.max="1"
-		kill_entity="0"
-		timeout_frames="2"
-	></LoadEntitiesComponent>
+	<LifetimeComponent
+		lifetime="320"
+	></LifetimeComponent>
 
 	<AudioComponent
 		file="data/audio/Desktop/projectiles.bank"

@@ -1,0 +1,20 @@
+<Entity>
+
+	<InheritTransformComponent/>
+
+	<VariableStorageComponent
+		_tags="effect_name"
+		value_string="teleport"
+	></VariableStorageComponent>
+
+	<LuaComponent
+		script_source_file="mods/empty_the_blackhole_catgirl/files/scripts/status_effects/game_effect_protection.lua"
+		execute_on_added="1"
+	></LuaComponent>
+
+	<GameEffectComponent
+		effect="TELEPORTITIS"
+		frames="600"
+	></GameEffectComponent>
+
+</Entity>

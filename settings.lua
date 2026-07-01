@@ -9,15 +9,17 @@ local b2 = b1 .. b1
 local b3 = b2 .. b1
 
 mod_settings = {
---[[
+	--[[
+
 	{
 		id = '',
 		ui_name = '',
 		ui_description = '',
 		value_default = nil,
-		scope = MOD_SETTING_SCOPE_NEW_GAME | MOD_SETTING_SCOPE_RUNTIME | MOD_SETTING_SCOPE_RUNTIME_RESTART,
+		scope = MOD_SETTING_SCOPE_NEW_GAME | MOD_SETTING_SCOPE_RUNTIME | MOD_SETTING_SCOPE_RUNTIME_RESTART | MOD_SETTING_SCOPE_ONLY_SET_DEFAULT,
 	},
-]]--
+
+	]]--
 }
 
 if ( language:find( '中文' ) or language:find( '汉化' ) ) then
@@ -149,6 +151,138 @@ if ( language:find( '中文' ) or language:find( '汉化' ) ) then
 			not_setting = true,
 		},
 		{
+			category_id = 'SETTINGS_NEW_THINGS',
+			ui_name = '新内容设置',
+			foldable = true,
+			_folded = true,
+			settings = {
+				{
+					id = 'EFFECT_CHANGE_DIAMOND_DIVIDE',
+					ui_name = '效果更改: 钻石房间 - 一分为十',
+					ui_description = '钻石房间掉落 [ 一分为十 ] 的场合, 额外掉落 [ 一分为十+/- ] 各 1 个',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_CHEST_LIGHT',
+					ui_name = '效果更改: 珊瑚宝箱',
+					ui_description = '珊瑚宝箱也掉落本模组新增的 [ 一分+/- ] 系列法术 ( 不含 [ 一分为十+/- ] )\n'
+						.. b1 .. '且掉落法术数量从 3 增加到 5',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_CHEST_DARK',
+					ui_name = '效果更改: 黑暗宝箱',
+					ui_description = '黑暗宝箱也掉落本模组新增的 [ 置换术 ] 系列法术\n'
+						.. b1 .. '且掉落法术数量从 3 增加到 5',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'LOOT_CHANGE_ALCHEMIST',
+					ui_name = '掉落更改: 古代炼金术师',
+					ui_description = '[ 古代炼金术师 ] 头目死亡时可能掉落本模组新增的 [ 字符+/- ] 系列法术\n'
+						.. b1 .. '且掉落法术数量从 4 增加到 7',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'LOOT_CHANGE_WIZARD',
+					ui_name = '掉落更改: 法师领主',
+					ui_description = '[ 法师领主 ] 头目死亡时可能掉落本模组新增的 [ 2× ] 系列法术',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'LOOT_CHANGE_FRIEND',
+					ui_name = '掉落更改: 大朋友',
+					ui_description = '[ 大朋友 ] 头目死亡时解锁并掉落本模组新增的 [ 幻彩 ] 系列法术\n'
+						.. b1 .. '禁用此项会使 [ 幻彩 ] 系列法术无需解锁',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_PLAYER_SPEED_CAP',
+					ui_name = '效果更改: 玩家 - 速度上限',
+					ui_description = '移除玩家的速度上限',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_STONE_AFFECT_IN_INV',
+					ui_name = '效果更改: 物品栏生效',
+					ui_description = '部分物品手持期间适用的效果在物品栏内时也生效',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_INIT_WAND_BLUE',
+					ui_name = '效果更改: 初始蓝杖',
+					ui_description = '更改初始蓝杖的各项属性, 含法术池',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_INIT_WAND_RED',
+					ui_name = '效果更改: 初始红杖',
+					ui_description = '更改初始红杖的各项属性, 含法术池',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_WAND_CONTENT',
+					ui_name = '效果更改: 法杖 - 法术',
+					ui_description = '法杖生成时可能包含 [ 其他 ] 类法术',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_POTION_HP',
+					ui_name = '效果更改: 烧瓶 - 生命',
+					ui_description = '将烧瓶的生命上限从 12.5 提升至 400',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_POTION_VOLUME',
+					ui_name = '效果更改: 烧瓶 - 容量',
+					ui_description = '将烧瓶的容量从 1000 提升至 2000',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_POTION_CONTENT',
+					ui_name = '效果更改: 烧瓶 - 内容',
+					ui_description = '烧瓶生成时有更多可能的内容物',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_POTION_HIGH_EXPLOSION',
+					ui_name = '效果更改: 烧瓶 - 高爆',
+					ui_description = '将烧瓶碎裂产生的爆炸的伤害从 0 增加到 325\n'
+						.. b1 .. '爆炸半径从 3 增加到 64',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_TEMPLE_HEART_ALSO_BUFF',
+					ui_name = '效果更改: 神山生命加成',
+					ui_description = '生成于神圣之山的 [ 完全生命再生 ] 也受 [ 更强大的心 ] 天赋影响',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'MAGNIFICENT_CONCLUSION',
+					ui_name = '盛大闭幕',
+					ui_description = '为玩家增加死亡效果',
+					value_default = false,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+			},
+		},
+		{
 			category_id = 'SETTINGS_WORLDS',
 			ui_name = '世界设置',
 			foldable = true,
@@ -178,7 +312,7 @@ if ( language:find( '中文' ) or language:find( '汉化' ) ) then
 					scope = MOD_SETTING_SCOPE_NEW_GAME,
 				},
 				{
-					id = 'EASY_NG+',
+					id = 'EASY_NG_PLUS',
 					ui_name = '更简单的 NG+',
 					ui_description = '降低 NG+ 的难度......各方面',
 					value_default = false,
@@ -293,7 +427,7 @@ if ( language:find( '中文' ) or language:find( '汉化' ) ) then
 				{
 					id = 'SPAWN_MANY_ENEMIES',
 					ui_name = '刷怪+',
-					ui_description = '刷怪率大幅提升',
+					ui_description = '刷怪率大幅提升, 0 号诅咒',
 					value_default = false,
 					scope = MOD_SETTING_SCOPE_NEW_GAME,
 				},
@@ -463,6 +597,13 @@ if ( language:find( '中文' ) or language:find( '汉化' ) ) then
 			},
 		},
 		{
+			id = 'DISPLAY_DEATH_COUNT',
+			ui_name = '显示死亡次数',
+			ui_description = '玩家生成时在屏幕左下角提示死亡次数',
+			value_default = false,
+			scope = MOD_SETTING_SCOPE_RUNTIME_RESTART,
+		},
+		{
 			id = 'COMMAND_FEEDBACK',
 			ui_name = '命令反馈',
 			ui_description = '命令法术将会在左下角反馈执行状态',
@@ -473,7 +614,7 @@ if ( language:find( '中文' ) or language:find( '汉化' ) ) then
 			id = 'SVAROG_TRANSLATION',
 			ui_name = '翻译: 伊芙琳娜',
 			ui_description = '将部分生物的名称替换为与 伊芙琳娜 相关的文本',
-			value_default = true,
+			value_default = false,
 			scope = MOD_SETTING_SCOPE_RUNTIME_RESTART,
 		},
 	}
@@ -595,6 +736,137 @@ else
 				},
 			},
 			not_setting = true,
+		},		{
+			category_id = 'SETTINGS_NEW_THINGS',
+			ui_name = 'New Content Settings',
+			foldable = true,
+			_folded = true,
+			settings = {
+				{
+					id = 'EFFECT_CHANGE_DIAMOND_DIVIDE',
+					ui_name = 'Effect Change: Diamond Room - Divide by 10',
+					ui_description = 'When [ Divide by 10 ] drops in Diamond Room, additionally drops 1 [ Divide by 10+ ] and 1 [ Divide by 10- ] each',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_CHEST_LIGHT',
+					ui_name = 'Effect Change: Coral Chest',
+					ui_description = 'Coral Chest also drops [ Divide+/- ] series spells added by this mod ( excluding [ Divide by 10+/- ] )\n'
+						.. b1 .. 'and increases number of spell drops from 3 to 5',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_CHEST_DARK',
+					ui_name = 'Effect Change: Dark Chest',
+					ui_description = 'Dark Chest also drops [ ALL ] series spells added by this mod\n'
+						.. b1 .. 'and increases number of spell drops from 3 to 5',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'LOOT_CHANGE_ALCHEMIST',
+					ui_name = 'Loot Change: Ancient Alchemist',
+					ui_description = '[ Ancient Alchemist ] Boss may drop [ Greek Letter+/- ] series spells added by this mod on death\n'
+						.. b1 .. 'and increases number of spell drops from 4 to 7',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'LOOT_CHANGE_WIZARD',
+					ui_name = 'Loot Change: Wizard Lord',
+					ui_description = '[ Wizard Lord ] Boss may drop [ 2× ] series spells added by this mod on death',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'LOOT_CHANGE_FRIEND',
+					ui_name = 'Loot Change: Big Friend',
+					ui_description = '[ Big Friend ] Boss unlocks and drops [ Colorful ] series spells added by this mod on death\n'
+						.. b1 .. 'disabling this makes [ Colorful ] series spells require no unlock',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_PLAYER_SPEED_CAP',
+					ui_name = 'Effect Change: Player - Speed Cap',
+					ui_description = 'Remove player speed cap',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_STONE_AFFECT_IN_INV',
+					ui_name = 'Effect Change: Inventory Effect',
+					ui_description = 'Effects that normally apply while held also apply from inventory for some items',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_INIT_WAND_BLUE',
+					ui_name = 'Effect Change: Starting Blue Wand',
+					ui_description = 'Change various attributes of starting blue wand, including spell pool',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_INIT_WAND_RED',
+					ui_name = 'Effect Change: Starting Red Wand',
+					ui_description = 'Change various attributes of starting red wand, including spell pool',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_WAND_CONTENT',
+					ui_name = 'Effect Change: Wand - Spells',
+					ui_description = 'Wands may contain spells of type [ Other ] when generated',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_POTION_HP',
+					ui_name = 'Effect Change: Flask - HP',
+					ui_description = 'Increase flask HP from 12.5 to 400',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_POTION_VOLUME',
+					ui_name = 'Effect Change: Flask - Capacity',
+					ui_description = 'Increase flask capacity from 1000 to 2000',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_POTION_CONTENT',
+					ui_name = 'Effect Change: Flask - Content',
+					ui_description = 'Flasks have more possible contents when spawned',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_POTION_HIGH_EXPLOSION',
+					ui_name = 'Effect Change: Flask - High Explosion',
+					ui_description = 'Increase damage of explosion from flask shattering from 0 to 325\n'
+						.. b1 .. 'explosion radius from 3 to 64',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'EFFECT_CHANGE_TEMPLE_HEART_ALSO_BUFF',
+					ui_name = 'Effect Change: Holy Mountain Healing Buff',
+					ui_description = '[ Full Health Restore ] spawned in Holy Mountain is also affected by [ Stronger Hearts ] perk',
+					value_default = true,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+				{
+					id = 'MAGNIFICENT_CONCLUSION',
+					ui_name = 'Magnificent Conclusion',
+					ui_description = 'Add a death effect for player',
+					value_default = false,
+					scope = MOD_SETTING_SCOPE_NEW_GAME,
+				},
+			},
 		},
 		{
 			category_id = 'SETTINGS_WORLDS',
@@ -626,7 +898,7 @@ else
 					scope = MOD_SETTING_SCOPE_NEW_GAME,
 				},
 				{
-					id = 'EASY_NG+',
+					id = 'EASY_NG_PLUS',
 					ui_name = 'Easier NG+',
 					ui_description = 'Lower NG+ difficulty... in every way',
 					value_default = false,
@@ -909,6 +1181,13 @@ else
 					scope = MOD_SETTING_SCOPE_NEW_GAME,
 				},
 			},
+		},
+		{
+			id = 'DISPLAY_DEATH_COUNT',
+			ui_name = 'Display Death Count',
+			ui_description = 'Show death count at bottom-left screen corner on player spawn',
+			value_default = false,
+			scope = MOD_SETTING_SCOPE_RUNTIME_RESTART,
 		},
 		{
 			id = 'COMMAND_FEEDBACK',

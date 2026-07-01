@@ -67,11 +67,11 @@ g_cartlike =
 
 local old_spawn_crate = spawn_crate
 function spawn_crate( x, y )
-	if ( ModSettingGet( 'empty_the_blackhole_catgirl.STARTING_EDIT' ) ) then
+	if ( get_setting_by_def( 'STARTING_EDIT' ) ) then
 		EntityLoad( 'data/entities/buildings/workshop_tree_holiday.xml', x, y )
 	end
 
-	if ( ModSettingGet( 'empty_the_blackhole_catgirl.TELEPORT_TO_PYRAMID' ) ) then
+	if ( get_setting_by_def( 'TELEPORT_TO_PYRAMID' ) ) then
 		EntityLoad( empty_path .. 'entities/buildings/teleport_pyramid.xml', x - 495, y - 128 )
 	end
 

@@ -1,7 +1,5 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-local death = tonumber( StatsGlobalGetValue( 'death_count' ) ) or 0
-
 function damage_about_to_be_received( dmg, x, y, res, cri_chance )
 	local shooter = get_root_entity( )
 
@@ -10,8 +8,12 @@ function damage_about_to_be_received( dmg, x, y, res, cri_chance )
 			{ 'value_float', 1 }
 		}, nil )
 
-		if ( dmg > 0 and def_mul ~= 1 ) then
-			return dmg / ( def_mul * cap( 1, death * 1.25, 10 ) ), 0
+		if ( dmg ~= 0 and def_mul ~= 1 ) then
+			if ( dmg > 0 ) then
+				return dmg * def_mul, 0
+			else
+				return dmg / def_mul, 0
+			end
 		end
 	end
 

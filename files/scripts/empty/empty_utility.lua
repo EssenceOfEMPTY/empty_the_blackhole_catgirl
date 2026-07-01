@@ -1,6 +1,12 @@
 dofile_once( 'data/scripts/lib/utilities.lua' )
 
-empty_path = 'mods/empty_the_blackhole_catgirl/files/'
+---@alias any_pair { [ 1 ]: string, [ 2 ]: any }
+---@alias num_pair { [ 1 ]: string, [ 2 ]: number }
+
+---@alias any_tri { [ 1 ]: string, [ 2 ]: string, [ 3 ]: any }
+
+mod_id = 'empty_the_blackhole_catgirl'
+empty_path = 'mods/' .. mod_id .. '/files/'
 
 int_huge = 2147483647
 
@@ -8,7 +14,92 @@ math_2p = 2 * math.pi
 math_e = math.exp( 1 )
 epsilon = 0.0003
 
+num_scale = tonumber( MagicNumbersGetValue( 'GUI_HP_MULTIPLIER' ) ) or 25
+
+max_deck_cap = 30
+
 chunk_len = 512
+
+setting_def = {
+	-- 新内容设置
+	EFFECT_CHANGE_DIAMOND_DIVIDE = true,
+	EFFECT_CHANGE_CHEST_LIGHT = true,
+	EFFECT_CHANGE_CHEST_DARK = true,
+	LOOT_CHANGE_ALCHEMIST = true,
+	LOOT_CHANGE_WIZARD = true,
+	LOOT_CHANGE_FRIEND = true,
+
+	EFFECT_CHANGE_PLAYER_SPEED_CAP = true,
+
+	EFFECT_CHANGE_STONE_AFFECT_IN_INV = true,
+
+	EFFECT_CHANGE_INIT_WAND_BLUE = true,
+	EFFECT_CHANGE_INIT_WAND_RED = true,
+	EFFECT_CHANGE_WAND_CONTENT = true,
+
+	EFFECT_CHANGE_POTION_HP = true,
+	EFFECT_CHANGE_POTION_VOLUME = true,
+	EFFECT_CHANGE_POTION_CONTENT = true,
+	EFFECT_CHANGE_POTION_HIGH_EXPLOSION = true,
+
+	MAGNIFICENT_CONCLUSION = false,
+
+	-- 世界设置
+	STARTING_EDIT = true,
+	TELEPORT_TO_PYRAMID = false,
+	CHAOS_CONNECTED_WORLD = false,
+	EASY_NG_PLUS = false,
+
+	-- 天赋设置
+	TRUE_POWER_OF_UNLIMITED_SPELLS = false,
+
+	-- 法术设置
+	UNLOCK_ALL_SPELL = false,
+	SPELL_ALL_EQUAL = false,
+
+	EFFECT_CHANGE_BOMB = true,
+	ICON_CHANGE_BLACKHOLE_DEATH_TRIGGER = true,
+	EFFECT_CHANGE_BUBBLESHOT = true,
+	EFFECT_CHANGE_BUBBLESHOT_TRIGGER = true,
+	ICON_CHANGE_MINE_DEATH_TRIGGER = true,
+	ICON_CHANGE_PIPE_BOMB_DEATH_TRIGGER = true,
+	ICON_CHANGE_SUMMON_EGG_DEATH_TRIGGER = true,
+
+	-- 敌怪设置
+	SPAWN_MANY_ENEMIES = false,
+	NO_KUMMITUS = false,
+
+	-- 诅咒设置
+	CURSE_MONK = false,
+	CURSE_ALWAYS_SHUFFLE = false,
+	CURSE_SHORT_WAND = false,
+	CURSE_MALICE_WASHES_OVER = false,
+	CURSE_REALITY_SHIFT = false,
+	CURSE_GUARANTEED_LOSE = false,
+	CURSE_GRAVITY_FREE = false,
+	CURSE_DEATH_TRAIL = false,
+
+	-- 视觉设置
+	VISION_IMPROVE = true,
+	REMOVE_LOW_HP_FLASH = false,
+
+	-- 漏洞 & 轮椅设置
+	BUGFIX_SPELL_TO_POWER = true,
+	BUGFIX_DUPE_MAX_HP_FROM_WORMRAIN = true,
+	BUGFIX_DUPE_MAX_HP_FROM_HEARTY = true,
+	BUGFIX_DUPE_DMG_MULTI_FROM_VULNERABLE = true,
+	BUGFIX_CONNOISSEUR_OF_WANDS = true,
+	BUGFIX_HAND_OF_MASTER = true,
+	CHEESE_CHANGE_CHAINSAW = false,
+
+	-- 杂项
+	DISPLAY_DEATH_COUNT = false,
+	COMMAND_FEEDBACK = true,
+	SVAROG_TRANSLATION = false,
+}
+
+---@type string[]
+all_mat = { }
 
 all_curses = {
 	'CURSE_MONK',
@@ -19,7 +110,7 @@ all_curses = {
 	'CURSE_GUARANTEED_LOSE',
 	'CURSE_GRAVITY_FREE',
 	'CURSE_DEATH_TRAIL',
-	--'CURSE_FURIOUS_COCKTAIL',
+	-- 'CURSE_FURIOUS_COCKTAIL',
 }
 
 all_d_muls = {
@@ -160,7 +251,10 @@ all_tag = {
 	player = 'player_unit',
 	poly_player = 'polymorphed_player',
 	enemy = 'enemy',
+	item = 'item_pickup',
 }
+
+max_adjust = 180
 
 orbit_loc_fix = {
 	{ x = 12, y = 12 },
@@ -168,8 +262,6 @@ orbit_loc_fix = {
 	{ x = -12, y = 12 },
 	{ x = -12, y = -12 },
 }
-
-max_adjust = 180
 
 ---打印一切信息, 此函数仅用于调试;
 ---正式版本中不应该看见任何地方调用这个函数
@@ -213,28 +305,28 @@ end
 
 ---检测 num 是否是正常数值
 ---@param num any
----@return boolean is_not_0_num
+---@return boolean is_num
 function is_not_nan_num( num )
 	return type( num ) == 'number' and num == num
 end
 
 ---检测 num 是否是正常数值且不为 0
 ---@param num any
----@return boolean is_not_0_num
+---@return boolean is_num
 function is_not_0_num( num )
 	return is_not_nan_num( num ) and num ~= 0
 end
 
 ---检测 str 是否是字符串且不为空字符串
 ---@param str any
----@return boolean is_not_nil_str
+---@return boolean is_str
 function is_not_nil_str( str )
 	return type( str ) == 'string' and str ~= ''
 end
 
 ---检测 v_table 是否是表且不为空表
 ---@param v_table any
----@return boolean is_not_nil_table
+---@return boolean is_table
 function is_not_nil_table( v_table )
 	return type( v_table ) == 'table' and next( v_table ) ~= nil
 end
@@ -253,17 +345,41 @@ function is_alive( entity )
 	return ( is_not_0_num( entity ) and EntityGetIsAlive( entity ) )
 end
 
----检查 search 内是否包含 value
----@param value any
----@param search table|nil
+---检测组件是否为图像、粒子效果、光源、声音等泄露存在信息的组件
+---@param comp number
+---@return boolean is_exposing_comp
+function is_exposing_comp( comp )
+	local comp_type = ComponentGetTypeName( comp )
+
+	return comp_type == 'SpriteComponent'
+		or comp_type == 'ParticleEmitterComponent'
+		or comp_type == 'SpriteParticleEmitterComponent'
+		or comp_type == 'LightComponent'
+		or comp_type == 'AudioComponent'
+		or comp_type == 'AudioLoopComponent'
+end
+
+---检查 search 内是否包含 v
+---@param v any
+---@param search table
 ---@return boolean is_in
-function is_in( value, search )
-	if ( type( search ) ~= 'table' ) then
-		return false
+function is_in( v, search )
+	for i, _ in ipairs( search ) do
+		if ( _ == v ) then
+			return true
+		end
 	end
 
-	for _, v in ipairs( search ) do
-		if ( v == value ) then
+	return false
+end
+
+---检查多个 search 内是否包含 v
+---@param v any
+---@param searches table[]
+---@return boolean is_in_mul
+function is_in_mul( v, searches )
+	for i, _ in ipairs( searches ) do
+		if ( is_in( v, _ ) ) then
 			return true
 		end
 	end
@@ -318,28 +434,39 @@ function atan( y, x )
 	end
 end
 
+---获取翻译
+---@param trans_key string
+---@param ... any
+---@return string trans_text
+function get_trans_text( trans_key, ... )
+	return GameTextGet( trans_key, ... )
+end
+
 ---显示重要信息
 ---@param title string
 ---@param desc string?
 function imp_print( title, desc )
-	if ( type( title ) == 'string' and type( desc ) == 'string' ) then
-		GamePrintImportant( title, desc )
-	elseif ( type( title ) == 'string' and type( desc ) ~= 'string' ) then
-		GamePrintImportant( title, '' )
+	if ( is_not_nil_str( title ) ) then
+		if ( is_not_nil_str( desc ) ) then
+			GamePrintImportant( title, desc )
+		else
+			GamePrintImportant( title, '' )
+		end
 	end
 end
 
 ---发送提示信息
+---@param trans_key string
+---@param ... any
+function trans_print( trans_key, ... )
+	GamePrint( get_trans_text( trans_key, ... ) )
+end
+
+---发送命令相关提示信息
 ---@param name string
 ---@param ... any
 function command_print( name, ... )
 	GamePrint( name .. ' : ' .. GameTextGet( ... ) )
-end
-
-if ( not ModSettingGet( 'empty_the_blackhole_catgirl.COMMAND_FEEDBACK' ) ) then
-	command_print = function ( name, ... )
-		--
-	end
 end
 
 ---返回关于时间的 3 个数, 主要作为随机种子使用
@@ -425,6 +552,19 @@ function create_all_table( k_table, v )
 	end
 
 	return v_table
+end
+
+---将 { key = value } 内联表转换为 any_pair[] 格式 { { 'key', value } }
+---@param v_table table<string, any>
+---@return any_pair[] v_table
+function convert_any_air( v_table )
+	local res = { }
+
+	for k, v in pairs( v_table ) do
+		table.insert( res, { k, v } )
+	end
+
+	return res
 end
 
 ---Lanczos 近似系数 ( g = 7, n = 9 )
@@ -540,8 +680,8 @@ end
 ---可在加入前清空 main 或在加入后清空 merge
 ---@param main table
 ---@param merge table
----@param is_clean_main boolean? --默认为 false
----@param is_clean_merge boolean? --默认为 true
+---@param is_clean_main boolean? -- 默认为 false
+---@param is_clean_merge boolean? -- 默认为 true
 function add_table( main, merge, is_clean_main, is_clean_merge )
 	if ( is_clean_main == nil ) then
 		is_clean_main = false
@@ -574,7 +714,7 @@ end
 ---可在替换后清空 replace
 ---@param main table
 ---@param replace table
----@param is_clean_replace boolean? --默认为 true
+---@param is_clean_replace boolean? -- 默认为 true
 function update_table_by_id( main, replace, is_clean_replace )
 	if ( is_clean_replace == nil ) then
 		is_clean_replace = true
@@ -614,7 +754,7 @@ end
 ---将 main 逆序并返回;
 ---可修改 main
 ---@param main table
----@param is_change_main boolean? --默认为 true
+---@param is_change_main boolean? -- 默认为 true
 ---@return table reversed
 function reverse_table( main, is_change_main )
 	if ( is_change_main == nil ) then
@@ -650,8 +790,8 @@ end
 ---将 from 中第 pos_from 项移动至 to 中 pos_to 位置
 ---@param from table
 ---@param to table
----@param pos_from integer? --默认为 1
----@param pos_to integer? --默认为 #to + 1
+---@param pos_from integer? -- 默认为 1
+---@param pos_to integer? -- 默认为 #to + 1
 function add_table_1( from, to, pos_from, pos_to )
 	if ( pos_from == nil ) then
 		pos_from = 1
@@ -668,9 +808,9 @@ end
 ---@param from table
 ---@param to table
 ---@param count integer
----@param from_front boolean? --默认为 true
----@param to_front boolean? --默认为 false
----@param is_reverse_order boolean? --默认为 false
+---@param from_front boolean? -- 默认为 true
+---@param to_front boolean? -- 默认为 false
+---@param is_reverse_order boolean? -- 默认为 false
 function add_table_count( from, to, count, from_front, to_front, is_reverse_order )
 	if ( count < 1 ) then
 		return
@@ -731,6 +871,17 @@ function ensure_table( check, keys )
 
 	return check
 end
+
+-- 延迟到 add_table 定义后再加
+if ( #all_mat <= 0 ) then
+	add_table( all_mat, CellFactory_GetAllLiquids( ) or { } )
+	add_table( all_mat, CellFactory_GetAllSolids( ) or { } )
+	add_table( all_mat, CellFactory_GetAllSands( ) or { } )
+	add_table( all_mat, CellFactory_GetAllGases( ) or { } )
+	add_table( all_mat, CellFactory_GetAllFires( ) or { } )
+end
+
+info_print( all_mat )
 
 ---从 random_table 中随机选取 count 项;
 ---count 或 random_table 的长度小于 1 时返回空表;
@@ -815,11 +966,11 @@ end
 ---@param key string
 ---@param value number
 ---@return number res
-function get_globals_num( key, value )
+function get_global_num( key, value )
 	local res = tonumber( GlobalsGetValue( key ) )
 
-	if ( type( res ) == 'number' and res == res ) then
-		return res
+	if ( is_not_nan_num( res ) ) then
+		return res or value
 	else
 		return value
 	end
@@ -828,8 +979,8 @@ end
 ---设置全局变量的数值
 ---@param key string
 ---@param value number
-function set_globals_num( key, value )
-	if ( type( value ) == 'number' and value == value ) then
+function set_global_num( key, value )
+	if ( is_not_nan_num( value ) ) then
 		GlobalsSetValue( key, tostring( value ) )
 	end
 end
@@ -838,8 +989,8 @@ end
 ---@param key string
 ---@param value any
 ---@return any res
-function get_settings_num( key, value )
-	local res = ModSettingGet( key )
+function get_setting_value( key, value )
+	local res = ModSettingGet( mod_id .. '.' .. string.upper( key ) )
 
 	if ( res ~= nil ) then
 		return res
@@ -851,9 +1002,42 @@ end
 ---设置模组设置的值
 ---@param key string
 ---@param value any
-function set_settings_num( key, value )
+function set_setting_value( key, value )
 	if ( value ~= nil ) then
-		ModSettingSet( key, value )
+		ModSettingSet( mod_id .. '.' .. string.upper( key ), value )
+	end
+end
+
+---获取模组设置的值, 没有的场合用默认值代替
+---@param key string
+---@return any res
+function get_setting_by_def( key )
+	local res = ModSettingGet( mod_id .. '.' .. string.upper( key ) )
+
+	if ( res ~= nil ) then
+		return res
+	else
+		return setting_def[ key ]
+	end
+end
+
+if ( not get_setting_by_def( 'COMMAND_FEEDBACK' ) ) then
+	command_print = function ( name, ... )
+		--
+	end
+end
+
+---获取状态的值
+---@param key string
+---@param value any
+---@return any res
+function get_stat_value( key, value )
+	local res = tonumber( StatsGlobalGetValue( key ) )
+
+	if ( res ) then
+		return res
+	else
+		return value
 	end
 end
 
@@ -879,12 +1063,12 @@ function max_hp_mul( entity, calc_type, mul, is_full_hp )
 		if ( max_hp > 0 ) then
 			if ( is_full_hp ) then
 				set_comp_value( entity, 'DamageModelComponent', nil, {
-					max_hp = max_hp,
-					hp = max_hp,
+					{ 'max_hp', max_hp },
+					{ 'hp', max_hp },
 				}, nil, nil )
 			else
 				set_comp_value( entity, 'DamageModelComponent', nil, {
-					max_hp = max_hp,
+					{ 'max_hp', max_hp },
 				}, nil, nil )
 			end
 		end
@@ -893,7 +1077,7 @@ end
 
 ---倍乘实体的承伤系数
 ---@param entity number
----@param calc_type string
+---@param calc_type string -- 计算方式: * 或 /
 ---@param mul number|table<string, number>
 function d_comps_mul( entity, calc_type, mul )
 	if ( is_has_comp( entity, 'DamageModelComponent', nil, nil ) ) then
@@ -997,9 +1181,10 @@ function get_len( vel_x, vel_y )
 	end
 end
 
----根据 num 在 min_num 与 max_num 之间的位置对数地获取 mul
+---根据 num 在 min_num 与 max_num 之间的位置获取 mul
+---log_e = 1 线性; log_e > 1 对数函数; 0 < log_e < 1 指数函数
 ---@param num number
----@param paras table<string, number>
+---@param paras table<string, number> -- min_num | max_num | min_log | max_log | log_e
 ---@return number log_mul
 function get_log_mul( num, paras )
 	if ( num <= paras.min_num ) then
@@ -1008,21 +1193,29 @@ function get_log_mul( num, paras )
 		return paras.max_log
 	end
 
-	local curve = paras.log_e or 1
+	local log_e = paras.log_e or 1
 
-	if ( curve <= 0 ) then
-		curve = 1
+	if ( log_e <= 0 ) then
+		log_e = 1
 	end
 
 	local num_range = paras.max_num - paras.min_num
 	local log_range = paras.max_log - paras.min_log
+	local t = ( num - paras.min_num ) / num_range
 
-	local diff = ( num - paras.min_num ) * curve
-	local range = num_range * curve
+	local ratio
 
-	local log_mul = math.log( diff + 1 ) / math.log( range + 1 )
+	if ( log_e == 1 ) then
+		ratio = t
+	elseif ( log_e > 1 ) then
+		local s = log_e - 1
+		ratio = math.log( t * num_range * s + 1 ) / math.log( num_range * s + 1 )
+	else
+		local p = 1 / log_e
+		ratio = t ^ p
+	end
 
-	return paras.min_log + log_range * log_mul
+	return paras.min_log + log_range * ratio
 end
 
 ---标准化向量
@@ -1166,14 +1359,14 @@ end
 ---获取生命显示比例
 ---@return number
 function get_scale( )
-	return tonumber( MagicNumbersGetValue( 'GUI_HP_MULTIPLIER' ) ) or 0
+	return num_scale
 end
 
 ---获取金钱数
 ---@param entity number
 ---@return number money
 function get_money( entity )
-	local wallet_comp, money = EntityGetFirstComponent( entity, 'WalletComponent' ), 0
+	local wallet_comp, money = EntityGetFirstComponentIncludingDisabled( entity, 'WalletComponent' ), 0
 
 	if ( wallet_comp ) then
 		money = ComponentGetValue2( wallet_comp, 'money' ) or 0
@@ -1199,11 +1392,11 @@ function cap( min, num, max )
 end
 
 ---将 num 的值循环调整至 min, max 之间
----@param num number
 ---@param min number
+---@param num number
 ---@param max number
----@return number mul_cap
-function mod_cap( num, min, max )
+---@return number mod_cap
+function mod_cap( min, num, max )
 	if ( min == max ) then
 		return max
 	end
@@ -1276,6 +1469,28 @@ end
 ---@return number
 function comp_get_entity( comp )
 	return ComponentGetEntity( comp )
+end
+
+---获取有 tag 而没有 tag_without 的所有实体
+---@param tag string
+---@param tag_without string?
+---@return number[] entity
+function get_all_entity( tag, tag_without )
+	local all = EntityGetWithTag( tag )
+
+	if ( is_not_nil_str( tag_without ) ) then
+		local entity = { }
+
+		for i, _ in ipairs( all ) do
+			if ( not EntityHasTag( _, tag_without ) ) then
+				table.insert( entity, _ )
+			end
+		end
+
+		return entity
+	else
+		return all
+	end
 end
 
 ---获取投射物的发射者
@@ -1374,6 +1589,12 @@ function get_closest_player( tar_id, tar_x, tar_y )
 	end
 end
 
+---随机获取 1 种材料
+---@return string mat
+function get_random_mat( )
+	return get_random_from( all_mat )
+end
+
 ---创建自定义价值的黄金块
 ---@param x number
 ---@param y number
@@ -1388,18 +1609,18 @@ function create_gold( x, y, value, unlimit_time )
 
 	if ( is_not_0_num( value ) ) then
 		set_comp_value( gold, 'VariableStorageComponent', 'empty_gold_value', {
-			value_int = value,
+			{ 'value_int', value },
 		}, nil, nil )
 
 		if ( value > 30000 ) then
 			set_comp_value( gold, 'PhysicsImageShapeComponent', nil, {
-				image_file = 'data/items_gfx/easter/golden_idol_big.png',
+				{ 'image_file', 'data/items_gfx/easter/golden_idol_big.png' },
 			}, nil, nil )
 		end
 	end
 
 	set_comp_value( gold, 'VelocityComponent', nil, {
-		mVelocity = { Random( -10, 10 ), Random( -10, 10 ) },
+		{ 'mVelocity', { Random( -10, 10 ), Random( -10, 10 ) } },
 	}, nil, nil )
 end
 
@@ -1418,13 +1639,7 @@ function copy_comp( entity, comp )
 		local comp_mem = ComponentGetMembers( _ )
 		local real_comp = { }
 
-		for k, v in pairs( comp_mem or { } ) do
-			--TODO
-		end
-
-		for j, e in ipairs( entity ) do
-			add_comp( entity, '', real_comp )
-		end
+		-- TODO
 	end
 end
 
@@ -1516,7 +1731,7 @@ function get_all_comp( entity, comp_type, tag, name )
 		return { }
 	end
 
-	if ( is_not_nil_str( comp_type ) and type( comp_type ) == 'string' ) then
+	if ( is_not_nil_str( comp_type ) ) then
 		if ( is_not_nil_str( tag ) and type( tag ) == 'string' ) then
 			for i, _ in ipairs( entity ) do
 				add_table( comps, EntityGetComponentIncludingDisabled( _, comp_type, tag ) or { } )
@@ -1527,9 +1742,21 @@ function get_all_comp( entity, comp_type, tag, name )
 			end
 		end
 	else
+		local all_comps = { }
+
 		for i, _ in ipairs( entity ) do
-			add_table( comps, EntityGetAllComponents( _ ) )
+			add_table( all_comps, EntityGetAllComponents( _ ) )
 		end
+
+		if ( is_not_nil_str( tag ) ) then
+			for _ = #all_comps, 1, -1 do
+				if ( not ComponentHasTag( all_comps[ _ ], tag ) ) then
+					table.remove( all_comps, _ )
+				end
+			end
+		end
+
+		add_table( comps, all_comps )
 	end
 
 	if ( is_not_nil_str( name ) ) then
@@ -1559,46 +1786,12 @@ end
 ---没有的场合用 field_table 对应"键"的值代替
 ---@param entity number
 ---@param comp_type string
----@param tag string|nil
----@param field_table table<string, any>[]|nil
+---@param tag string?
+---@param field_table any_pair[]?
 ---@param name string?
 ---@return any ...
 function get_comp_value( entity, comp_type, tag, field_table, name )
-	local values, comp = { }, nil
-
-	if ( type( tag ) == 'string' ) then
-		if ( is_not_nil_str( name ) ) then
-			local comps = EntityGetComponent( entity, comp_type, tag )
-
-			for i, _ in ipairs( comps or { } ) do
-				local v = ComponentGetValue2( _, 'name' )
-
-				if ( v and v == name ) then
-					comp = _
-
-					break
-				end
-			end
-		else
-			comp = EntityGetFirstComponent( entity, comp_type, tag )
-		end
-	else
-		if ( is_not_nil_str( name ) ) then
-			local comps = EntityGetComponent( entity, comp_type )
-
-			for i, _ in ipairs( comps or { } ) do
-				local v = ComponentGetValue2( _, 'name' )
-
-				if ( v and v == name ) then
-					comp = _
-
-					break
-				end
-			end
-		else
-			comp = EntityGetFirstComponent( entity, comp_type )
-		end
-	end
+	local values, comp = { }, get_all_comp( entity, comp_type, tag, name )[ 1 ]
 
 	if ( comp ) then
 		for _, t in ipairs( field_table or { } ) do
@@ -1625,46 +1818,12 @@ end
 ---没有的场合用 field_table 对应"键"的默认值代替
 ---@param entity number
 ---@param comp_type string
----@param tag string|nil
----@param field_table table<string, string, any>[]|nil
+---@param tag string?
+---@param field_table any_tri[]?
 ---@param name string?
 ---@return any ...
 function get_comp_obj_value( entity, comp_type, tag, field_table, name )
-	local values, comp = { }, nil
-
-	if ( type( tag ) == 'string' ) then
-		if ( is_not_nil_str( name ) ) then
-			local comps = EntityGetComponent( entity, comp_type, tag )
-
-			for i, _ in ipairs( comps or { } ) do
-				local v = ComponentGetValue2( _, 'name' )
-
-				if ( v and v == name ) then
-					comp = _
-
-					break
-				end
-			end
-		else
-			comp = EntityGetFirstComponent( entity, comp_type, tag )
-		end
-	else
-		if ( is_not_nil_str( name ) ) then
-			local comps = EntityGetComponent( entity, comp_type )
-
-			for i, _ in ipairs( comps or { } ) do
-				local v = ComponentGetValue2( _, 'name' )
-
-				if ( v and v == name ) then
-					comp = _
-
-					break
-				end
-			end
-		else
-			comp = EntityGetFirstComponent( entity, comp_type )
-		end
-	end
+	local values, comp = { }, get_all_comp( entity, comp_type, tag, name )[ 1 ]
 
 	if ( comp ) then
 		for _, t in ipairs( field_table or { } ) do
@@ -1688,219 +1847,224 @@ end
 ---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件
 ---@param entity number|number[]
 ---@param comp_type string
----@param comp_table table
----@return number comps_count
----@return number[] affect_comps
+---@param comp_table any_pair[]
+---@return number[] aff_comps
 function add_comp( entity, comp_type, comp_table )
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
-	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
-		return 0, { }
+	elseif ( not is_not_nil_table( entity ) ) then
+		return { }
 	end
 
 	local comps = { }
 
-	for _, e in ipairs( entity ) do
-		local comp = EntityAddComponent2( e, comp_type, comp_table )
+	-- 将 any_pair[] 转为 { key = value }
+	local comp_table_old = { }
 
-		table.insert( comps, comp )
+	if ( is_not_nil_table( comp_table ) ) then
+		for _, pair in ipairs( comp_table ) do
+			comp_table_old[ pair[ 1 ] ] = pair[ 2 ]
+		end
 	end
 
-	return #comps, comps
+	if ( next( comp_table_old ) ~= nil ) then
+		for i, _ in ipairs( entity ) do
+			local comp = EntityAddComponent2( _, comp_type, comp_table_old )
+
+			table.insert( comps, comp )
+		end
+	end
+
+	return comps
+end
+
+---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件;
+---实体已有此组件时不添加
+---@param entity number|number[]
+---@param comp_type string
+---@param tag string?
+---@param comp_table any_pair[]
+---@param name string?
+---@return number[] aff_comps
+function add_comp_or_not( entity, comp_type, tag, comp_table, name )
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	elseif ( not is_not_nil_table( entity ) ) then
+		return { }
+	end
+
+	local aff_comps = { }
+
+	for i, _ in ipairs( entity ) do
+		if ( not is_has_comp( _, comp_type, tag, name ) ) then
+			add_table( aff_comps, add_comp( _, comp_type, comp_table ) )
+		end
+	end
+
+	return aff_comps
 end
 
 ---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件;
 ---当元素为字符串时，增量为 comp_table[ 元素 ] ;
 ---当元素为 { key, inc } 表时，增量为 inc ;
----会删除多余的组件, 返回影响组件的总数、操作方法以及受影响后仍存在的组件表
+---会删除多余的组件, 返回受影响后仍存在的组件表
 ---@param entity number|number[]
 ---@param comp_type string
 ---@param tag string|nil
----@param comp_table table
----@param prolong_table (string|{[1]:string,[2]:number})[]?
+---@param comp_table any_pair[]
+---@param prolong_table num_pair[]?
 ---@param name string|nil
----@return number comps_count
----@return string method
----@return number[] affect_comps
+---@return number[] aff_comps
 function add_comp_prolong( entity, comp_type, tag, comp_table, prolong_table, name )
-	local count, method = 0, 'nil'
-
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
 	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
-		return 0, method, { }
+		return { }
 	end
 
-	local comps = get_all_comp( entity, comp_type, tag, name )
+	local aff_comps, e_add = { }, { }
 
-	if ( #comps == 0 ) then
-		method, comps = 'add', { }
+	for i, _ in ipairs( entity ) do
+		local comps = get_all_comp( entity, comp_type, tag, name )
 
-		for _, e in ipairs( entity ) do
-			local comp = EntityAddComponent2( e, comp_type, comp_table )
+		if ( #comps > 0 ) then
+			for j, comp in ipairs( comps ) do
+				for l, k in ipairs( prolong_table or { } ) do
+					local v = ComponentGetValue2( comp, k[ 1 ] )
 
-			table.insert( comps, comp )
-		end
-
-		count = #comps
-	else
-		method, count = 'prolong', #comps
-		local op_comps, oped_entity = { }, { }
-
-		add_table( op_comps, comps, false, true )
-
-		for _, comp in ipairs( op_comps ) do
-			local op_entity = comp_get_entity( comp )
-
-			if ( is_in( op_entity, oped_entity ) ) then
-				EntityRemoveComponent( op_entity, comp )
-			else
-				table.insert( oped_entity, op_entity )
-
-				for i, k in ipairs( prolong_table or { } ) do
-					if ( type( k ) == 'table' and type( k[ 1 ] ) == 'string' and type( k[ 2 ] ) == 'number' ) then
-						local value = ComponentGetValue2( comp, k[ 1 ] )
-						ComponentSetValue2( comp, k[ 1 ], value + k[ 2 ] )
-					elseif ( type( k ) == 'string' and type( comp_table[ k ] ) == 'number' ) then
-						local value = ComponentGetValue2( comp, k )
-						ComponentSetValue2( comp, k, value + comp_table[ k ] )
+					if ( type( k[ 2 ] ) == 'number' ) then
+						ComponentSetValue2( comp, k[ 1 ], v + k[ 2 ] )
+					else
+						ComponentSetValue2( comp, k[ 1 ], v + comp_table[ k ] )
 					end
 				end
-
-				table.insert( comps, comp )
 			end
+
+			add_table( aff_comps, comps )
+		else
+			table.insert( e_add, _ )
 		end
 	end
 
-	return count, method, comps
+	if ( #e_add > 0 ) then
+		add_table( aff_comps, add_comp( e_add, comp_type, comp_table ) )
+	end
+
+	return aff_comps
 end
 
 ---为每个 entity 实体增加类型为 comp_type 的以 comp_table 构建的组件;
 ---会删除多余的组件, 返回影响组件的总数、操作方法以及受影响后仍存在的组件表
 ---@param entity number|number[]
 ---@param comp_type string
----@param tag string|nil
----@param comp_table table
+---@param tag string?
+---@param comp_table any_pair[]
 ---@param name string?
----@return number comps_count
----@return string method
 ---@return number[] affect_comps
 function add_comp_remove_dupli( entity, comp_type, tag, comp_table, name )
-	local count, method = 0, 'nil'
-
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
 	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
-		return 0, method, { }
+		return { }
 	end
 
-	local comps = get_all_comp( entity, comp_type, tag, name )
+	local aff_comps, e_add = { }, { }
 
-	if ( #comps == 0 ) then
-		method, comps = 'add', { }
+	for i, _ in ipairs( entity ) do
+		local comps = get_all_comp( _, comp_type, tag, name )
 
-		for _, e in ipairs( entity ) do
-			local comp = EntityAddComponent2( e, comp_type, comp_table )
+		if ( #comps > 0 ) then
+			for j, comp in ipairs( comps ) do
+				if ( j == 1 ) then
+					for l, k in ipairs( comp_table ) do
+						ComponentSetValue2( comp, k[ 1 ], k[ 2 ] )
+					end
 
-			table.insert( comps, comp )
-		end
-
-		count = #comps
-	else
-		method, count = 'change', #comps
-		local op_comps, oped_entity = { }, { }
-
-		add_table( op_comps, comps, false, true )
-
-		for _, comp in ipairs( op_comps ) do
-			local op_entity = comp_get_entity( comp )
-
-			if ( is_in( op_entity, oped_entity ) ) then
-				EntityRemoveComponent( op_entity, comp )
-			else
-				table.insert( oped_entity, op_entity )
-
-				for k, v in pairs( comp_table ) do
-					ComponentSetValue2( comp, k, v )
+					table.insert( aff_comps, comp )
+				else
+					EntityRemoveComponent( _, comp )
 				end
-
-				table.insert( comps, comp )
 			end
+		else
+			table.insert( e_add, _ )
 		end
 	end
 
-	return count, method, comps
+	if ( #e_add > 0 ) then
+		add_table( aff_comps, add_comp( e_add, comp_type, comp_table ) )
+	end
+
+	return aff_comps
 end
 
 ---将每个 entity 实体所有类型为 comp_type 的组件的值按照 v_table 设置;
 ---在传入 func 时对每个类型为 comp_type 的组件执行一次 func ;
----返回影响组件的总数以及受影响的组件表
+---返回受影响的组件表
 ---@param entity number|number[]
----@param comp_type string|nil
----@param tag string|nil
----@param v_table table|nil
+---@param comp_type string?
+---@param tag string?
+---@param v_table any_pair[]?
 ---@param pre_func function?
 ---@param aft_func function?
----@return number comps_count
 ---@return number[] affect_comps
 function set_comp_value( entity, comp_type, tag, v_table, pre_func, aft_func )
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
 	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
-		return 0, { }
+		return { }
 	end
 
-	local comps = get_all_comp( entity, comp_type, tag )
+	local aff_comps = get_all_comp( entity, comp_type, tag )
 
 	if ( is_not_nil_table( v_table ) ) then
 		if ( pre_func ) then
 			if ( aft_func ) then
-				for _, comp in ipairs( comps ) do
+				for i, comp in ipairs( aff_comps ) do
 					pre_func( comp )
 
-					for k, v in pairs( v_table or { } ) do
-						if ( type( v ) == 'table' ) then
-							ComponentSetValue2( comp, k, unpack( v ) )
+					for j, _ in ipairs( v_table or { } ) do
+						if ( type( _[ 2 ] ) == 'table' ) then
+							ComponentSetValue2( comp, _[ 1 ], unpack( _[ 2 ] ) )
 						else
-							ComponentSetValue2( comp, k, v )
+							ComponentSetValue2( comp, _[ 1 ], _[ 2 ] )
 						end
 					end
 
 					aft_func( comp )
 				end
 			else
-				for _, comp in ipairs( comps ) do
+				for i, comp in ipairs( aff_comps ) do
 					pre_func( comp )
 
-					for k, v in pairs( v_table or { } ) do
-						if ( type( v ) == 'table' ) then
-							ComponentSetValue2( comp, k, unpack( v ) )
+					for j, _ in ipairs( v_table or { } ) do
+						if ( type( _[ 2 ] ) == 'table' ) then
+							ComponentSetValue2( comp, _[ 1 ], unpack( _[ 2 ] ) )
 						else
-							ComponentSetValue2( comp, k, v )
+							ComponentSetValue2( comp, _[ 1 ], _[ 2 ] )
 						end
 					end
 				end
 			end
 		else
 			if ( aft_func ) then
-				for _, comp in ipairs( comps ) do
-					for k, v in pairs( v_table or { } ) do
-						if ( type( v ) == 'table' ) then
-							ComponentSetValue2( comp, k, unpack( v ) )
+				for i, comp in ipairs( aff_comps ) do
+					for j, _ in ipairs( v_table or { } ) do
+						if ( type( _[ 2 ] ) == 'table' ) then
+							ComponentSetValue2( comp, _[ 1 ], unpack( _[ 2 ] ) )
 						else
-							ComponentSetValue2( comp, k, v )
+							ComponentSetValue2( comp, _[ 1 ], _[ 2 ] )
 						end
 					end
 
 					aft_func( comp )
 				end
 			else
-				for _, comp in ipairs( comps ) do
-					for k, v in pairs( v_table or { } ) do
-						if ( type( v ) == 'table' ) then
-							ComponentSetValue2( comp, k, unpack( v ) )
+				for i, comp in ipairs( aff_comps ) do
+					for j, _ in ipairs( v_table or { } ) do
+						if ( type( _[ 2 ] ) == 'table' ) then
+							ComponentSetValue2( comp, _[ 1 ], unpack( _[ 2 ] ) )
 						else
-							ComponentSetValue2( comp, k, v )
+							ComponentSetValue2( comp, _[ 1 ], _[ 2 ] )
 						end
 					end
 				end
@@ -1909,54 +2073,53 @@ function set_comp_value( entity, comp_type, tag, v_table, pre_func, aft_func )
 	else
 		if ( pre_func ) then
 			if ( aft_func ) then
-				for _, comp in ipairs( comps ) do
+				for i, comp in ipairs( aff_comps ) do
 					pre_func( comp )
 
 					aft_func( comp )
 				end
 			else
-				for _, comp in ipairs( comps ) do
+				for i, comp in ipairs( aff_comps ) do
 					pre_func( comp )
 				end
 			end
 		else
 			if ( aft_func ) then
-				for _, comp in ipairs( comps ) do
+				for i, comp in ipairs( aff_comps ) do
 					aft_func( comp )
 				end
 			else
-				comps = { }
+				return { }
 			end
 		end
 	end
 
-	return #comps, comps
+	return aff_comps
 end
 
 ---将每个 entity 实体所有类型为 comp_type 的组件内子对象属性按照 v_table 设置;
 ---在传入 func 时对每个类型为 comp_type 的组件执行一次 func ;
----返回影响组件的总数以及受影响的组件表
+---返回受影响的组件表
 ---@param entity number|number[]
 ---@param comp_type string
----@param tag string|nil
----@param v_table table<string, string, any>[]|nil
+---@param tag string?
+---@param v_table any_tri[]?
 ---@param pre_func function?
 ---@param aft_func function?
----@return number comps_count
 ---@return number[] affect_comps
 function set_comp_obj_value( entity, comp_type, tag, v_table, pre_func, aft_func )
 	if ( type( entity ) == 'number' ) then
 		entity = { entity }
 	elseif ( entity == nil or not is_not_nil_table( entity ) ) then
-		return 0, { }
+		return { }
 	end
 
-	local comps = get_all_comp( entity, comp_type, tag )
+	local aff_comps = get_all_comp( entity, comp_type, tag )
 
 	if ( is_not_nil_table( v_table ) ) then
 		if ( pre_func ) then
 			if ( aft_func ) then
-				for i, comp in ipairs( comps ) do
+				for i, comp in ipairs( aff_comps ) do
 					pre_func( comp )
 
 					for j, _ in ipairs( v_table or { } ) do
@@ -1970,7 +2133,7 @@ function set_comp_obj_value( entity, comp_type, tag, v_table, pre_func, aft_func
 					aft_func( comp )
 				end
 			else
-				for i, comp in ipairs( comps ) do
+				for i, comp in ipairs( aff_comps ) do
 					pre_func( comp )
 
 					for j, _ in ipairs( v_table or { } ) do
@@ -1984,7 +2147,7 @@ function set_comp_obj_value( entity, comp_type, tag, v_table, pre_func, aft_func
 			end
 		else
 			if ( aft_func ) then
-				for i, comp in ipairs( comps ) do
+				for i, comp in ipairs( aff_comps ) do
 					for j, _ in ipairs( v_table or { } ) do
 						if ( type( _[ 3 ] ) == 'table' ) then
 							ComponentObjectSetValue2( comp, _[ 1 ], _[ 2 ], unpack( _[ 3 ] ) )
@@ -1996,7 +2159,7 @@ function set_comp_obj_value( entity, comp_type, tag, v_table, pre_func, aft_func
 					aft_func( comp )
 				end
 			else
-				for i, comp in ipairs( comps ) do
+				for i, comp in ipairs( aff_comps ) do
 					for j, _ in ipairs( v_table or { } ) do
 						if ( type( _[ 3 ] ) == 'table' ) then
 							ComponentObjectSetValue2( comp, _[ 1 ], _[ 2 ], unpack( _[ 3 ] ) )
@@ -2010,28 +2173,28 @@ function set_comp_obj_value( entity, comp_type, tag, v_table, pre_func, aft_func
 	else
 		if ( pre_func ) then
 			if ( aft_func ) then
-				for _, comp in ipairs( comps ) do
+				for _, comp in ipairs( aff_comps ) do
 					pre_func( comp )
 
 					aft_func( comp )
 				end
 			else
-				for _, comp in ipairs( comps ) do
+				for _, comp in ipairs( aff_comps ) do
 					pre_func( comp )
 				end
 			end
 		else
 			if ( aft_func ) then
-				for _, comp in ipairs( comps ) do
+				for _, comp in ipairs( aff_comps ) do
 					aft_func( comp )
 				end
 			else
-				comps = { }
+				return { }
 			end
 		end
 	end
 
-	return #comps, comps
+	return aff_comps
 end
 
 ---移除每个 entity 实体所有类型为 comp_type 的组件;
@@ -2153,8 +2316,8 @@ end
 ---为投射物进行伤害变换
 ---@param proj number
 ---@param dmg_type string
----@param mul number? --伤害倍率, 默认 50%
----@param base_dmg number? --基础伤害, 默认 0
+---@param mul number? -- 伤害倍率, 默认 50%
+---@param base_dmg number? -- 基础伤害, 默认 0
 function damage_to( proj, dmg_type, mul, base_dmg )
 	if ( is_has_comp( proj, 'ProjectileComponent', nil ) ) then
 		mul, base_dmg = mul or 0.5, base_dmg or 0
@@ -2184,7 +2347,7 @@ function damage_to( proj, dmg_type, mul, base_dmg )
 
 		if ( dmg_type == 'projectile' ) then
 			set_comp_value( proj, 'ProjectileComponent', nil, {
-				damage = sum,
+				{ 'damage', sum },
 			}, nil, nil )
 		elseif ( dmg_type == 'healing' ) then
 			set_comp_obj_value( proj, 'ProjectileComponent', nil, {
@@ -2200,7 +2363,7 @@ end
 
 ---为投射物全伤害乘以伤害倍率
 ---@param proj number
----@param mul number? --伤害倍率, 默认 200%
+---@param mul number? -- 伤害倍率, 默认 200%
 ---@return boolean is_has_dmg
 ---@return table<string, number> dmg_data
 function damage_mul( proj, mul )
@@ -2217,7 +2380,7 @@ function damage_mul( proj, mul )
 			p_dmg = p_dmg * mul
 
 			set_comp_value( proj, 'ProjectileComponent', nil, {
-				damage = p_dmg,
+				{ 'damage', p_dmg },
 			}, nil, nil )
 
 			is_has_dmg, dmg_data.projectile = true, p_dmg
@@ -2263,6 +2426,82 @@ function damage_mul( proj, mul )
 	return is_has_dmg, dmg_data
 end
 
+---获取一个法杖的法力信息
+---@param wand number
+---@return number mana_max
+---@return number mana_charge
+function get_wand_mana( wand )
+	local mana_max, mana_charge = get_comp_value( wand, 'AbilityComponent', nil, {
+		{ 'mana_max', 0 },
+		{ 'mana_charge_speed', 0 },
+	}, nil )
+
+	return mana_max, mana_charge
+end
+
+---设置一个法杖的法力信息
+---@param wand number
+---@param mana_max number?
+---@param mana_charge number?
+function set_wand_mana( wand, mana_max, mana_charge )
+	local data = { }
+	local is_max, is_charge = is_not_nan_num( mana_max ), is_not_nan_num( mana_charge )
+
+	if ( is_max or is_charge ) then
+		if ( is_max ) then
+			data.mana_max = mana_max
+		end
+
+		if ( is_charge ) then
+			data.mana_charge_speed = mana_charge
+		end
+
+		set_comp_value( wand, 'AbilityComponent', nil, data, nil, nil )
+	end
+end
+
+---获取一个法杖的双延迟信息
+---@param wand number
+---@return number delay
+---@return number reload
+function get_wand_delay( wand )
+	local delay, relaod = get_comp_obj_value( wand, 'AbilityComponent', nil, {
+		{ 'gunaction_config', 'fire_rate_wait', 0 },
+		{ 'gun_config', 'reload_time', 0 },
+	}, nil )
+
+	return delay, relaod
+end
+
+---设置一个法杖的双延迟信息
+---@param wand number
+---@param delay number?
+---@param reload number?
+function set_wand_delay( wand, delay, reload )
+	local data = { }
+	local is_delay, is_reload = is_not_nan_num( delay ), is_not_nan_num( reload )
+
+	if ( is_delay or is_reload ) then
+		if ( is_delay ) then
+			table.insert( data, {
+				'gunaction_config',
+				'fire_rate_wait',
+				delay,
+			} )
+		end
+
+		if ( is_reload ) then
+			table.insert( data, {
+				'gun_config',
+				'reload_time',
+				reload,
+			} )
+		end
+
+		set_comp_obj_value( wand, 'AbilityComponent', nil, data, nil, nil )
+	end
+end
+
 ---获取一个法杖的始终释放法术信息
 ---@param wand number
 ---@return number always_count
@@ -2298,7 +2537,7 @@ end
 ---@param tgt_real_cap number 目标普通容量
 ---@param tgt_always number 目标始终法术数量
 ---@return number actual_always 实际调整后的始终法术数量（可能因实体不足而小于目标）
-function adjusts_spells( wand, tgt_real_cap, tgt_always )
+function adjust_spells( wand, tgt_real_cap, tgt_always )
 	local spells, always, non_always = get_all_child( wand ), { }, { }
 	local cur_always = get_always( wand )
 
@@ -2323,7 +2562,7 @@ function adjusts_spells( wand, tgt_real_cap, tgt_always )
 			local card = non_always[ _ ]
 
 			set_comp_value( card, 'ItemComponent', nil, {
-				permanently_attached = true,
+				{ 'permanently_attached', true },
 			}, nil, nil )
 		end
 
@@ -2335,7 +2574,7 @@ function adjusts_spells( wand, tgt_real_cap, tgt_always )
 			local card = always[ #always - _ + 1 ]
 
 			set_comp_value( card, 'ItemComponent', nil, {
-				permanently_attached = false,
+				{ 'permanently_attached', false },
 			}, nil, nil )
 		end
 
@@ -2366,12 +2605,17 @@ function adjusts_spells( wand, tgt_real_cap, tgt_always )
 		for _ = 1, excess, 1 do
 			table.insert( real_spell, cur_non_always[ #cur_non_always - _ + 1 ] )
 		end
-info_print( real_spell, 'adjusts spells - real_spell' )
-		rem_child( real_spell, x, y )
 
-		set_comp_value( real_spell, nil, 'enabled_in_world', {
-			_enabled = true,
-		}, nil, nil )
+		for _, spell in ipairs( real_spell ) do
+			local comp = EntityGetFirstComponentIncludingDisabled( spell, 'ItemActionComponent' )
+			local action_id = comp and ComponentGetValue2( comp, 'action_id' ) or ''
+
+			if ( is_not_nil_str( action_id ) ) then
+				CreateItemActionEntity( action_id, x + Random( -8, 8 ), y - 4 + Random( -6, 6 ) )
+			end
+
+			EntityKill( spell )
+		end
 	end
 
 	return new_always
@@ -2379,7 +2623,7 @@ end
 
 ---调整法杖容量
 ---@param wand number|number[]
----@param cap_change table<string, number?> --属性: always_set, always_delta, real_set, real_delta
+---@param cap_change table<string, number?> -- 属性: always_set, always_delta, real_set, real_delta
 function adjust_wand_deck( wand, cap_change )
 	if ( type( wand ) == 'number' ) then
 		wand = { wand }
@@ -2405,7 +2649,7 @@ function adjust_wand_deck( wand, cap_change )
 
 			tar_always, tar_real_cap = math.max( tar_always, 0 ), math.max( tar_real_cap, 0 )
 
-			local actual_always = adjusts_spells( entity, tar_real_cap, tar_always )
+			local actual_always = adjust_spells( entity, tar_real_cap, tar_always )
 
 			local deck_cap = tar_real_cap + actual_always
 
@@ -2440,21 +2684,21 @@ function shoot_proj( from, xml, x, y, vel_x, vel_y, tag, func_pre, func_aft )
 			}, nil )
 
 			set_comp_value( from, 'ProjectileComponent', nil, {
-				mEntityThatShot = e,
+				{ 'mEntityThatShot', e },
 			}, nil, nil )
 
 			if ( is_has_comp( e, 'ProjectileComponent', nil ) ) then
 				set_comp_value( e, 'ProjectileComponent', nil, {
-					mWhoShot = shooter,
-					mShooterHerdId = herd,
+					{ 'mWhoShot', shooter },
+					{ 'mShooterHerdId', herd },
 				}, nil, nil )
 
 				if ( EntityHasTag( from, 'friendly_fire_enabled' ) ) then
 					EntityAddTag( e, 'friendly_fire_enabled' )
 
 					set_comp_value( e, 'ProjectileComponent', nil, {
-						friendly_fire = true,
-						collide_with_shooter_frames = 6,
+						{ 'friendly_fire', true },
+						{ 'collide_with_shooter_frames', 6 },
 					}, nil, nil )
 				end
 			end
@@ -3214,7 +3458,7 @@ end
 ---@param pattern string?
 ---@return table|nil result_table
 function parse_and_evaluate_command_paras( action, entity, param_names, pattern )
-	local p_comp = EntityGetFirstComponent( entity, 'ProjectileComponent' )
+	local p_comp = EntityGetFirstComponentIncludingDisabled( entity, 'ProjectileComponent' )
 
 	if ( not p_comp ) then
 		return nil

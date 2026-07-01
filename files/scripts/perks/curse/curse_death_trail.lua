@@ -13,16 +13,16 @@ if ( is_alive( entity ) ) then
 
 		if ( not is_has_comp( entity, 'VariableStorageComponent', curse ) ) then
 			add_comp_remove_dupli( entity, 'VariableStorageComponent', curse, {
-				_tags = curse,
-				value_int = 0,
+				{ '_tags', curse },
+				{ 'value_int', 0 },
 			} )
 
 			set_comp_value( e, 'LifetimeComponent', nil, {
-				lifetime = max + 1,
+				{ 'lifetime', max + 1 },
 			}, nil, nil )
 
 			set_comp_value( e, 'ParticleEmitterComponent', curse, {
-				delay_frames = max,
+				{ 'delay_frames', max },
 			}, nil, nil )
 		else
 			local count = get_comp_value( entity, 'VariableStorageComponent', curse, {
@@ -31,15 +31,15 @@ if ( is_alive( entity ) ) then
 
 			if ( count < max - 180 ) then
 				set_comp_value( entity, 'VariableStorageComponent', curse, {
-					value_int = count + 1,
+					{ 'value_int', count + 1 },
 				}, nil, nil )
 
 				set_comp_value( e, 'LifetimeComponent', nil, {
-					lifetime = max - count + 1,
+					{ 'lifetime', max - count + 1 },
 				}, nil, nil )
 
 				set_comp_value( e, 'ParticleEmitterComponent', curse, {
-					delay_frames = max - count,
+					{ 'delay_frames', max - count },
 				}, nil, nil )
 			end
 		end

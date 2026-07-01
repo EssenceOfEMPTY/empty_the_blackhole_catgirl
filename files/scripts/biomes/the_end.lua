@@ -358,7 +358,7 @@ function spawn_nest(x, y)
 end
 
 function spawn_ladder(x, y)
-	--spawn(g_ladder,x,y-80,0,0)
+	-- spawn(g_ladder,x,y-80,0,0)
 end
 
 function spawn_meditation_cube( x, y )
@@ -734,9 +734,9 @@ function spawn_lab_puzzle(x, y)
 end
 
 
------------------------------------------
+---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -
 -- PIPES
------------------------------------------
+---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -
 
 function spawn_pipes_hor( x, y )
 end
