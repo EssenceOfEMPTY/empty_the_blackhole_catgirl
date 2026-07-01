@@ -209,7 +209,7 @@ local luas = {
 	'scripts/gun/gun_extra_modifiers',
 	'scripts/gun/procedural/gun_procedural',
 	'scripts/gun/procedural/gun_procedural_better',
-	'scripts/status_effects/status_list.lua',
+	'scripts/status_effects/status_list',
 }
 
 for i, _ in ipairs( luas ) do
