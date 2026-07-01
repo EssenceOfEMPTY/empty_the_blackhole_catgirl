@@ -1,5 +1,9 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
+function RandomFromArray( arr )
+	return get_random_from( arr )
+end
+
 local old_GetWand = GetWand
 
 function GetWand( gun )

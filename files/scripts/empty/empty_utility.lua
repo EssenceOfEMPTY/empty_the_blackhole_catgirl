@@ -41,6 +41,7 @@ setting_def = {
 	EFFECT_CHANGE_POTION_VOLUME = true,
 	EFFECT_CHANGE_POTION_CONTENT = true,
 	EFFECT_CHANGE_POTION_HIGH_EXPLOSION = true,
+	EFFECT_CHANGE_TEMPLE_HEART_ALSO_BUFF = true,
 
 	MAGNIFICENT_CONCLUSION = false,
 
@@ -872,17 +873,6 @@ function ensure_table( check, keys )
 	return check
 end
 
--- 延迟到 add_table 定义后再加
-if ( #all_mat <= 0 ) then
-	add_table( all_mat, CellFactory_GetAllLiquids( ) or { } )
-	add_table( all_mat, CellFactory_GetAllSolids( ) or { } )
-	add_table( all_mat, CellFactory_GetAllSands( ) or { } )
-	add_table( all_mat, CellFactory_GetAllGases( ) or { } )
-	add_table( all_mat, CellFactory_GetAllFires( ) or { } )
-end
-
-info_print( all_mat )
-
 ---从 random_table 中随机选取 count 项;
 ---count 或 random_table 的长度小于 1 时返回空表;
 ---count 大于 random_table 的长度时变作与 random_table 的长度相同
@@ -1592,6 +1582,16 @@ end
 ---随机获取 1 种材料
 ---@return string mat
 function get_random_mat( )
+	if ( #all_mat <= 0 ) then
+		add_table( all_mat, CellFactory_GetAllLiquids( ) or { } )
+		add_table( all_mat, CellFactory_GetAllSolids( ) or { } )
+		add_table( all_mat, CellFactory_GetAllSands( ) or { } )
+		add_table( all_mat, CellFactory_GetAllGases( ) or { } )
+		add_table( all_mat, CellFactory_GetAllFires( ) or { } )
+	end
+
+	--info_print( all_mat )
+
 	return get_random_from( all_mat )
 end
 
@@ -3449,6 +3449,242 @@ function add_desc_by_info( c, options, args, extra_entities, pattern )
 			end
 		end
 	end
+end
+
+---处理延迟表达式
+---@param expr_string string
+---@param pattern string
+---@param shooter number
+---@param tar_x number
+---@param tar_y number
+---@return string|number|number[]|nil result
+---@return boolean is_correct
+function evaluate_delayed_expression( expr_string, pattern, shooter, tar_x, tar_y )
+	if ( not expr_string or expr_string == '' ) then
+		return nil, false
+	end
+
+	local actual_expr = expr_string
+	if ( string.sub( expr_string, 1, #DELY_EXPR_PREFIX ) == DELY_EXPR_PREFIX ) then
+		actual_expr = string.sub( expr_string, #DELY_EXPR_PREFIX + 1 )
+	end
+
+	if ( string.sub( actual_expr, 1, #FUNC_CALL_PREFIX ) == FUNC_CALL_PREFIX ) then
+		local first_sep_pos = string.find( actual_expr, ARGS_SEPA_PREFIX, #FUNC_CALL_PREFIX + 1, true )
+			if ( first_sep_pos ) then
+			local func_name = string.sub( actual_expr, #FUNC_CALL_PREFIX + 1, first_sep_pos - 1 )
+			local args_str = string.sub( actual_expr, first_sep_pos + #ARGS_SEPA_PREFIX )
+			local args_table = parse_kv_pairs( args_str, false )
+
+			local param_values = { }
+			for i, _ in pairs( args_table ) do
+				if ( string.sub( _, 1, #DELY_EXPR_PREFIX ) == DELY_EXPR_PREFIX ) then
+					local stripped_value = string.sub( _, #DELY_EXPR_PREFIX + 1 )
+					local param_result, param_correct = evaluate_delayed_expression( stripped_value, pattern, shooter, tar_x, tar_y )
+					if ( param_correct ) then
+						param_values[ i ] = param_result
+					else
+						return nil, false
+					end
+				else
+					param_values[ i ] = tonumber( _ ) or _
+				end
+			end
+
+			local param_count = 0
+			for _ in pairs( param_values ) do
+				param_count = param_count + 1
+			end
+
+			local para_count_key = 'para_' .. param_count
+			local para_names = nil
+			if ( e_cmd_funcs[ func_name ].para_names and
+				 e_cmd_funcs[ func_name ].para_names[ para_count_key ] ) then
+				para_names = e_cmd_funcs[ func_name ].para_names[ para_count_key ]
+			end
+			if ( not para_names ) then
+				return nil, false
+			end
+
+			local paras = { }
+			for _, para_name in ipairs( para_names ) do
+				if ( param_values[ para_name ] ) then
+					table.insert( paras, param_values[ para_name ] )
+				else
+					return nil, false
+				end
+			end
+
+			local func_result, max_paras = nil, e_cmd_funcs[ func_name ].max_paras
+
+			if ( #paras > max_paras ) then
+				command_print( func_name .. '(', '$empty_command_error_paras_overflow', tostring( #paras ), tostring( max_paras ) )
+				return nil, false
+			end
+
+			if ( #paras == 1 and e_cmd_funcs[ func_name ].action_1_paras ) then
+				func_result = e_cmd_funcs[ func_name ].action_1_paras( { }, true, shooter, paras[ 1 ] )
+			elseif ( #paras == 2 and e_cmd_funcs[ func_name ].action_2_paras ) then
+				func_result = e_cmd_funcs[ func_name ].action_2_paras( { }, true, shooter, paras[ 1 ], paras[ 2 ] )
+			elseif ( #paras == 3 and e_cmd_funcs[ func_name ].action_3_paras ) then
+				func_result = e_cmd_funcs[ func_name ].action_3_paras( { }, true, shooter, paras[ 1 ], paras[ 2 ], paras[ 3 ] )
+			elseif ( #paras == 4 and e_cmd_funcs[ func_name ].action_4_paras ) then
+				func_result = e_cmd_funcs[ func_name ].action_4_paras( { }, true, shooter, paras[ 1 ], paras[ 2 ], paras[ 3 ], paras[ 4 ] )
+			else
+				return nil, false
+			end
+
+			return func_result, true
+		end
+	end
+
+	local paren_pos = string.find( actual_expr, '(', 1, true )
+	if ( paren_pos and string.sub( actual_expr, #actual_expr, #actual_expr ) == ')' ) then
+		local func_name = string.sub( actual_expr, 1, paren_pos - 1 )
+		local params_str = string.sub( actual_expr, paren_pos + 1, #actual_expr - 1 )
+		local func_result, func_correct = parse_and_execute_function( func_name, params_str, pattern, shooter, tar_x, tar_y )
+		if ( func_correct ) then
+			return func_result, true
+		else
+			return nil, false
+		end
+	end
+
+	local tokens = { }
+	local i = 1
+	local len = #actual_expr
+
+	while ( i <= len ) do
+		local char = string.sub( actual_expr, i, i )
+
+		if ( char == '@' ) then
+			local j = i + 1
+			while ( j <= len and string.match( string.sub( actual_expr, j, j ), '[%a_]' ) ) do
+				j = j + 1
+			end
+			local selector = string.sub( actual_expr, i, j - 1 )
+			table.insert( tokens, { type = 'SELECTOR', value = selector } )
+			i = j
+		elseif ( char == '~' ) then
+			if ( i + 1 <= len and string.sub( actual_expr, i + 1, i + 1 ) == pattern ) then
+				local j = i + 2
+				while ( j <= len and string.sub( actual_expr, j, j ) ~= pattern ) do
+					j = j + 1
+				end
+				if ( j <= len ) then
+					local tilde_type = string.sub( actual_expr, i + 2, j - 1 )
+					table.insert( tokens, { type = 'TILDE', value = tilde_type } )
+					i = j + 1
+				else
+					return nil, false
+				end
+			else
+				return nil, false
+			end
+		elseif ( string.match( char, '[%+%-*/]' ) ) then
+			table.insert( tokens, { type = 'OPERATOR', value = char } )
+			i = i + 1
+		elseif ( string.match( char, '[%d%.]' ) ) then
+			local j = i
+			while ( j <= len and string.match( string.sub( actual_expr, j, j ), '[%d%.]' ) ) do
+				j = j + 1
+			end
+			local num_str = string.sub( actual_expr, i, j - 1 )
+			table.insert( tokens, { type = 'NUMBER', value = num_str } )
+			i = j
+		elseif ( string.match( char, '[%a_]' ) ) then
+			local j = i
+			while ( j <= len and string.match( string.sub( actual_expr, j, j ), '[%a_0-9]' ) ) do
+				j = j + 1
+			end
+			local func_name = string.sub( actual_expr, i, j - 1 )
+			if ( j <= len and string.sub( actual_expr, j, j ) == '(' ) then
+				local paren_depth = 1
+				local k = j + 1
+				while ( k <= len and paren_depth > 0 ) do
+					local next_char = string.sub( actual_expr, k, k )
+					if ( next_char == '(' ) then
+						paren_depth = paren_depth + 1
+					elseif ( next_char == ')' ) then
+						paren_depth = paren_depth - 1
+					end
+					k = k + 1
+				end
+
+				if ( paren_depth == 0 ) then
+					local params_str = string.sub( actual_expr, j + 1, k - 2 )
+					table.insert( tokens, { type = 'FUNCTION', value = func_name, paras = params_str } )
+					i = k
+				else
+					return nil, false
+				end
+			else
+				return nil, false
+			end
+		elseif ( string.match( char, '%s' ) ) then
+			i = i + 1
+		else
+			return nil, false
+		end
+	end
+
+	local result, num_to_operate, current_operator, is_correct = nil, nil, nil, true
+
+	for _, token in ipairs( tokens ) do
+		if ( token.type == 'NUMBER' ) then
+			local num_value = tonumber( token.value )
+			if ( num_value == nil ) then
+				return nil, false
+			end
+
+			if ( result or current_operator ) then
+				num_to_operate = num_value
+			else
+				result = num_value
+			end
+		elseif ( token.type == 'SELECTOR' ) then
+			local selector_value = command_at_handler( token.value, 'none', shooter, tar_x, tar_y )
+
+			if ( result or current_operator ) then
+				num_to_operate = selector_value
+			else
+				result = selector_value
+			end
+		elseif ( token.type == 'TILDE' ) then
+			local tilde_value = command_at_handler( '~', token.value, shooter, tar_x, tar_y )
+
+			if ( result or current_operator ) then
+				num_to_operate = tilde_value
+			else
+				result = tilde_value
+			end
+		elseif ( token.type == 'FUNCTION' ) then
+			local func_result, func_correct = parse_and_execute_function( token.value, token.paras, pattern, shooter, tar_x, tar_y )
+			if ( not func_correct ) then
+				return nil, false
+			end
+
+			if ( result or current_operator ) then
+				num_to_operate = func_result
+			else
+				result = func_result
+			end
+		elseif ( token.type == 'OPERATOR' ) then
+			if ( current_operator == nil ) then
+				current_operator = token.value
+			else
+				return nil, false
+			end
+		end
+
+		result, current_operator, is_correct = binary_operation_handler( result, num_to_operate, current_operator )
+		num_to_operate = nil
+		if ( not is_correct ) then
+			return nil, false
+		end
+	end
+
+	return result, true
 end
 
 ---解析 command 的参数并求值

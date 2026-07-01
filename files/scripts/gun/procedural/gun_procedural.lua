@@ -1,5 +1,9 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
+function RandomFromArray( arr )
+	return get_random_from( arr )
+end
+
 function wand_add_random_cards( gun, entity_id, level )
 
 	local is_rare = gun.is_rare
