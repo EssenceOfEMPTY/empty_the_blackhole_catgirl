@@ -662,14 +662,10 @@ local new_perks =
 				{ 'full_inventory_slots_y' , 1 },
 			}, nil )
 
-			if ( not EntityHasTag( who, 'more_spell_inv_1' ) ) then
-				EntityAddTag( who, 'more_spell_inv_1' )
-
+			if ( inv_y == 1 ) then
 				inv.full_inventory_slots_y = inv_y + 1
 			else
-				if ( not EntityHasTag( who, 'more_spell_inv_2' ) ) then
-					EntityAddTag( who, 'more_spell_inv_2' )
-
+				if ( inv_y == 2 ) then
 					inv.full_inventory_slots_y = inv_y + 1
 				else
 					inv.full_inventory_slots_y = 1
@@ -677,16 +673,9 @@ local new_perks =
 				end
 			end
 
-			set_comp_value( who, 'Inventory2Component', nil, inv, nil, nil )
+			set_comp_value( who, 'Inventory2Component', nil, to_any_pair( inv ), nil, nil )
 		end,
 		func_remove = function( who )
-			if ( EntityHasTag( who, 'more_spell_inv_2' ) ) then
-				EntityRemoveTag( who, 'more_spell_inv_2' )
-			end
-			if ( EntityHasTag( who, 'more_spell_inv_1' ) ) then
-				EntityRemoveTag( who, 'more_spell_inv_1' )
-			end
-
 			set_comp_value( who, 'Inventory2Component', nil, {
 				{ 'full_inventory_slots_y', 1 },
 				{ 'full_inventory_slots_x', 16 },

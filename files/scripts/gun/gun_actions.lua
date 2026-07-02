@@ -421,7 +421,7 @@ local new_actions =
 			if ( reflecting ) then
 				add_projectile( empty_path .. 'entities/projectiles/deck/holy_orb.xml' )
 			else
-				if ( is_in_mul( 'MANA_REDUCE', { deck, hand, discarded } ) ) then
+				if ( is_in_loc( 'MANA_REDUCE', { deck, hand, discarded } ) ) then
 					c.spread_degrees = 30
 
 					for _ = 1, 7, 1 do

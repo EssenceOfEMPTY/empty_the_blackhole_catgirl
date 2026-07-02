@@ -364,28 +364,49 @@ end
 ---@param v any
 ---@param search table
 ---@return boolean is_in
+---@return number? i_j
 function is_in( v, search )
 	for i, _ in ipairs( search ) do
 		if ( _ == v ) then
-			return true
+			return true, i
 		end
 	end
 
-	return false
+	return false, nil
 end
 
 ---检查多个 search 内是否包含 v
 ---@param v any
 ---@param searches table[]
 ---@return boolean is_in_mul
+---@return { [ 1 ]: number?, [ 2 ]: number? } i_j
 function is_in_mul( v, searches )
 	for i, _ in ipairs( searches ) do
-		if ( is_in( v, _ ) ) then
-			return true
+		local is_corr, i_j = is_in( v, _ )
+
+		if ( is_corr ) then
+			return true, { i, i_j }
 		end
 	end
 
-	return false
+	return false, { nil, nil }
+end
+
+---检查多个区域内是否有 spell
+---@param spell string
+---@param locs table[]
+---@return boolean is_in_loc
+---@return { [ 1 ]: number?, [ 2 ]: number? } i_j
+function is_in_loc( spell, locs )
+	for i, loc in ipairs( locs ) do
+		for j, _ in ipairs( loc ) do
+			if ( _.id == spell ) then
+				return true, { i, j }
+			end
+		end
+	end
+
+	return false, { nil, nil }
 end
 
 ---判断实体是否为玩家, 含变形
@@ -558,7 +579,7 @@ end
 ---将 { key = value } 内联表转换为 any_pair[] 格式 { { 'key', value } }
 ---@param v_table table<string, any>
 ---@return any_pair[] v_table
-function convert_any_air( v_table )
+function to_any_pair( v_table )
 	local res = { }
 
 	for k, v in pairs( v_table ) do
@@ -1498,19 +1519,25 @@ end
 ---获取所有玩家, 包括变形中的
 ---@return number[] players
 function get_all_players( )
-	local players = EntityGetWithTag( 'player_unit' ) or { }
+	local player, alive_player = EntityGetWithTag( 'player_unit' ), { }
 
-	add_table( players, EntityGetWithTag( 'polymorphed_player' ) or { } )
+	add_table( player, EntityGetWithTag( 'polymorphed_player' ) )
 
-	return players
+	for i, _ in ipairs( player ) do
+		if ( is_alive( _ ) ) then
+			table.insert( alive_player, player[ _ ] )
+		end
+	end
+
+	return player
 end
 
 ---获取所有投射物
 ---@return number[] projs
 function get_all_projs( )
-	local projs = EntityGetWithTag( 'projectile' ) or { }
+	local projs = EntityGetWithTag( 'projectile' )
 
-	add_table( projs, EntityGetWithTag( 'projectile_player' ) or { } )
+	add_table( projs, EntityGetWithTag( 'projectile_player' ) )
 
 	return remove_dupes( projs )
 end

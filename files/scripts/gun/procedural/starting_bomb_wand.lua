@@ -65,7 +65,7 @@ gun.mana_max = math.ceil( mana_max * mana_mul )
 gun.mana = gun.mana_max
 gun.mana_charge_speed = math.ceil( gun.mana_max / 6 )
 
-gun = convert_any_air( gun )
+gun = to_any_pair( gun )
 
 set_comp_value( init_wand, 'AbilityComponent', nil, gun, nil, nil )
 
