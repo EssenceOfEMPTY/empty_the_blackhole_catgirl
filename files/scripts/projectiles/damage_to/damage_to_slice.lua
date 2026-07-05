@@ -1,3 +1,3 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-damage_to( get_root_entity( ), 'slice' )
+damage_to( get_root_entity( ), 'slice', 0.5, 1 )

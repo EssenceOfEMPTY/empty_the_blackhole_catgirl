@@ -1,3 +1,3 @@
 dofile_once( 'mods/empty_the_blackhole_catgirl/files/scripts/empty/empty_utility.lua' )
 
-damage_to( get_root_entity( ), 'physics_hit' )
+damage_to( get_root_entity( ), 'physics_hit', 0.5, 1 )

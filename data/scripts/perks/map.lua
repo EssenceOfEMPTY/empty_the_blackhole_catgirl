@@ -9,8 +9,8 @@ y = y - 4
 local orbdata = orb_map_get( )
 local pw, mx = check_parallel_pos( x )
 
-local timer = 0
 local timercomp = get_all_comp( entity, 'VariableStorageComponent', nil, 'map_timer' )[ 1 ]
+local timer = ComponentGetValue2( timercomp, 'value_int' ) or 0
 
 if ( timercomp ) and ( entity ~= player ) then
 	local is_moving = false

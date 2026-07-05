@@ -36,7 +36,6 @@ local magics = {
 	'NO_KUMMITUS',
 
 	-- 视觉设置
-	'REMOVE_LOW_HP_FLASH',
 	'VISION_IMPROVE',
 
 	-- 漏洞 & 轮椅设置
@@ -51,7 +50,9 @@ end
 
 ---<<<<<<<<<<<<<<<<<<<<<<<< 通用 lua 覆写 >>>>>>>>>>>>>>>>>>>>>>>>---
 
-local overwrites = { }
+local overwrites = {
+	'entities/animals/boss_centipede/ending/sampo_normal_ending.lua'
+}
 
 -- 新内容设置
 if ( get_setting_by_def( 'EFFECT_CHANGE_INIT_WAND_BLUE' ) ) then
@@ -277,6 +278,10 @@ function OnPlayerSpawned( player )
 				{ 'script_source_file', empty_path .. 'settings_lua/potion_change.lua' },
 				{ 'execute_every_n_frame', 180 },
 			}, nil )
+		end
+
+		if ( get_setting_by_def( 'REMOVE_LOW_HP_FLASH' ) ) then
+			set_world_stat( 'damage_flash_multiplier', 0 )
 		end
 
 		local kick = {

@@ -456,6 +456,19 @@ function atan( y, x )
 	end
 end
 
+---返回任意数据的全大写数据类型
+---@param any any
+---@return string upper_type
+function upper_type( any )
+	local any_type = string.upper( type( any ) )
+
+	if ( any_type == 'TABLE' ) then
+		return 'NUMBER[ ]'
+	else
+		return any_type
+	end
+end
+
 ---获取翻译
 ---@param trans_key string
 ---@param ... any
@@ -547,19 +560,6 @@ function get_para_pos( x, y )
 	p_info.p_y = ( ( y + y_half ) % m_high ) - y_half
 
 	return p_info
-end
-
----返回任意数据的全大写数据类型
----@param any any
----@return string upper_type
-function upper_type( any )
-	local any_type = string.upper( type( any ) )
-
-	if ( any_type == 'TABLE' ) then
-		return 'NUMBER[ ]'
-	else
-		return any_type
-	end
 end
 
 ---根据 k_table 模板表创建键值全为 v 的表
@@ -1519,17 +1519,11 @@ end
 ---获取所有玩家, 包括变形中的
 ---@return number[] players
 function get_all_players( )
-	local player, alive_player = EntityGetWithTag( 'player_unit' ), { }
+	local players = get_all_entity( all_tag.player )
 
-	add_table( player, EntityGetWithTag( 'polymorphed_player' ) )
+	add_table( players, get_all_entity( all_tag.poly_player ) )
 
-	for i, _ in ipairs( player ) do
-		if ( is_alive( _ ) ) then
-			table.insert( alive_player, player[ _ ] )
-		end
-	end
-
-	return player
+	return players
 end
 
 ---获取所有投射物
@@ -1606,6 +1600,36 @@ function get_closest_player( tar_id, tar_x, tar_y )
 	end
 end
 
+---获取世界状态
+---@param info string
+---@param default any?
+---@return any value
+function get_world_stat( info, default )
+	return get_comp_value( GameGetWorldStateEntity( ), 'WorldStateComponent', nil, {
+		{ info, default },
+	}, nil )
+end
+
+---设置世界状态
+---@param info string
+---@param value any?
+---@return boolean is_correct
+function set_world_stat( info, value )
+	local v = get_comp_value( GameGetWorldStateEntity( ), 'WorldStateComponent', nil, {
+		{ info, nil },
+	}, nil )
+
+	if ( v ~= nil ) then
+		set_comp_value( GameGetWorldStateEntity( ), 'WorldStateComponent', nil, {
+			{ info, value },
+		}, nil, nil )
+
+		return true
+	else
+		return false
+	end
+end
+
 ---随机获取 1 种材料
 ---@return string mat
 function get_random_mat( )
@@ -1617,9 +1641,29 @@ function get_random_mat( )
 		add_table( all_mat, CellFactory_GetAllFires( ) or { } )
 	end
 
-	--info_print( all_mat )
-
 	return get_random_from( all_mat )
+end
+
+---按最大生命值点金实体
+---@param entity number|number[]
+function midas_entity( entity )
+	if ( type( entity ) == 'number' ) then
+		entity = { entity }
+	end
+
+	for i, _ in ipairs( entity or { } ) do
+		if ( is_alive( _ ) ) then
+			local max_hp = get_comp_value( _, 'DamageModelComponent', nil, {
+				{ 'max_hp', 0 },
+			}, nil )
+
+			if ( max_hp > 0 ) then
+				local x, y = EntityGetTransform( _ )
+
+				EntityInflictDamage( 0, max_hp * 100, 'DAMAGE_CURSE', get_trans_text( 'damage_midas' ), 'CONVERT_TO_MATERIAL', 0, 0, 0, x, y, 0 )
+			end
+		end
+	end
 end
 
 ---创建自定义价值的黄金块
@@ -2352,7 +2396,7 @@ function damage_to( proj, dmg_type, mul, base_dmg )
 		local sum = 0
 
 		set_comp_value( proj, 'ProjectileComponent', nil, {
-			damage = 0,
+			{ 'damage', 0 },
 		}, function ( comp )
 			sum = sum + math.abs( ComponentGetValue2( comp, 'damage' ) or 0 )
 		end, nil )
@@ -2370,7 +2414,7 @@ function damage_to( proj, dmg_type, mul, base_dmg )
 			end
 		end, nil )
 
-		sum = base_dmg + sum * mul
+		sum = sum * mul + base_dmg
 
 		if ( dmg_type == 'projectile' ) then
 			set_comp_value( proj, 'ProjectileComponent', nil, {
